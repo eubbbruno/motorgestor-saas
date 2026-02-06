@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Local pnpm shim (works without global install)
+exec corepack pnpm "$@"
+
