@@ -134,6 +134,26 @@ Inclui landing premium + páginas legais + blog:
 
 ---
 
+## Variáveis de ambiente obrigatórias para Vercel
+Configure em **Project → Settings → Environment Variables** (Production e Preview):
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase → Project Settings → API → Project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase → Project Settings → API → anon public key
+- `NEXT_PUBLIC_SITE_URL`: URL final do site (ex.: `https://seu-dominio.com`)
+
+Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem de dados podem exibir erro em runtime.
+
+---
+
+## Deploy: erros comuns e como resolver
+### 1) "Cannot find module 'react-day-picker' ..."
+O componente `components/ui/calendar.tsx` (shadcn/ui) depende de `react-day-picker`.
+
+Como resolver:
+- Garanta que `react-day-picker` está em `dependencies`
+- Rode `pnpm install` e depois `pnpm build`
+
+---
+
 ## O que falta configurar (Checklist)
 ### Obrigatório para produção
 - **Vercel**
