@@ -50,6 +50,14 @@ grant execute on function public.is_admin() to authenticated;
 
 -- Foreign keys (aplicadas APÓS as tabelas existirem)
 do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'companies_created_by_fkey') then
+    alter table public.companies
+      add constraint companies_created_by_fkey
+      foreign key (created_by) references auth.users(id) on delete restrict;
+  end if;
+end $$;
+
+do $$ begin
   if not exists (select 1 from pg_constraint where conname = 'profiles_id_fkey') then
     alter table public.profiles
       add constraint profiles_id_fkey
@@ -168,14 +176,25 @@ drop policy if exists "companies_select_own" on public.companies;
 create policy "companies_select_own"
 on public.companies
 for select
-using (id = public.current_company_id());
+using (
+  id = public.current_company_id()
+  or created_by = public.current_user_id()
+);
 
 drop policy if exists "companies_insert_authenticated" on public.companies;
 create policy "companies_insert_authenticated"
 on public.companies
 for insert
 to authenticated
-with check (true);
+with check (
+  created_by = public.current_user_id()
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = public.current_user_id()
+      and p.company_id is null
+  )
+);
 
 drop policy if exists "companies_update_admin" on public.companies;
 create policy "companies_update_admin"
@@ -495,14 +514,25 @@ drop policy if exists "companies_select_own" on public.companies;
 create policy "companies_select_own"
 on public.companies
 for select
-using (id = public.current_company_id());
+using (
+  id = public.current_company_id()
+  or created_by = public.current_user_id()
+);
 
 drop policy if exists "companies_insert_authenticated" on public.companies;
 create policy "companies_insert_authenticated"
 on public.companies
 for insert
 to authenticated
-with check (true);
+with check (
+  created_by = public.current_user_id()
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = public.current_user_id()
+      and p.company_id is null
+  )
+);
 
 drop policy if exists "companies_update_admin" on public.companies;
 create policy "companies_update_admin"

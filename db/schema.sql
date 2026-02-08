@@ -27,11 +27,15 @@ end $$;
 -- Tables (sem FKs / sem triggers / sem RLS)
 create table if not exists public.companies (
   id uuid primary key default gen_random_uuid(),
+  created_by uuid not null default auth.uid(),
   name text not null,
   slug text not null unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Garante 1 empresa por usuário (onboarding)
+create unique index if not exists companies_created_by_unique on public.companies(created_by);
 
 create table if not exists public.profiles (
   id uuid primary key,
