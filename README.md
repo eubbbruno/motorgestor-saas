@@ -39,6 +39,9 @@ Crie um projeto no Supabase e execute os SQLs em ordem no **SQL Editor**:
 1) `db/schema.sql`
 2) `db/rls.sql`
 
+Se você já tem um banco existente (staging/prod) e o onboarding falha, rode antes:
+- `db/migrations/2026_onboarding_companies.sql`
+
 No Supabase, em **Authentication → URL Configuration**, configure:
 - **Site URL**: `http://localhost:3000`
 - **Redirect URLs**: `http://localhost:3000/**`
@@ -76,6 +79,10 @@ pnpm start
 Execute no **SQL Editor**, em ordem:
 1) `db/schema.sql` (tabelas/tipos/índices)
 2) `db/rls.sql` (FKs, funções, triggers, RLS e policies)
+
+Para **banco existente** (incremental, sem destruir dados):
+1) `db/migrations/2026_onboarding_companies.sql`
+2) `db/rls.sql`
 
 3) **Auth URLs**
 - Dev:
