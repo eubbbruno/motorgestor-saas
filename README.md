@@ -35,7 +35,9 @@ corepack pnpm install
 ```
 
 ### 2) Configurar Supabase
-Crie um projeto no Supabase e execute o SQL em `db/schema.sql` no **SQL Editor**.
+Crie um projeto no Supabase e execute os SQLs em ordem no **SQL Editor**:
+1) `db/schema.sql`
+2) `db/rls.sql`
 
 No Supabase, em **Authentication → URL Configuration**, configure:
 - **Site URL**: `http://localhost:3000`
@@ -71,7 +73,9 @@ pnpm start
 1) **Criar projeto** no Supabase.
 
 2) **Aplicar schema + RLS**  
-Execute `db/schema.sql` no **SQL Editor**.
+Execute no **SQL Editor**, em ordem:
+1) `db/schema.sql` (tabelas/tipos/índices)
+2) `db/rls.sql` (FKs, funções, triggers, RLS e policies)
 
 3) **Auth URLs**
 - Dev:
@@ -136,7 +140,7 @@ Inclui landing premium + páginas legais + blog:
   - Importar repo e configurar env vars (Production/Preview).
   - Configurar domínio e HTTPS.
 - **Supabase**
-  - Criar projeto e rodar `db/schema.sql`.
+  - Criar projeto e rodar `db/schema.sql` e depois `db/rls.sql`.
   - Configurar Auth URLs (Site URL + Redirect URLs).
   - Validar RLS (isolamento por `company_id`).
 - **Imagem da Hero (asset local)**
