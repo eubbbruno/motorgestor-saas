@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const json = await req.json().catch(() => null);
-  const parsed = Schema.safeParse(json);
+  const input = await req.json().catch(() => null);
+  const parsed = Schema.safeParse(input);
   if (!parsed.success) {
     return NextResponse.json(
       { ok: false, error: "Dados inválidos.", details: parsed.error.flatten() },
@@ -28,7 +28,23 @@ export async function POST(req: NextRequest) {
   }
 
   // SSR Auth: usa cookies do request/response (não depende de localStorage)
-  let response = NextResponse.json({ ok: true });
+  const pendingCookies: Array<{
+    name: string;
+    value: string;
+    options: Parameters<NextResponse["cookies"]["set"]>[2];
+  }> = [];
+
+  const respondJson = (
+    body: unknown,
+    init?: Parameters<typeof NextResponse.json>[1],
+  ) => {
+    const res = NextResponse.json(body, init);
+    pendingCookies.forEach(({ name, value, options }) => {
+      res.cookies.set(name, value, options);
+    });
+    return res;
+  };
+
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
@@ -36,9 +52,7 @@ export async function POST(req: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          // Mantém coerência request/response
-          req.cookies.set(name, value);
-          response.cookies.set(name, value, options);
+          pendingCookies.push({ name, value, options });
         });
       },
     },
@@ -55,7 +69,7 @@ export async function POST(req: NextRequest) {
       hasSession: Boolean(sessionData?.session),
       userError: userError?.message,
     });
-    return NextResponse.json(
+    return respondJson(
       {
         ok: false,
         error: "Sessão inválida. Faça login novamente.",
@@ -86,8 +100,12 @@ export async function POST(req: NextRequest) {
       details: companyError?.details,
       hint: companyError?.hint,
     });
-    return NextResponse.json(
-      { ok: false, error: companyError?.message ?? "Falha ao criar empresa." },
+    return respondJson(
+      {
+        ok: false,
+        error:
+          "Não foi possível criar a empresa agora. Faça logout/login e tente novamente.",
+      },
       { status: 403 },
     );
   }
@@ -113,13 +131,16 @@ export async function POST(req: NextRequest) {
       details: profileError.details,
       hint: profileError.hint,
     });
-    return NextResponse.json(
-      { ok: false, error: profileError.message ?? "Falha ao configurar perfil." },
+    return respondJson(
+      {
+        ok: false,
+        error:
+          "Empresa criada, mas não foi possível finalizar seu perfil. Faça logout/login e tente novamente.",
+      },
       { status: 403 },
     );
   }
 
-  response = NextResponse.json({ ok: true, companyId: company.id });
-  return response;
+  return respondJson({ ok: true, companyId: company.id });
 }
 

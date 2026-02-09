@@ -191,15 +191,8 @@ on public.companies
 for insert
 to authenticated
 with check (
-  -- onboarding: a empresa precisa ser “do usuário”
-  created_by = public.current_user_id()
-  -- onboarding: o usuário ainda não tem company_id (aceita profile inexistente ou NULL)
-  and not exists (
-    select 1
-    from public.profiles p
-    where p.id = public.current_user_id()
-      and p.company_id is not null
-  )
+  auth.uid() is not null
+  and created_by = auth.uid()
 );
 
 drop policy if exists "companies_update_admin" on public.companies;
@@ -542,13 +535,8 @@ on public.companies
 for insert
 to authenticated
 with check (
-  created_by = public.current_user_id()
-  and not exists (
-    select 1
-    from public.profiles p
-    where p.id = public.current_user_id()
-      and p.company_id is not null
-  )
+  auth.uid() is not null
+  and created_by = auth.uid()
 );
 
 drop policy if exists "companies_update_admin" on public.companies;
@@ -881,13 +869,8 @@ on public.companies
 for insert
 to authenticated
 with check (
-  created_by = public.current_user_id()
-  and exists (
-    select 1
-    from public.profiles p
-    where p.id = public.current_user_id()
-      and p.company_id is null
-  )
+  auth.uid() is not null
+  and created_by = auth.uid()
 );
 
 drop policy if exists "companies_update_admin" on public.companies;
