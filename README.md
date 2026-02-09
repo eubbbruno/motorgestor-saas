@@ -163,6 +163,10 @@ Como resolver:
 
 ## O que falta configurar (Checklist)
 ### Obrigatório para produção
+- **Supabase (PROD)**:
+  - Rodar no Supabase de produção (o mesmo que a Vercel aponta):
+    1) `db/migrations/2026_onboarding_companies.sql`
+    2) `db/rls.sql`
 - **Vercel**
   - Importar repo e configurar env vars (Production/Preview).
   - Configurar domínio e HTTPS.

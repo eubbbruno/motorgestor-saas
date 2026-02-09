@@ -52,26 +52,21 @@ export default function OnboardingPage() {
       if (userError) throw userError;
       if (!user) throw new Error("Sessão inválida. Faça login novamente.");
 
-      const { data: company, error: companyError } = await supabase
-        .from("companies")
-        .insert({
+      const res = await fetch("/api/onboarding/company", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
           name: values.companyName,
           slug: suggestedSlug || slugify(values.companyName),
-        })
-        .select("id")
-        .single();
+        }),
+      });
+      const body = (await res.json().catch(() => null)) as
+        | { ok: true; companyId: string }
+        | { ok: false; error: string };
 
-      if (companyError) throw companyError;
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          company_id: company.id,
-          role: "admin",
-        })
-        .eq("id", user.id);
-
-      if (profileError) throw profileError;
+      if (!res.ok || !body || body.ok === false) {
+        throw new Error(body && "error" in body ? body.error : "Falha ao criar empresa.");
+      }
 
       toast.success("Empresa configurada. Bora vender!");
       router.push("/app");
