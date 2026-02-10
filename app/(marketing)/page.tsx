@@ -93,19 +93,19 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Card className="relative overflow-hidden border bg-background/50 p-2 shadow-sm backdrop-blur">
+            <Card className="relative overflow-hidden border bg-background/50 p-2 shadow-sm backdrop-blur lg:scale-[1.03]">
               <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-emerald-400/15 blur-3xl" />
               <div className="pointer-events-none absolute -left-24 -bottom-24 size-72 rounded-full bg-blue-500/15 blur-3xl" />
 
-              <div className="relative aspect-16/10 overflow-hidden rounded-lg border bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.22),transparent_55%),radial-gradient(900px_circle_at_80%_40%,rgba(59,130,246,.22),transparent_55%)]">
+              <div className="relative aspect-16/11 overflow-hidden rounded-lg border bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.22),transparent_55%),radial-gradient(900px_circle_at_80%_40%,rgba(59,130,246,.22),transparent_55%)] lg:aspect-16/12">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(500px_circle_at_70%_40%,rgba(16,185,129,.18),transparent_60%)]" />
                 <Image
-                  src="/hero-3d.png"
-                  alt="Ilustração 3D do MotorGestor"
+                  src="/hero-nova.png"
+                  alt="Interface do MotorGestor"
                   fill
-                  className="object-contain p-6 drop-shadow-[0_18px_38px_rgba(0,0,0,0.35)] sm:p-8"
+                  className="object-cover object-center drop-shadow-[0_18px_38px_rgba(0,0,0,0.35)]"
                   priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 56vw, 100vw"
                 />
               </div>
               <div className="grid gap-2 p-4 sm:grid-cols-3">

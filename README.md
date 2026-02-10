@@ -175,7 +175,7 @@ Como resolver:
   - Configurar Auth URLs (Site URL + Redirect URLs).
   - Validar RLS (isolamento por `company_id`).
 - **Imagem da Hero (asset local)**
-  - Colocar a imagem 3D transparente em `public/hero-3d.png` (PNG/SVG sem background).
+  - Colocar a imagem em `public/hero-nova.png`.
 
 ### Opcional (recomendado)
 - **E-mail transacional** (Resend/Postmark) para contato/convites/reset.
