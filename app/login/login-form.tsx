@@ -7,8 +7,9 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Loader2Icon } from "lucide-react";
 
-import { getErrorMessage } from "@/lib/errors";
+import { getHumanErrorMessage } from "@/lib/errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -43,7 +44,7 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
       router.refresh();
     } catch (err: unknown) {
       toast.error("Não foi possível entrar.", {
-        description: getErrorMessage(err) ?? "Tente novamente em instantes.",
+        description: getHumanErrorMessage(err) ?? "Tente novamente em instantes.",
       });
     } finally {
       setLoading(false);
@@ -51,7 +52,7 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
         <p className="text-sm text-muted-foreground">
@@ -61,40 +62,55 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
 
       <Card className="bg-background/60 p-6">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="voce@empresa.com"
-              autoComplete="email"
-              {...form.register("email")}
-            />
-            {form.formState.errors.email ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.email.message}
-              </p>
-            ) : null}
-          </div>
+          <fieldset disabled={loading} aria-busy={loading} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="voce@empresa.com"
+                autoComplete="email"
+                aria-invalid={Boolean(form.formState.errors.email)}
+                aria-describedby={form.formState.errors.email ? "email-error" : undefined}
+                className={form.formState.errors.email ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("email")}
+              />
+              {form.formState.errors.email ? (
+                <p id="email-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.email.message}
+                </p>
+              ) : null}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              {...form.register("password")}
-            />
-            {form.formState.errors.password ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.password.message}
-              </p>
-            ) : null}
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                aria-invalid={Boolean(form.formState.errors.password)}
+                aria-describedby={form.formState.errors.password ? "password-error" : undefined}
+                className={form.formState.errors.password ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("password")}
+              />
+              {form.formState.errors.password ? (
+                <p id="password-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.password.message}
+                </p>
+              ) : null}
+            </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
-          </Button>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
+            </Button>
+          </fieldset>
 
           <Separator />
 

@@ -7,8 +7,9 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Loader2Icon } from "lucide-react";
 
-import { getErrorMessage } from "@/lib/errors";
+import { getHumanErrorMessage } from "@/lib/errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -61,7 +62,7 @@ export default function CadastroPage() {
       router.refresh();
     } catch (err: unknown) {
       toast.error("Não foi possível criar sua conta.", {
-        description: getErrorMessage(err) ?? "Tente novamente em instantes.",
+        description: getHumanErrorMessage(err) ?? "Tente novamente em instantes.",
       });
     } finally {
       setLoading(false);
@@ -69,7 +70,7 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Criar conta</h1>
         <p className="text-sm text-muted-foreground">
@@ -79,50 +80,73 @@ export default function CadastroPage() {
 
       <Card className="bg-background/60 p-6">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Nome</Label>
-            <Input id="fullName" placeholder="Seu nome" {...form.register("fullName")} />
-            {form.formState.errors.fullName ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.fullName.message}
-              </p>
-            ) : null}
-          </div>
+          <fieldset disabled={loading} aria-busy={loading} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Nome</Label>
+              <Input
+                id="fullName"
+                placeholder="Seu nome"
+                autoComplete="name"
+                aria-invalid={Boolean(form.formState.errors.fullName)}
+                aria-describedby={form.formState.errors.fullName ? "fullName-error" : undefined}
+                className={form.formState.errors.fullName ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("fullName")}
+              />
+              {form.formState.errors.fullName ? (
+                <p id="fullName-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.fullName.message}
+                </p>
+              ) : null}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="voce@empresa.com"
-              autoComplete="email"
-              {...form.register("email")}
-            />
-            {form.formState.errors.email ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.email.message}
-              </p>
-            ) : null}
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="voce@empresa.com"
+                autoComplete="email"
+                aria-invalid={Boolean(form.formState.errors.email)}
+                aria-describedby={form.formState.errors.email ? "email-error" : undefined}
+                className={form.formState.errors.email ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("email")}
+              />
+              {form.formState.errors.email ? (
+                <p id="email-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.email.message}
+                </p>
+              ) : null}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              {...form.register("password")}
-            />
-            {form.formState.errors.password ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.password.message}
-              </p>
-            ) : null}
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                aria-invalid={Boolean(form.formState.errors.password)}
+                aria-describedby={form.formState.errors.password ? "password-error" : undefined}
+                className={form.formState.errors.password ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("password")}
+              />
+              {form.formState.errors.password ? (
+                <p id="password-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.password.message}
+                </p>
+              ) : null}
+            </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Criando..." : "Criar conta"}
-          </Button>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Criando...
+                </>
+              ) : (
+                "Criar conta"
+              )}
+            </Button>
+          </fieldset>
 
           <Separator />
 

@@ -7,6 +7,7 @@ import { LeadForm } from "@/features/leads/lead-form";
 import { useCreateLead } from "@/features/leads/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
 import type { LeadFormValues } from "@/features/leads/schema";
+import { getHumanErrorMessage } from "@/lib/errors";
 
 export default function NovoLeadPage() {
   const router = useRouter();
@@ -20,15 +21,21 @@ export default function NovoLeadPage() {
       return;
     }
 
-    const l = await create.mutateAsync({
-      values,
-      companyId: profile.data.company_id,
-      userId: profile.data.id,
-    });
+    try {
+      const l = await create.mutateAsync({
+        values,
+        companyId: profile.data.company_id,
+        userId: profile.data.id,
+      });
 
-    toast.success("Lead criado.");
-    router.push(`/app/leads/${l.id}`);
-    router.refresh();
+      toast.success("Lead criado.");
+      router.push(`/app/leads/${l.id}`);
+      router.refresh();
+    } catch (err: unknown) {
+      toast.error("Não foi possível criar o lead.", {
+        description: getHumanErrorMessage(err) ?? "Tente novamente.",
+      });
+    }
   }
 
   return (

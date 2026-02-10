@@ -7,6 +7,7 @@ import { VehicleForm } from "@/features/vehicles/vehicle-form";
 import { useCreateVehicle } from "@/features/vehicles/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
 import type { VehicleFormValues } from "@/features/vehicles/schema";
+import { getHumanErrorMessage } from "@/lib/errors";
 
 export default function NovoVeiculoPage() {
   const router = useRouter();
@@ -20,15 +21,21 @@ export default function NovoVeiculoPage() {
       return;
     }
 
-    const v = await create.mutateAsync({
-      values,
-      companyId: profile.data.company_id,
-      userId: profile.data.id,
-    });
+    try {
+      const v = await create.mutateAsync({
+        values,
+        companyId: profile.data.company_id,
+        userId: profile.data.id,
+      });
 
-    toast.success("Veículo cadastrado.");
-    router.push(`/app/veiculos/${v.id}`);
-    router.refresh();
+      toast.success("Veículo cadastrado.");
+      router.push(`/app/veiculos/${v.id}`);
+      router.refresh();
+    } catch (err: unknown) {
+      toast.error("Não foi possível cadastrar o veículo.", {
+        description: getHumanErrorMessage(err) ?? "Tente novamente.",
+      });
+    }
   }
 
   return (

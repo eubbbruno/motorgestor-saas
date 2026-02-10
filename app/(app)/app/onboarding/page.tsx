@@ -6,8 +6,9 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Loader2Icon } from "lucide-react";
 
-import { getErrorMessage } from "@/lib/errors";
+import { getHumanErrorMessage } from "@/lib/errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -73,7 +74,7 @@ export default function OnboardingPage() {
       router.refresh();
     } catch (err: unknown) {
       toast.error("Não foi possível concluir o onboarding.", {
-        description: getErrorMessage(err) ?? "Tente novamente.",
+        description: getHumanErrorMessage(err) ?? "Tente novamente.",
       });
     } finally {
       setLoading(false);
@@ -93,28 +94,41 @@ export default function OnboardingPage() {
 
       <Card className="bg-background/60 p-6">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Nome da empresa</Label>
-            <Input
-              id="companyName"
-              placeholder="Ex: Revenda Central"
-              {...form.register("companyName")}
-            />
-            {suggestedSlug ? (
-              <p className="text-xs text-muted-foreground">
-                Identificador sugerido: <span className="font-mono">{suggestedSlug}</span>
-              </p>
-            ) : null}
-            {form.formState.errors.companyName ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.companyName.message}
-              </p>
-            ) : null}
-          </div>
+          <fieldset disabled={loading} aria-busy={loading} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Nome da empresa</Label>
+              <Input
+                id="companyName"
+                placeholder="Ex: Revenda Central"
+                autoComplete="organization"
+                aria-invalid={Boolean(form.formState.errors.companyName)}
+                aria-describedby={form.formState.errors.companyName ? "companyName-error" : undefined}
+                className={form.formState.errors.companyName ? "border-destructive focus-visible:ring-destructive/30" : undefined}
+                {...form.register("companyName")}
+              />
+              {suggestedSlug ? (
+                <p className="text-xs text-muted-foreground">
+                  Identificador sugerido: <span className="font-mono">{suggestedSlug}</span>
+                </p>
+              ) : null}
+              {form.formState.errors.companyName ? (
+                <p id="companyName-error" className="text-xs text-destructive" role="alert">
+                  {form.formState.errors.companyName.message}
+                </p>
+              ) : null}
+            </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Salvando..." : "Concluir"}
-          </Button>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                "Concluir"
+              )}
+            </Button>
+          </fieldset>
         </form>
       </Card>
     </div>
