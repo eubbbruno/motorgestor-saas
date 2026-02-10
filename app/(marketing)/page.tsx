@@ -38,12 +38,19 @@ const highlights = [
 export default function HomePage() {
   return (
     <>
-      <section className="py-14 sm:py-20">
+      <section className="relative overflow-hidden py-14 sm:py-20">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -left-40 -top-40 size-112 rounded-full bg-blue-500/10 blur-3xl" />
+          <div className="absolute -right-40 top-10 size-120 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_50%_-10%,rgba(59,130,246,.16),transparent_55%),radial-gradient(700px_circle_at_0%_30%,rgba(16,185,129,.14),transparent_55%)]" />
+        </div>
         <Container>
-          <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             <div className="space-y-6">
-              <Badge variant="secondary">SaaS B2B para revendas pequenas</Badge>
-              <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+              <Badge variant="secondary" className="border bg-background/60 backdrop-blur">
+                SaaS B2B para revendas pequenas
+              </Badge>
+              <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.05]">
                 Gestão de veículos, leads e agenda em um só lugar.{" "}
                 <span className="text-emerald-300">Sem planilha.</span>
               </h1>
@@ -54,12 +61,21 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg">
+                <Button
+                  asChild
+                  size="lg"
+                  className="shadow-sm shadow-emerald-500/20 ring-1 ring-emerald-500/20 transition hover:-translate-y-0.5 hover:shadow-emerald-500/30 focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                >
                   <Link href="/cadastro">
                     Criar minha conta <ArrowRightIcon className="ml-2 size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="bg-background/40 backdrop-blur transition hover:bg-background/60 focus-visible:ring-2 focus-visible:ring-blue-400/50"
+                >
                   <Link href="/recursos">Ver recursos</Link>
                 </Button>
               </div>
@@ -77,27 +93,31 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Card className="relative overflow-hidden border bg-background/60 p-2 shadow-sm">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_40%,rgba(59,130,246,.18),transparent_55%)]">
+            <Card className="relative overflow-hidden border bg-background/50 p-2 shadow-sm backdrop-blur">
+              <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-emerald-400/15 blur-3xl" />
+              <div className="pointer-events-none absolute -left-24 -bottom-24 size-72 rounded-full bg-blue-500/15 blur-3xl" />
+
+              <div className="relative aspect-16/10 overflow-hidden rounded-lg border bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.22),transparent_55%),radial-gradient(900px_circle_at_80%_40%,rgba(59,130,246,.22),transparent_55%)]">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(500px_circle_at_70%_40%,rgba(16,185,129,.18),transparent_60%)]" />
                 <Image
                   src="/hero-3d.png"
                   alt="Ilustração 3D do MotorGestor"
                   fill
-                  className="object-contain p-6 sm:p-8"
+                  className="object-contain p-6 drop-shadow-[0_18px_38px_rgba(0,0,0,0.35)] sm:p-8"
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
                 />
               </div>
               <div className="grid gap-2 p-4 sm:grid-cols-3">
-                <div className="rounded-lg border bg-background/70 p-3">
+                <div className="rounded-lg border bg-background/60 p-3">
                   <div className="text-xs text-muted-foreground">Leads hoje</div>
                   <div className="text-xl font-semibold">12</div>
                 </div>
-                <div className="rounded-lg border bg-background/70 p-3">
+                <div className="rounded-lg border bg-background/60 p-3">
                   <div className="text-xs text-muted-foreground">Veículos</div>
                   <div className="text-xl font-semibold">37</div>
                 </div>
-                <div className="rounded-lg border bg-background/70 p-3">
+                <div className="rounded-lg border bg-background/60 p-3">
                   <div className="text-xs text-muted-foreground">Conversão</div>
                   <div className="text-xl font-semibold">18%</div>
                 </div>
