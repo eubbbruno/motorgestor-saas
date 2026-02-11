@@ -27,6 +27,10 @@ export async function createVehicle(args: {
   userId: string;
 }): Promise<VehicleRow> {
   const supabase = createSupabaseBrowserClient();
+  const hasFipe =
+    args.values.fipe_value !== undefined ||
+    args.values.fipe_reference !== undefined ||
+    args.values.fipe_code !== undefined;
   const { data, error } = await supabase
     .from("vehicles")
     .insert({
@@ -37,6 +41,13 @@ export async function createVehicle(args: {
       model: args.values.model ?? null,
       year: args.values.year ?? null,
       price: args.values.price ?? null,
+      ...(hasFipe
+        ? {
+            fipe_value: args.values.fipe_value ?? null,
+            fipe_reference: args.values.fipe_reference ?? null,
+            fipe_code: args.values.fipe_code ?? null,
+          }
+        : {}),
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,
@@ -55,6 +66,10 @@ export async function updateVehicle(args: {
   values: VehicleFormValues;
 }): Promise<VehicleRow> {
   const supabase = createSupabaseBrowserClient();
+  const hasFipe =
+    args.values.fipe_value !== undefined ||
+    args.values.fipe_reference !== undefined ||
+    args.values.fipe_code !== undefined;
   const { data, error } = await supabase
     .from("vehicles")
     .update({
@@ -63,6 +78,13 @@ export async function updateVehicle(args: {
       model: args.values.model ?? null,
       year: args.values.year ?? null,
       price: args.values.price ?? null,
+      ...(hasFipe
+        ? {
+            fipe_value: args.values.fipe_value ?? null,
+            fipe_reference: args.values.fipe_reference ?? null,
+            fipe_code: args.values.fipe_code ?? null,
+          }
+        : {}),
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,

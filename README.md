@@ -42,6 +42,9 @@ Crie um projeto no Supabase e execute os SQLs em ordem no **SQL Editor**:
 Se você já tem um banco existente (staging/prod) e o onboarding falha, rode antes:
 - `db/migrations/2026_onboarding_companies.sql`
 
+Se você já tem um banco existente e quer usar **FIPE** no cadastro de veículos, rode também:
+- `db/migrations/2026_vehicles_fipe.sql`
+
 No Supabase, em **Authentication → URL Configuration**, configure:
 - **Site URL**: `http://localhost:3000`
 - **Redirect URLs**: `http://localhost:3000/**`
@@ -82,6 +85,7 @@ Execute no **SQL Editor**, em ordem:
 
 Para **banco existente** (incremental, sem destruir dados):
 1) `db/migrations/2026_onboarding_companies.sql`
+2) `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
 2) `db/rls.sql`
 
 3) **Auth URLs**
@@ -146,6 +150,9 @@ Configure em **Project → Settings → Environment Variables** (Production e Pr
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase → Project Settings → API → Project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase → Project Settings → API → anon public key
 - `NEXT_PUBLIC_SITE_URL`: URL final do site (ex.: `https://seu-dominio.com`)
+
+### (Opcional) FIPE
+- `FIPE_API_BASE_URL`: base da API FIPE (padrão: Parallelum). Ex.: `https://parallelum.com.br/fipe/api/v1/carros`
 
 Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem de dados podem exibir erro em runtime.
 
