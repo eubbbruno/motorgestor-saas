@@ -48,6 +48,9 @@ Se você já tem um banco existente e quer usar **FIPE** no cadastro de veículo
 Se você quer usar o **Pipeline (Kanban)**, rode também:
 - `db/migrations/2026_leads_pipeline_status.sql`
 
+Se você quer ver **métricas reais no Dashboard**, rode também:
+- `db/migrations/2026_dashboard_metrics.sql`
+
 No Supabase, em **Authentication → URL Configuration**, configure:
 - **Site URL**: `http://localhost:3000`
 - **Redirect URLs**: `http://localhost:3000/**`
@@ -94,6 +97,7 @@ Para **banco existente** (incremental, sem destruir dados):
 2) `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
 3) `db/migrations/2026_vehicles_ai_description.sql` (campo IA em `vehicles`)
 4) `db/migrations/2026_leads_pipeline_status.sql` (status Kanban em `leads`)
+5) `db/migrations/2026_dashboard_metrics.sql` (função SQL de métricas do dashboard)
 5) `db/rls.sql`
 
 3) **Auth URLs**
@@ -182,6 +186,7 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
     - `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
     - `db/migrations/2026_leads_pipeline_status.sql` (pipeline/kanban em `leads`)
     - `db/migrations/2026_vehicles_ai_description.sql` (descrição IA em `vehicles`)
+    - `db/migrations/2026_dashboard_metrics.sql` (métricas do dashboard)
     - `db/rls.sql`
 - **Auth URLs (obrigatório)**:
   - Supabase → Authentication → URL Configuration
