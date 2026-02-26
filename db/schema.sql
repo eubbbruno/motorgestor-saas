@@ -19,7 +19,7 @@ exception
 end $$;
 
 do $$ begin
-  create type public.lead_status as enum ('novo', 'contato', 'visita', 'proposta', 'ganho', 'perdido');
+  create type public.lead_status as enum ('novo', 'contato', 'proposta', 'negociacao', 'fechado', 'perdido');
 exception
   when duplicate_object then null;
 end $$;

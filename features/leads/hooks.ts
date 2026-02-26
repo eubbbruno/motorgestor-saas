@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { createLead, deleteLead, getLead, listLeads, updateLead } from "@/features/leads/api";
+import { createLead, deleteLead, getLead, listLeads, updateLead, updateLeadStatus } from "@/features/leads/api";
 
 export function useLeads() {
   return useQuery({
@@ -33,6 +33,17 @@ export function useUpdateLead() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: updateLead,
+    onSuccess: async (l) => {
+      await qc.invalidateQueries({ queryKey: ["leads"] });
+      await qc.invalidateQueries({ queryKey: ["leads", l.id] });
+    },
+  });
+}
+
+export function useUpdateLeadStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: updateLeadStatus,
     onSuccess: async (l) => {
       await qc.invalidateQueries({ queryKey: ["leads"] });
       await qc.invalidateQueries({ queryKey: ["leads", l.id] });

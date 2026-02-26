@@ -2,7 +2,7 @@
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { LeadRow } from "@/types/models";
-import type { LeadFormValues } from "@/features/leads/schema";
+import { LeadPipelineStatusSchema, type LeadFormValues } from "@/features/leads/schema";
 
 export async function listLeads(): Promise<LeadRow[]> {
   const supabase = createSupabaseBrowserClient();
@@ -70,6 +70,23 @@ export async function updateLead(args: { id: string; values: LeadFormValues }): 
       vehicle_id: vehicleId,
       notes: args.values.notes ?? null,
     })
+    .eq("id", args.id)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as LeadRow;
+}
+
+export async function updateLeadStatus(args: { id: string; status: unknown }): Promise<LeadRow> {
+  const parsed = LeadPipelineStatusSchema.safeParse(args.status);
+  if (!parsed.success) {
+    throw new Error("Status inválido.");
+  }
+
+  const supabase = createSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("leads")
+    .update({ status: parsed.data })
     .eq("id", args.id)
     .select("*")
     .single();

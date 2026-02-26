@@ -6,7 +6,7 @@ import { BarChart3Icon } from "lucide-react";
 import { useLeads } from "@/features/leads/hooks";
 import { Card } from "@/components/ui/card";
 
-const order = ["novo", "contato", "visita", "proposta", "ganho", "perdido"] as const;
+const order = ["novo", "contato", "proposta", "negociacao", "fechado", "perdido"] as const;
 
 export default function VendasPage() {
   const leads = useLeads();
@@ -14,7 +14,15 @@ export default function VendasPage() {
   const summary = useMemo(() => {
     const map = new Map<string, number>();
     order.forEach((s) => map.set(s, 0));
-    (leads.data ?? []).forEach((l) => map.set(l.status, (map.get(l.status) ?? 0) + 1));
+    (leads.data ?? []).forEach((l) => {
+      const s =
+        l.status === "visita"
+          ? "negociacao"
+          : l.status === "ganho"
+            ? "fechado"
+            : l.status;
+      map.set(s, (map.get(s) ?? 0) + 1);
+    });
     return order.map((s) => ({ status: s, count: map.get(s) ?? 0 }));
   }, [leads.data]);
 

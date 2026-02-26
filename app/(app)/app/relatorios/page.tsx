@@ -13,9 +13,9 @@ export default function RelatoriosPage() {
 
   const conv = useMemo(() => {
     const total = (leads.data ?? []).length;
-    const ganho = (leads.data ?? []).filter((l) => l.status === "ganho").length;
-    const pct = total ? Math.round((ganho / total) * 100) : 0;
-    return { total, ganho, pct };
+    const fechado = (leads.data ?? []).filter((l) => l.status === "fechado" || l.status === "ganho").length;
+    const pct = total ? Math.round((fechado / total) * 100) : 0;
+    return { total, fechado, pct };
   }, [leads.data]);
 
   return (
@@ -55,7 +55,7 @@ export default function RelatoriosPage() {
           </div>
           <div className="mt-2 text-2xl font-semibold">{conv.pct}%</div>
           <div className="mt-1 text-xs text-muted-foreground">
-            {conv.ganho} ganhos de {conv.total} leads.
+            {conv.fechado} fechados de {conv.total} leads.
           </div>
         </Card>
       </div>

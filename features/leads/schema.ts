@@ -3,9 +3,20 @@ import { z } from "zod";
 export const LeadStatusSchema = z.enum([
   "novo",
   "contato",
-  "visita",
   "proposta",
+  "negociacao",
+  "fechado",
+  "perdido",
+  "visita",
   "ganho",
+]);
+
+export const LeadPipelineStatusSchema = z.enum([
+  "novo",
+  "contato",
+  "proposta",
+  "negociacao",
+  "fechado",
   "perdido",
 ]);
 

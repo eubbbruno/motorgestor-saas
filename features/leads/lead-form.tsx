@@ -26,11 +26,22 @@ import {
 const statusLabels: Record<LeadFormValues["status"], string> = {
   novo: "Novo",
   contato: "Contato",
-  visita: "Visita/Test-drive",
   proposta: "Proposta",
-  ganho: "Ganho",
+  negociacao: "Negociação",
+  fechado: "Fechado",
   perdido: "Perdido",
+  visita: "Visita/Test-drive (legado)",
+  ganho: "Ganho (legado)",
 };
+
+const pipelineStatuses = [
+  "novo",
+  "contato",
+  "proposta",
+  "negociacao",
+  "fechado",
+  "perdido",
+] as const;
 
 export function LeadForm({
   title,
@@ -208,11 +219,18 @@ export function LeadForm({
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(statusLabels).map(([value, label]) => (
+                  {pipelineStatuses.map((value) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {statusLabels[value]}
                     </SelectItem>
                   ))}
+
+                  {form.watch("status") === "visita" ? (
+                    <SelectItem value="visita">{statusLabels.visita}</SelectItem>
+                  ) : null}
+                  {form.watch("status") === "ganho" ? (
+                    <SelectItem value="ganho">{statusLabels.ganho}</SelectItem>
+                  ) : null}
                 </SelectContent>
               </Select>
             </div>

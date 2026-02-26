@@ -20,7 +20,7 @@ export default function AppDashboardPage() {
 
   const activeLeads = useMemo(() => {
     const list = leads.data ?? [];
-    return list.filter((l) => l.status !== "ganho" && l.status !== "perdido").length;
+    return list.filter((l) => l.status !== "fechado" && l.status !== "ganho" && l.status !== "perdido").length;
   }, [leads.data]);
 
   const upcoming = useMemo(() => {

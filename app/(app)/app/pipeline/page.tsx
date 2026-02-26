@@ -1,0 +1,227 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import { toast } from "sonner";
+import { Loader2Icon, MessageCircleIcon } from "lucide-react";
+
+import { useLeads, useUpdateLeadStatus } from "@/features/leads/hooks";
+import { useVehicles } from "@/features/vehicles/hooks";
+import type { LeadRow } from "@/types/models";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const columns = [
+  { key: "novo", title: "Novo" },
+  { key: "contato", title: "Contato" },
+  { key: "proposta", title: "Proposta" },
+  { key: "negociacao", title: "Negociação" },
+  { key: "fechado", title: "Fechado" },
+  { key: "perdido", title: "Perdido" },
+] as const;
+
+type PipelineStatus = (typeof columns)[number]["key"];
+
+function normalizeStatus(status: LeadRow["status"]): PipelineStatus {
+  if (status === "visita") return "negociacao";
+  if (status === "ganho") return "fechado";
+  if (
+    status === "novo" ||
+    status === "contato" ||
+    status === "proposta" ||
+    status === "negociacao" ||
+    status === "fechado" ||
+    status === "perdido"
+  ) {
+    return status;
+  }
+  return "novo";
+}
+
+function formatBRL(value: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function waLink(phone?: string | null) {
+  if (!phone) return null;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  const withCountry = digits.startsWith("55") ? digits : `55${digits}`;
+  return `https://wa.me/${withCountry}`;
+}
+
+export default function PipelinePage() {
+  const leads = useLeads();
+  const vehicles = useVehicles();
+  const updateStatus = useUpdateLeadStatus();
+
+  const [draggingId, setDraggingId] = React.useState<string | null>(null);
+  const [movingId, setMovingId] = React.useState<string | null>(null);
+
+  const vehicleById = React.useMemo(() => {
+    const map = new Map<string, { title: string; fipe_value?: number | null }>();
+    (vehicles.data ?? []).forEach((v) => {
+      map.set(v.id, { title: v.title, fipe_value: v.fipe_value ?? null });
+    });
+    return map;
+  }, [vehicles.data]);
+
+  const grouped = React.useMemo(() => {
+    const map = new Map<PipelineStatus, LeadRow[]>();
+    columns.forEach((c) => map.set(c.key, []));
+    (leads.data ?? []).forEach((l) => {
+      const s = normalizeStatus(l.status);
+      map.get(s)?.push(l);
+    });
+    // ordena por mais recente
+    map.forEach((list) =>
+      list.sort((a, b) => (a.created_at < b.created_at ? 1 : -1)),
+    );
+    return map;
+  }, [leads.data]);
+
+  function onDragStart(e: React.DragEvent, id: string) {
+    setDraggingId(id);
+    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function onDragEnd() {
+    setDraggingId(null);
+  }
+
+  async function onDrop(e: React.DragEvent, status: PipelineStatus) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("text/plain");
+    if (!id) return;
+    if (movingId) return;
+
+    const lead = (leads.data ?? []).find((l) => l.id === id);
+    if (!lead) return;
+
+    const current = normalizeStatus(lead.status);
+    if (current === status) return;
+
+    setMovingId(id);
+    try {
+      await updateStatus.mutateAsync({ id, status });
+      toast.success("Status atualizado.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Tente novamente.";
+      toast.error("Não foi possível mover o lead.", { description: message });
+    } finally {
+      setMovingId(null);
+      setDraggingId(null);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
+          <p className="text-sm text-muted-foreground">
+            Arraste os leads entre as etapas para atualizar o funil.
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link href="/app/leads/novo">Novo lead</Link>
+        </Button>
+      </div>
+
+      {leads.isLoading ? (
+        <div className="text-sm text-muted-foreground">Carregando pipeline...</div>
+      ) : leads.isError ? (
+        <div className="text-sm text-destructive">Não foi possível carregar os leads.</div>
+      ) : (
+        <div className="-mx-4 overflow-x-auto px-4">
+          <div className="flex min-w-6xl gap-4 pb-2">
+            {columns.map((col) => {
+              const list = grouped.get(col.key) ?? [];
+              return (
+                <div
+                  key={col.key}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => void onDrop(e, col.key)}
+                  className="w-[18rem] shrink-0"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="text-sm font-semibold">{col.title}</div>
+                    <div className="text-xs text-muted-foreground">{list.length}</div>
+                  </div>
+
+                  <div className="space-y-3 rounded-xl border bg-background/50 p-3">
+                    {list.length === 0 ? (
+                      <div className="rounded-md border border-dashed bg-background/40 p-4 text-xs text-muted-foreground">
+                        Arraste um lead para cá.
+                      </div>
+                    ) : null}
+
+                    {list.map((l) => {
+                      const v = l.vehicle_id ? vehicleById.get(l.vehicle_id) : null;
+                      const link = waLink(l.phone);
+                      const isMoving = movingId === l.id;
+                      const isDragging = draggingId === l.id;
+
+                      return (
+                        <Card
+                          key={l.id}
+                          draggable={!isMoving}
+                          onDragStart={(e) => onDragStart(e, l.id)}
+                          onDragEnd={onDragEnd}
+                          className={[
+                            "bg-background/70 p-3 shadow-sm transition",
+                            isDragging ? "opacity-70 ring-2 ring-primary/30" : "",
+                            isMoving ? "opacity-60" : "hover:shadow-md",
+                          ].join(" ")}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-medium">{l.name}</div>
+                              <div className="mt-1 text-xs text-muted-foreground">
+                                {v?.title ? v.title : "Sem veículo"}
+                              </div>
+                              {v?.fipe_value != null ? (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  FIPE: <span className="font-medium">{formatBRL(Number(v.fipe_value))}</span>
+                                </div>
+                              ) : null}
+                            </div>
+
+                            {isMoving ? (
+                              <Loader2Icon className="mt-0.5 size-4 animate-spin text-muted-foreground" />
+                            ) : null}
+                          </div>
+
+                          <div className="mt-3 flex items-center gap-2">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="outline"
+                              disabled={!link}
+                              className="w-full"
+                            >
+                              <a href={link ?? "#"} target="_blank" rel="noreferrer">
+                                <MessageCircleIcon className="mr-2 size-4" />
+                                WhatsApp
+                              </a>
+                            </Button>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

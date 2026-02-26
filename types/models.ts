@@ -2,7 +2,16 @@ export type UserRole = "admin" | "vendedor";
 
 export type VehicleStatus = "disponivel" | "reservado" | "vendido" | "inativo";
 
-export type LeadStatus = "novo" | "contato" | "visita" | "proposta" | "ganho" | "perdido";
+// Inclui valores legados ("visita"/"ganho") para compatibilidade com bancos ainda não migrados.
+export type LeadStatus =
+  | "novo"
+  | "contato"
+  | "proposta"
+  | "negociacao"
+  | "fechado"
+  | "perdido"
+  | "visita"
+  | "ganho";
 
 export type ProfileRow = {
   id: string;
