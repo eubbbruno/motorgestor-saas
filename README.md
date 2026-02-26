@@ -158,6 +158,40 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
 
 ---
 
+## Configuração manual (Vercel + Supabase)
+### Supabase (produção)
+- **SQL (obrigatório)**:
+  - Banco novo: rode **nesta ordem**:
+    - `db/schema.sql`
+    - `db/rls.sql`
+  - Banco existente (staging/prod): rode **nesta ordem**:
+    - `db/migrations/2026_onboarding_companies.sql` (onboarding)
+    - `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
+    - `db/rls.sql`
+- **Auth URLs (obrigatório)**:
+  - Supabase → Authentication → URL Configuration
+    - **Site URL**: `https://SEU-DOMINIO`
+    - **Redirect URLs**: `https://SEU-DOMINIO/**`
+- **Storage (não é necessário para FIPE)**:
+  - Só configure bucket/policies se você for fazer **upload** de fotos de veículos.
+
+### Vercel (produção)
+- **Environment Variables (obrigatório)**:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `NEXT_PUBLIC_SITE_URL` (ex.: `https://seu-dominio.com`)
+- **FIPE (NÃO precisa configurar nada)**:
+  - Por padrão, o endpoint `/api/fipe` usa a API pública Parallelum.
+  - Só configure `FIPE_API_BASE_URL` se você quiser trocar de provedor/rota. Ex.: `https://parallelum.com.br/fipe/api/v1/carros`
+- **Deploy (obrigatório)**:
+  - Após rodar SQL/migrações no Supabase e ajustar env vars, faça **Redeploy** na Vercel e teste o fluxo.
+
+### O que NÃO precisa configurar
+- **Nenhuma chave de FIPE** (não usamos API key).
+- **Nenhuma configuração extra de CORS** (a chamada FIPE é feita pelo servidor via `/api/fipe`).
+
+---
+
 ## Deploy: erros comuns e como resolver
 ### 1) "Cannot find module 'react-day-picker' ..."
 O componente `components/ui/calendar.tsx` (shadcn/ui) depende de `react-day-picker`.
