@@ -61,6 +61,7 @@ create table if not exists public.vehicles (
   fipe_value numeric(12,2),
   fipe_reference text,
   fipe_code text,
+  description_ai text,
   mileage int,
   fuel text,
   transmission text,

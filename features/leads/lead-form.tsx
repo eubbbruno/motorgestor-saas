@@ -4,6 +4,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
 
 import { LeadFormSchema, type LeadFormValues } from "@/features/leads/schema";
 import { useVehicles } from "@/features/vehicles/hooks";
@@ -13,6 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const statusLabels: Record<LeadFormValues["status"], string> = {
   novo: "Novo",
@@ -53,7 +62,12 @@ export function LeadForm({
   });
 
   const [submitting, setSubmitting] = React.useState(false);
+  const [aiLoading, setAiLoading] = React.useState(false);
+  const [aiOpen, setAiOpen] = React.useState(false);
+  const [aiShort, setAiShort] = React.useState<string>("");
+  const [aiLong, setAiLong] = React.useState<string>("");
   const busy = Boolean(loading || submitting);
+  const busyAi = Boolean(busy || aiLoading);
 
   async function handleSubmit(values: LeadFormValues) {
     setSubmitting(true);
@@ -61,6 +75,63 @@ export function LeadForm({
       await onSubmit(values);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function copyToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copiado.");
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  }
+
+  async function generateWhatsapp() {
+    if (busyAi) return;
+
+    const leadName = (form.getValues("name") ?? "").trim();
+    if (!leadName) {
+      toast.error("Informe o nome do lead para gerar a mensagem.");
+      return;
+    }
+
+    const vehicleId = form.getValues("vehicle_id") ?? "";
+    const vehicleTitle =
+      vehicleId && vehicleId.length > 0
+        ? (vehicles.data ?? []).find((v) => v.id === vehicleId)?.title ?? null
+        : null;
+
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/lead-whatsapp", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          leadName,
+          vehicleTitle,
+          source: (form.getValues("source") ?? "").trim() || null,
+          status: (form.getValues("status") ?? "").toString() || null,
+        }),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | { ok: true; short: string; long: string }
+        | { ok: false; error: string };
+
+      if (!res.ok || !body || body.ok === false) {
+        throw new Error(body && "error" in body ? body.error : "IA indisponível.");
+      }
+
+      setAiShort(body.short);
+      setAiLong(body.long);
+      setAiOpen(true);
+      toast.success("Mensagem gerada.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "IA indisponível.";
+      toast.error("Não foi possível gerar a mensagem.", { description: message });
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -184,6 +255,17 @@ export function LeadForm({
             />
           </div>
 
+          <Button type="button" variant="outline" className="w-full" onClick={generateWhatsapp} disabled={busyAi}>
+            {busyAi ? (
+              <>
+                <Loader2Icon className="mr-2 size-4 animate-spin" />
+                Gerando mensagem...
+              </>
+            ) : (
+              "Gerar mensagem WhatsApp"
+            )}
+          </Button>
+
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? (
               <>
@@ -196,6 +278,41 @@ export function LeadForm({
           </Button>
         </fieldset>
       </form>
+
+      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mensagem para WhatsApp</DialogTitle>
+            <DialogDescription>
+              Copie e cole no WhatsApp. Ajuste o tom conforme necessário.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Versão curta</div>
+              <div className="rounded-md border bg-background/60 p-3 text-sm whitespace-pre-wrap">
+                {aiShort}
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => copyToClipboard(aiShort)} disabled={!aiShort}>
+                Copiar versão curta
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Versão longa</div>
+              <div className="rounded-md border bg-background/60 p-3 text-sm whitespace-pre-wrap">
+                {aiLong}
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => copyToClipboard(aiLong)} disabled={!aiLong}>
+                Copiar versão longa
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter showCloseButton />
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

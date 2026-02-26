@@ -57,6 +57,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
         fipe_value: vehicle.data.fipe_value ?? undefined,
         fipe_reference: vehicle.data.fipe_reference ?? "",
         fipe_code: vehicle.data.fipe_code ?? "",
+        description_ai: vehicle.data.description_ai ?? "",
         mileage: vehicle.data.mileage ?? undefined,
         fuel: vehicle.data.fuel ?? "",
         transmission: vehicle.data.transmission ?? "",

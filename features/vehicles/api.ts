@@ -31,6 +31,7 @@ export async function createVehicle(args: {
     args.values.fipe_value !== undefined ||
     args.values.fipe_reference !== undefined ||
     args.values.fipe_code !== undefined;
+  const hasAi = args.values.description_ai !== undefined;
   const { data, error } = await supabase
     .from("vehicles")
     .insert({
@@ -48,6 +49,7 @@ export async function createVehicle(args: {
             fipe_code: args.values.fipe_code ?? null,
           }
         : {}),
+      ...(hasAi ? { description_ai: args.values.description_ai ?? null } : {}),
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,
@@ -70,6 +72,7 @@ export async function updateVehicle(args: {
     args.values.fipe_value !== undefined ||
     args.values.fipe_reference !== undefined ||
     args.values.fipe_code !== undefined;
+  const hasAi = args.values.description_ai !== undefined;
   const { data, error } = await supabase
     .from("vehicles")
     .update({
@@ -85,6 +88,7 @@ export async function updateVehicle(args: {
             fipe_code: args.values.fipe_code ?? null,
           }
         : {}),
+      ...(hasAi ? { description_ai: args.values.description_ai ?? null } : {}),
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,

@@ -45,6 +45,7 @@ export function VehicleForm({
       fipe_value: undefined,
       fipe_reference: "",
       fipe_code: "",
+      description_ai: "",
       mileage: undefined,
       fuel: "",
       transmission: "",
@@ -57,6 +58,7 @@ export function VehicleForm({
 
   const [submitting, setSubmitting] = React.useState(false);
   const [fipeLoading, setFipeLoading] = React.useState(false);
+  const [aiLoading, setAiLoading] = React.useState(false);
 
   async function handleSubmit(values: VehicleFormValues) {
     setSubmitting(true);
@@ -69,6 +71,7 @@ export function VehicleForm({
 
   const busy = Boolean(loading || submitting);
   const busyFipe = Boolean(busy || fipeLoading);
+  const busyAi = Boolean(busy || aiLoading);
 
   async function fetchFipe() {
     if (busyFipe) return;
@@ -110,6 +113,58 @@ export function VehicleForm({
       });
     } finally {
       setFipeLoading(false);
+    }
+  }
+
+  async function generateDescriptionAi() {
+    if (busyAi) return;
+
+    const title = (form.getValues("title") ?? "").trim();
+    if (!title) {
+      toast.error("Informe pelo menos o título do veículo para gerar a descrição.");
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const payload = {
+        title,
+        make: (form.getValues("make") ?? "").trim() || null,
+        model: (form.getValues("model") ?? "").trim() || null,
+        year: form.getValues("year") ?? null,
+        price: form.getValues("price") ?? null,
+        mileage: form.getValues("mileage") ?? null,
+        fuel: (form.getValues("fuel") ?? "").trim() || null,
+        transmission: (form.getValues("transmission") ?? "").trim() || null,
+        color: (form.getValues("color") ?? "").trim() || null,
+        notes: (form.getValues("notes") ?? "").trim() || null,
+      };
+
+      const res = await fetch("/api/ai/vehicle-description", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | { ok: true; description: string }
+        | { ok: false; error: string };
+
+      if (!res.ok || !body || body.ok === false) {
+        throw new Error(body && "error" in body ? body.error : "IA indisponível.");
+      }
+
+      form.setValue("description_ai", body.description, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+
+      toast.success("Descrição gerada com IA.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "IA indisponível.";
+      toast.error("Não foi possível gerar a descrição.", { description: message });
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -307,6 +362,34 @@ export function VehicleForm({
               <Label htmlFor="color">Cor</Label>
               <Input id="color" placeholder="Prata" {...form.register("color")} />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <Label htmlFor="description_ai">Descrição (IA)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={generateDescriptionAi}
+                disabled={busyAi}
+                className="sm:w-auto"
+              >
+                {busyAi ? (
+                  <>
+                    <Loader2Icon className="mr-2 size-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  "Gerar descrição com IA"
+                )}
+              </Button>
+            </div>
+            <Textarea
+              id="description_ai"
+              rows={7}
+              placeholder="Clique em “Gerar descrição com IA” para criar um texto profissional de anúncio."
+              {...form.register("description_ai")}
+            />
           </div>
 
           <div className="space-y-2">

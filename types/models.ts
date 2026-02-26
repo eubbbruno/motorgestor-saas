@@ -34,6 +34,7 @@ export type VehicleRow = {
   fipe_value?: number | null;
   fipe_reference?: string | null;
   fipe_code?: string | null;
+  description_ai?: string | null;
   mileage: number | null;
   fuel: string | null;
   transmission: string | null;

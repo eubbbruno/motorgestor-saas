@@ -56,6 +56,9 @@ Crie `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL="https://SEU-PROJETO.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_ANON_KEY"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+AI_PROVIDER="mock"
+# OPENAI_API_KEY="sua-chave-aqui"         # obrigatório só se AI_PROVIDER="openai"
+# OPENAI_MODEL="gpt-4o-mini"              # opcional (default seguro)
 ```
 
 ### 4) Rodar o dev server
@@ -86,6 +89,7 @@ Execute no **SQL Editor**, em ordem:
 Para **banco existente** (incremental, sem destruir dados):
 1) `db/migrations/2026_onboarding_companies.sql`
 2) `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
+3) `db/migrations/2026_vehicles_ai_description.sql` (campo IA em `vehicles`)
 2) `db/rls.sql`
 
 3) **Auth URLs**
@@ -154,6 +158,11 @@ Configure em **Project → Settings → Environment Variables** (Production e Pr
 ### (Opcional) FIPE
 - `FIPE_API_BASE_URL`: base da API FIPE (padrão: Parallelum). Ex.: `https://parallelum.com.br/fipe/api/v1/carros`
 
+### IA (mock por padrão)
+- `AI_PROVIDER`: `mock` (default) ou `openai`
+- `OPENAI_API_KEY`: obrigatório somente se `AI_PROVIDER="openai"`
+- `OPENAI_MODEL`: opcional (default: `gpt-4o-mini`)
+
 Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem de dados podem exibir erro em runtime.
 
 ---
@@ -167,6 +176,7 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
   - Banco existente (staging/prod): rode **nesta ordem**:
     - `db/migrations/2026_onboarding_companies.sql` (onboarding)
     - `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
+    - `db/migrations/2026_vehicles_ai_description.sql` (descrição IA em `vehicles`)
     - `db/rls.sql`
 - **Auth URLs (obrigatório)**:
   - Supabase → Authentication → URL Configuration
@@ -186,9 +196,17 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
 - **Deploy (obrigatório)**:
   - Após rodar SQL/migrações no Supabase e ajustar env vars, faça **Redeploy** na Vercel e teste o fluxo.
 
+- **IA (mock por padrão)**:
+  - Se você NÃO configurar nada: `AI_PROVIDER` assume `mock` e a IA gera textos “fake” bem estruturados (para demo).
+  - Para usar OpenAI:
+    - Configure `AI_PROVIDER="openai"`
+    - Configure `OPENAI_API_KEY`
+    - (Opcional) Configure `OPENAI_MODEL`
+
 ### O que NÃO precisa configurar
 - **Nenhuma chave de FIPE** (não usamos API key).
 - **Nenhuma configuração extra de CORS** (a chamada FIPE é feita pelo servidor via `/api/fipe`).
+ - **IA**: se você estiver satisfeito com `mock`, não precisa de nenhuma chave.
 
 ---
 
