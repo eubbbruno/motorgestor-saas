@@ -2,12 +2,19 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchDashboardMetrics } from "@/features/dashboard/api";
+import { fetchDashboardCharts, fetchDashboardMetrics } from "@/features/dashboard/api";
 
 export function useDashboardMetrics() {
   return useQuery({
     queryKey: ["metrics", "dashboard"],
     queryFn: fetchDashboardMetrics,
+  });
+}
+
+export function useDashboardCharts() {
+  return useQuery({
+    queryKey: ["metrics", "dashboard", "charts"],
+    queryFn: fetchDashboardCharts,
   });
 }
 

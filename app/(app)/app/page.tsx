@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useEvents } from "@/features/events/hooks";
 import { useDashboardMetrics } from "@/features/dashboard/hooks";
+import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 
 export default function AppDashboardPage() {
   const metrics = useDashboardMetrics();
@@ -203,6 +204,16 @@ export default function AppDashboardPage() {
             Agende retornos e test-drives com contexto.
           </div>
         </Card>
+      </div>
+
+      <div className="space-y-2">
+        <div className="space-y-1">
+          <div className="text-base font-semibold tracking-tight">Insights</div>
+          <p className="text-sm text-muted-foreground">
+            Gráficos com dados reais do seu funil (multi-tenant).
+          </p>
+        </div>
+        <DashboardCharts />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
