@@ -16,13 +16,13 @@ export function MobileSidebar() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="left" className="w-80 p-0">
-        <SheetHeader className="border-b p-4">
+        <SheetHeader className="border-b p-5">
           <SheetTitle className="flex items-center gap-2">
-            <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,.15)]" />
-            <span>MotorGestor</span>
+            <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
+            <span className="tracking-tight">MotorGestor</span>
           </SheetTitle>
         </SheetHeader>
-        <nav className="space-y-1 p-3">
+        <nav className="space-y-1.5 p-4">
           {appNav.map((item) => {
             const active =
               pathname === item.href ||
@@ -34,11 +34,18 @@ export function MobileSidebar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                  active && "bg-accent text-foreground",
+                  "group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors",
+                  active
+                    ? "bg-muted text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                 )}
               >
-                <Icon className="size-4" />
+                <Icon
+                  className={cn(
+                    "size-4 transition-opacity",
+                    active ? "opacity-100" : "opacity-65 group-hover:opacity-90",
+                  )}
+                />
                 <span>{item.label}</span>
               </Link>
             );

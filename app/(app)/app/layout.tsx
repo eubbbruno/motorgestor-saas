@@ -32,7 +32,9 @@ export default async function AppLayout({
             email={profile?.email ?? user.email}
             roleLabel={roleLabel}
           />
-          <div className="flex-1 p-4 lg:p-6">{children}</div>
+          <div className="flex-1 px-4 py-8 lg:px-8 lg:py-10">
+            <div className="mx-auto w-full max-w-7xl">{children}</div>
+          </div>
         </div>
       </div>
     </div>
