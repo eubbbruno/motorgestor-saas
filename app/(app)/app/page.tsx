@@ -5,7 +5,9 @@ import {
   ArrowRightIcon,
   BarChart3Icon,
   CalendarIcon,
+  CarIcon,
   HandshakeIcon,
+  LayoutGridIcon,
   MessageSquareTextIcon,
   TrendingUpIcon,
   UsersIcon,
@@ -58,6 +60,37 @@ export default function AppDashboardPage() {
           </Button>
         </div>
       </div>
+
+      <Card className="bg-background/60 p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <div className="text-base font-medium">Ações rápidas</div>
+            <p className="text-sm text-muted-foreground">
+              Atalhos para executar as rotinas mais comuns.
+            </p>
+          </div>
+          <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+            <Button asChild variant="outline" className="justify-start sm:justify-center">
+              <Link href="/app/veiculos/novo">
+                <CarIcon className="mr-2 size-4" />
+                Novo veículo
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="justify-start sm:justify-center">
+              <Link href="/app/leads/novo">
+                <UsersIcon className="mr-2 size-4" />
+                Novo lead
+              </Link>
+            </Button>
+            <Button asChild className="justify-start sm:justify-center">
+              <Link href="/app/pipeline">
+                <LayoutGridIcon className="mr-2 size-4" />
+                Ver Pipeline
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-background/60 p-5">
