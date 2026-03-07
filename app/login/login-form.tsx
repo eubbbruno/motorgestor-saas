@@ -60,8 +60,11 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
     setFormError(null);
     try {
       const supabase = createSupabaseBrowserClient();
-      const next = redirectTo || "/app";
-      const redirectToUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).replace(
+        /\/$/,
+        "",
+      );
+      const redirectToUrl = `${siteUrl}/auth/callback`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectToUrl },
@@ -80,15 +83,15 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
     <div className="relative min-h-screen bg-background">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_30%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_70%_30%,rgba(16,185,129,.10),transparent_55%)]" />
 
-      <div className="mx-auto flex min-h-screen w-full max-w-md items-center px-4 py-14">
+      <div className="mx-auto flex min-h-screen w-full max-w-[420px] items-center px-4 py-14">
         <div className="w-full space-y-6">
           <div className="space-y-2 text-center">
             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               MotorGestor
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Entrar na sua conta</h1>
             <p className="text-sm text-muted-foreground">
-              Acesse sua empresa e continue de onde parou.
+              Acesse o MotorGestor e continue gerenciando seus veículos e leads.
             </p>
           </div>
 
