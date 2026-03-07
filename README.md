@@ -68,6 +68,29 @@ AI_PROVIDER="mock"
 # OPENAI_MODEL="gpt-4o-mini"              # opcional (default seguro)
 ```
 
+### Google OAuth (Login com Google)
+Para habilitar o botão **“Continuar com Google”**:
+
+1) **Supabase → Authentication → Providers → Google**
+- Ative o provider **Google**
+- Preencha:
+  - **Client ID**: cole o *OAuth Client ID* do Google Cloud
+  - **Client Secret**: cole o *Client Secret* do Google Cloud
+
+2) **Supabase → Authentication → URL Configuration**
+- **Site URL**:
+  - Dev: `http://localhost:3000`
+  - Prod: `https://seu-dominio.com`
+- **Redirect URLs** (adicione ambos):
+  - `http://localhost:3000/auth/callback`
+  - `https://seu-dominio.com/auth/callback`
+
+3) **Google Cloud Console (OAuth)**
+- Crie credenciais **OAuth Client ID** (tipo **Web application**)
+- Em **Authorized redirect URIs**, adicione exatamente:
+  - `http://localhost:3000/auth/callback`
+  - `https://seu-dominio.com/auth/callback`
+
 ### 4) Rodar o dev server
 
 ```bash

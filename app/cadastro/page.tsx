@@ -33,9 +33,12 @@ export default function CadastroPage() {
   });
 
   const [loading, setLoading] = React.useState(false);
+  const [oauthLoading, setOauthLoading] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
 
   async function onSubmit(values: FormValues) {
     setLoading(true);
+    setFormError(null);
     try {
       const supabase = createSupabaseBrowserClient();
       const { data, error } = await supabase.auth.signUp({
@@ -61,6 +64,7 @@ export default function CadastroPage() {
       router.push("/app");
       router.refresh();
     } catch (err: unknown) {
+      setFormError(getHumanErrorMessage(err) ?? "Tente novamente em instantes.");
       toast.error("Não foi possível criar sua conta.", {
         description: getHumanErrorMessage(err) ?? "Tente novamente em instantes.",
       });
@@ -69,18 +73,97 @@ export default function CadastroPage() {
     }
   }
 
-  return (
-    <div className="mx-auto w-full max-w-md space-y-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Criar conta</h1>
-        <p className="text-sm text-muted-foreground">
-          Comece em minutos com estoque, leads e agenda prontos para operar.
-        </p>
-      </div>
+  async function onGoogle() {
+    setOauthLoading(true);
+    setFormError(null);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const redirectToUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent("/app")}`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: redirectToUrl },
+      });
+      if (error) throw error;
+    } catch (err: unknown) {
+      setFormError(getHumanErrorMessage(err) ?? "Tente novamente em instantes.");
+      toast.error("Não foi possível continuar com Google.", {
+        description: getHumanErrorMessage(err) ?? "Tente novamente em instantes.",
+      });
+      setOauthLoading(false);
+    }
+  }
 
-      <Card className="bg-background/60 p-6">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <fieldset disabled={loading} aria-busy={loading} className="space-y-4">
+  return (
+    <div className="relative min-h-screen bg-background">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_30%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_70%_30%,rgba(16,185,129,.10),transparent_55%)]" />
+
+      <div className="mx-auto flex min-h-screen w-full max-w-md items-center px-4 py-14">
+        <div className="w-full space-y-6">
+          <div className="space-y-2 text-center">
+            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              MotorGestor
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">Criar conta</h1>
+            <p className="text-sm text-muted-foreground">
+              Comece em minutos com estoque, leads e agenda prontos para operar.
+            </p>
+          </div>
+
+          <Card className="rounded-xl border bg-background/70 p-7 shadow-sm backdrop-blur">
+            <div className="space-y-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-center bg-background/60"
+                onClick={onGoogle}
+                disabled={loading || oauthLoading}
+              >
+                {oauthLoading ? (
+                  <>
+                    <Loader2Icon className="mr-2 size-4 animate-spin" />
+                    Redirecionando...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="mr-2 size-4"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M21.35 11.1H12v2.9h5.35c-.7 3.25-4.15 4.95-7.2 3.45a6.04 6.04 0 0 1-3.3-3.55 6.05 6.05 0 0 1 1.4-6.1 6.2 6.2 0 0 1 8.55-.2l2-2A8.94 8.94 0 0 0 3.1 9.7a9.01 9.01 0 0 0 4.85 12.7c4.85 2.55 11.8.1 13.25-6.2.15-.7.15-1.45.15-2.2 0-.6-.05-1.25-.1-1.9Z"
+                      />
+                    </svg>
+                    Continuar com Google
+                  </>
+                )}
+              </Button>
+
+              <div className="relative">
+                <Separator />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
+                    ou
+                  </span>
+                </div>
+              </div>
+
+              {formError ? (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+                >
+                  {formError}
+                </div>
+              ) : null}
+
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <fieldset
+                  disabled={loading || oauthLoading}
+                  aria-busy={loading || oauthLoading}
+                  className="space-y-4"
+                >
             <div className="space-y-2">
               <Label htmlFor="fullName">Nome</Label>
               <Input
@@ -146,18 +229,22 @@ export default function CadastroPage() {
                 "Criar conta"
               )}
             </Button>
-          </fieldset>
+                </fieldset>
 
-          <Separator />
-
-          <p className="text-center text-sm text-muted-foreground">
-            Já tem conta?{" "}
-            <Link href="/login" className="text-foreground underline underline-offset-4">
-              Entrar
-            </Link>
-          </p>
-        </form>
-      </Card>
+                <p className="pt-1 text-center text-sm text-muted-foreground">
+                  Já tem conta?{" "}
+                  <Link
+                    href="/login"
+                    className="text-foreground underline underline-offset-4"
+                  >
+                    Entrar
+                  </Link>
+                </p>
+              </form>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
