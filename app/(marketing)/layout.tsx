@@ -13,7 +13,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(1200px_circle_at_0%_0%,rgba(16,185,129,.12),transparent_58%),radial-gradient(1000px_circle_at_100%_20%,rgba(59,130,246,.12),transparent_58%)]">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />
