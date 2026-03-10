@@ -10,10 +10,14 @@ import { LeadForm } from "@/features/leads/lead-form";
 import type { LeadFormValues } from "@/features/leads/schema";
 import { useLead, useUpdateLead, useDeleteLead } from "@/features/leads/hooks";
 import { useCreateLeadEvent, useLeadEvents } from "@/features/leads/events-hooks";
+import { useCreateLeadTask, useDeleteTask, useLeadTasks, usePatchTask } from "@/features/leads/tasks-hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -52,8 +56,14 @@ export function LeadDetailClient({ id }: { id: string }) {
   const del = useDeleteLead();
   const events = useLeadEvents(id);
   const createEvent = useCreateLeadEvent();
+  const tasks = useLeadTasks(id);
+  const createTask = useCreateLeadTask();
+  const patchTask = usePatchTask();
+  const deleteTask = useDeleteTask();
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [note, setNote] = React.useState("");
+  const [taskTitle, setTaskTitle] = React.useState("");
+  const [taskDue, setTaskDue] = React.useState<string>("");
 
   async function onSubmit(values: LeadFormValues) {
     const prev = lead.data?.status ?? null;
@@ -113,6 +123,36 @@ export function LeadDetailClient({ id }: { id: string }) {
       toast.success("Comentário adicionado.");
     } catch {
       toast.error("Não foi possível adicionar comentário.");
+    }
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  function formatDueDate(value: string) {
+    try {
+      return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(`${value}T00:00:00`));
+    } catch {
+      return value;
+    }
+  }
+
+  async function addTask() {
+    const title = taskTitle.trim();
+    if (!title) {
+      toast.error("Informe um título para a tarefa.");
+      return;
+    }
+    try {
+      await createTask.mutateAsync({
+        leadId: id,
+        title,
+        due_date: taskDue ? taskDue : null,
+      });
+      setTaskTitle("");
+      setTaskDue("");
+      toast.success("Tarefa criada.");
+    } catch {
+      toast.error("Não foi possível criar a tarefa.");
     }
   }
 
@@ -246,6 +286,137 @@ export function LeadDetailClient({ id }: { id: string }) {
               ) : (
                 <div className="text-sm text-muted-foreground">
                   Nenhum evento ainda. Adicione um comentário para começar o histórico.
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className="bg-background/60 p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-0.5">
+                <div className="text-base font-medium">Tarefas / Follow-ups</div>
+                <div className="text-sm text-muted-foreground">
+                  Acompanhe próximos passos e vencimentos para não perder o timing.
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => tasks.refetch()}
+                disabled={tasks.isFetching}
+              >
+                {tasks.isFetching ? (
+                  <>
+                    <Loader2Icon className="mr-2 size-4 animate-spin" />
+                    Atualizando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCcwIcon className="mr-2 size-4" />
+                    Atualizar
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-12">
+              <div className="space-y-2 md:col-span-8">
+                <Label htmlFor="task-title">Nova tarefa</Label>
+                <Input
+                  id="task-title"
+                  placeholder="Ex: Ligar amanhã às 10h e enviar proposta..."
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  disabled={createTask.isPending}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-4">
+                <Label htmlFor="task-due">Vencimento</Label>
+                <Input
+                  id="task-due"
+                  type="date"
+                  value={taskDue}
+                  onChange={(e) => setTaskDue(e.target.value)}
+                  disabled={createTask.isPending}
+                />
+              </div>
+              <div className="md:col-span-12">
+                <Button className="w-full" onClick={addTask} disabled={createTask.isPending}>
+                  {createTask.isPending ? (
+                    <>
+                      <Loader2Icon className="mr-2 size-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    "Nova tarefa"
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {tasks.isLoading ? (
+                <div className="text-sm text-muted-foreground">Carregando tarefas...</div>
+              ) : tasks.isError ? (
+                <div className="text-sm text-destructive">
+                  Não foi possível carregar as tarefas. A migração `lead_tasks` já foi aplicada?
+                </div>
+              ) : tasks.data?.length ? (
+                <div className="space-y-2">
+                  {tasks.data.map((t) => {
+                    const overdue =
+                      t.status === "pending" && Boolean(t.due_date) && String(t.due_date) < today;
+                    const checked = t.status === "done";
+                    return (
+                      <div
+                        key={t.id}
+                        className="flex items-start gap-3 rounded-lg border bg-background/60 p-4"
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(v) =>
+                            patchTask
+                              .mutateAsync({ taskId: t.id, status: v ? "done" : "pending" })
+                              .catch(() => toast.error("Não foi possível atualizar a tarefa."))
+                          }
+                          disabled={patchTask.isPending || deleteTask.isPending}
+                          aria-label="Marcar como concluída"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className={checked ? "text-sm font-medium line-through opacity-70" : "text-sm font-medium"}>
+                              {t.title}
+                            </div>
+                            {overdue ? <Badge variant="destructive">Atrasada</Badge> : null}
+                            {t.status === "cancelled" ? <Badge variant="secondary">Cancelada</Badge> : null}
+                          </div>
+                          {t.due_date ? (
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              Vence em {formatDueDate(String(t.due_date))}
+                            </div>
+                          ) : null}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            deleteTask
+                              .mutateAsync(t.id)
+                              .then(() => tasks.refetch())
+                              .catch(() => toast.error("Não foi possível excluir a tarefa."))
+                          }
+                          disabled={deleteTask.isPending}
+                          aria-label="Excluir tarefa"
+                        >
+                          <TrashIcon className="size-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  Nenhuma tarefa ainda. Crie a primeira para organizar o próximo passo.
                 </div>
               )}
             </div>

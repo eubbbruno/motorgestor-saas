@@ -126,8 +126,9 @@ Para **banco existente** (incremental, sem destruir dados):
 7) `db/migrations/2026_dashboard_charts.sql` (função SQL para gráficos do dashboard)
 8) `db/migrations/2026_saas_plans.sql` (planos + assinaturas + limites)
 9) `db/migrations/2026_lead_events_timeline.sql` (timeline/comentários de leads)
-10) (Opcional) `db/migrations/2026_vehicle_photos_storage.sql` (bucket + policies do Storage)
-11) `db/rls.sql`
+10) `db/migrations/2026_lead_tasks_followups.sql` (tarefas/follow-ups de leads)
+11) (Opcional) `db/migrations/2026_vehicle_photos_storage.sql` (bucket + policies do Storage)
+12) `db/rls.sql`
 
 3) **Auth URLs**
 - Dev:

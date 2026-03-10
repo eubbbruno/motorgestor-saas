@@ -24,6 +24,12 @@ exception
   when duplicate_object then null;
 end $$;
 
+do $$ begin
+  create type public.lead_task_status as enum ('pending', 'done', 'cancelled');
+exception
+  when duplicate_object then null;
+end $$;
+
 -- Tables (sem FKs / sem triggers / sem RLS)
 create table if not exists public.companies (
   id uuid primary key default gen_random_uuid(),
@@ -130,4 +136,20 @@ create table if not exists public.contact_messages (
   utm_campaign text,
   created_at timestamptz not null default now()
 );
+
+create table if not exists public.lead_tasks (
+  id uuid primary key default gen_random_uuid(),
+  lead_id uuid not null,
+  company_id uuid not null,
+  title text not null,
+  description text,
+  status public.lead_task_status not null default 'pending',
+  due_date date,
+  created_by uuid default auth.uid(),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists lead_tasks_company_id_idx on public.lead_tasks(company_id);
+create index if not exists lead_tasks_lead_id_idx on public.lead_tasks(lead_id, created_at desc);
+create index if not exists lead_tasks_due_date_idx on public.lead_tasks(company_id, status, due_date);
 
