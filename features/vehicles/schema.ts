@@ -9,8 +9,12 @@ export const VehicleStatusSchema = z.enum([
 
 export const VehicleFormSchema = z.object({
   title: z.string().min(3, "Informe um título (ex: Corolla XEi 2020)."),
+  plate: z.string().optional(),
+  chassis: z.string().optional(),
+  renavam: z.string().optional(),
   make: z.string().optional(),
   model: z.string().optional(),
+  version: z.string().optional(),
   year: z.number().int().min(1900).max(2100).optional(),
   price: z.number().min(0).optional(),
   fipe_value: z.number().min(0).optional(),

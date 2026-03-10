@@ -50,8 +50,12 @@ export function VehicleDetailClient({ id }: { id: string }) {
   const defaultValues: Partial<VehicleFormValues> | undefined = vehicle.data
     ? {
         title: vehicle.data.title,
+        plate: vehicle.data.plate ?? "",
+        chassis: vehicle.data.chassis ?? "",
+        renavam: vehicle.data.renavam ?? "",
         make: vehicle.data.make ?? "",
         model: vehicle.data.model ?? "",
+        version: vehicle.data.version ?? "",
         year: vehicle.data.year ?? undefined,
         price: vehicle.data.price ?? undefined,
         fipe_value: vehicle.data.fipe_value ?? undefined,

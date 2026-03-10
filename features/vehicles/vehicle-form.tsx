@@ -14,6 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
+type FipeOption = { code: string; name: string };
+type FipeYearOption = { code: string; name: string; year: number };
+
 const statusLabels: Record<VehicleFormValues["status"], string> = {
   disponivel: "Disponível",
   reservado: "Reservado",
@@ -38,8 +41,12 @@ export function VehicleForm({
     resolver: zodResolver(VehicleFormSchema),
     defaultValues: {
       title: "",
+      plate: "",
+      chassis: "",
+      renavam: "",
       make: "",
       model: "",
+      version: "",
       year: undefined,
       price: undefined,
       fipe_value: undefined,
@@ -60,6 +67,19 @@ export function VehicleForm({
   const [fipeLoading, setFipeLoading] = React.useState(false);
   const [aiLoading, setAiLoading] = React.useState(false);
 
+  const [brandsLoading, setBrandsLoading] = React.useState(false);
+  const [modelsLoading, setModelsLoading] = React.useState(false);
+  const [yearsLoading, setYearsLoading] = React.useState(false);
+
+  const [brands, setBrands] = React.useState<FipeOption[]>([]);
+  const [models, setModels] = React.useState<FipeOption[]>([]);
+  const [years, setYears] = React.useState<FipeYearOption[]>([]);
+
+  const [brandCode, setBrandCode] = React.useState<string>("");
+  const [modelCode, setModelCode] = React.useState<string>("");
+  const [yearCode, setYearCode] = React.useState<string>("");
+  const fipeOptionsAvailable = brandsLoading || brands.length > 0;
+
   async function handleSubmit(values: VehicleFormValues) {
     setSubmitting(true);
     try {
@@ -73,6 +93,117 @@ export function VehicleForm({
   const busyFipe = Boolean(busy || fipeLoading);
   const busyAi = Boolean(busy || aiLoading);
 
+  async function fetchFipeOptions(params?: { brandCode?: string; modelCode?: string }) {
+    const sp = new URLSearchParams();
+    if (params?.brandCode) sp.set("brandCode", params.brandCode);
+    if (params?.modelCode) sp.set("modelCode", params.modelCode);
+    const res = await fetch(`/api/fipe/options?${sp.toString()}`, { method: "GET" });
+    const body = (await res.json().catch(() => null)) as
+      | { ok: true; data: unknown }
+      | { ok: false; error: string };
+    if (!res.ok || !body || body.ok === false) {
+      throw new Error(body && "error" in body ? body.error : "FIPE indisponível.");
+    }
+    return body.data as unknown;
+  }
+
+  // Carrega marcas (1x)
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setBrandsLoading(true);
+      try {
+        const data = (await fetchFipeOptions()) as Array<{ code: string; name: string }>;
+        if (!cancelled) setBrands(data ?? []);
+      } catch {
+        if (!cancelled) setBrands([]);
+      } finally {
+        if (!cancelled) setBrandsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Quando brand muda, carrega modelos
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!brandCode) {
+        setModels([]);
+        setYears([]);
+        return;
+      }
+      setModelsLoading(true);
+      try {
+        const data = (await fetchFipeOptions({ brandCode })) as Array<{ code: string; name: string }>;
+        if (!cancelled) setModels(data ?? []);
+      } catch {
+        if (!cancelled) setModels([]);
+      } finally {
+        if (!cancelled) setModelsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [brandCode]);
+
+  // Quando model muda, carrega anos
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!brandCode || !modelCode) {
+        setYears([]);
+        return;
+      }
+      setYearsLoading(true);
+      try {
+        const data = (await fetchFipeOptions({
+          brandCode,
+          modelCode,
+        })) as Array<{ code: string; name: string; year: number }>;
+        if (!cancelled) setYears((data ?? []).filter((y) => Number.isFinite(y.year)));
+      } catch {
+        if (!cancelled) setYears([]);
+      } finally {
+        if (!cancelled) setYearsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [brandCode, modelCode]);
+
+  // Tenta pré-selecionar (edição) via nomes existentes
+  React.useEffect(() => {
+    if (!brands.length) return;
+    if (brandCode) return;
+    const currentMake = (form.getValues("make") ?? "").trim().toLowerCase();
+    if (!currentMake) return;
+    const found = brands.find((b) => b.name.toLowerCase() === currentMake) ?? null;
+    if (found) setBrandCode(found.code);
+  }, [brands, brandCode, form]);
+
+  React.useEffect(() => {
+    if (!models.length) return;
+    if (modelCode) return;
+    const currentModel = (form.getValues("model") ?? "").trim().toLowerCase();
+    if (!currentModel) return;
+    const found = models.find((m) => m.name.toLowerCase() === currentModel) ?? null;
+    if (found) setModelCode(found.code);
+  }, [models, modelCode, form]);
+
+  React.useEffect(() => {
+    if (!years.length) return;
+    if (yearCode) return;
+    const currentYear = form.getValues("year");
+    if (!currentYear) return;
+    const found = years.find((y) => y.year === currentYear) ?? null;
+    if (found) setYearCode(found.code);
+  }, [years, yearCode, form]);
+
   async function fetchFipe() {
     if (busyFipe) return;
 
@@ -80,8 +211,8 @@ export function VehicleForm({
     const model = (form.getValues("model") ?? "").trim();
     const year = form.getValues("year");
 
-    if (!make || !model || !year) {
-      toast.error("Para buscar FIPE, informe marca, modelo e ano.");
+    if ((!make || !model || !year) && !(brandCode && modelCode && yearCode)) {
+      toast.error("Para buscar FIPE, selecione Marca, Modelo e Ano.");
       return;
     }
 
@@ -90,7 +221,11 @@ export function VehicleForm({
       const res = await fetch("/api/fipe", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ make, model, year }),
+        body: JSON.stringify(
+          brandCode && modelCode && yearCode
+            ? { brandCode, modelCode, yearCode }
+            : { make, model, year },
+        ),
       });
 
       const body = (await res.json().catch(() => null)) as
@@ -111,6 +246,61 @@ export function VehicleForm({
       toast.error("Não foi possível buscar a FIPE.", {
         description: message,
       });
+    } finally {
+      setFipeLoading(false);
+    }
+  }
+
+  async function lookupVehicle() {
+    if (busy) return;
+
+    const plate = (form.getValues("plate") ?? "").trim();
+    const chassis = (form.getValues("chassis") ?? "").trim();
+    const renavam = (form.getValues("renavam") ?? "").trim();
+
+    if (!plate && !chassis && !renavam) {
+      toast.error("Informe placa, chassi ou renavam para buscar.");
+      return;
+    }
+
+    setFipeLoading(true);
+    try {
+      const res = await fetch("/api/vehicle-lookup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ plate, chassis, renavam }),
+      });
+
+      const body = (await res.json().catch(() => null)) as
+        | {
+            ok: true;
+            make?: string | null;
+            model?: string | null;
+            year?: number | null;
+            version?: string | null;
+            fuel?: string | null;
+          }
+        | { ok: false; error: string };
+
+      if (!res.ok || !body || body.ok === false) {
+        throw new Error(body && "error" in body ? body.error : "Busca indisponível.");
+      }
+
+      if (body.make) form.setValue("make", body.make, { shouldDirty: true, shouldValidate: true });
+      if (body.model) form.setValue("model", body.model, { shouldDirty: true, shouldValidate: true });
+      if (body.year) form.setValue("year", body.year, { shouldDirty: true, shouldValidate: true });
+      if (body.version) form.setValue("version", body.version, { shouldDirty: true, shouldValidate: true });
+      if (body.fuel) form.setValue("fuel", body.fuel, { shouldDirty: true, shouldValidate: true });
+
+      // Re-tenta casar selects FIPE com os valores preenchidos
+      setBrandCode("");
+      setModelCode("");
+      setYearCode("");
+
+      toast.success("Dados do veículo preenchidos.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Busca indisponível.";
+      toast.error("Não foi possível buscar os dados do veículo.", { description: message });
     } finally {
       setFipeLoading(false);
     }
@@ -192,33 +382,197 @@ export function VehicleForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="make">Marca</Label>
-              <Input id="make" placeholder="Toyota" {...form.register("make")} />
+              <Label htmlFor="plate">Placa</Label>
+              <Input id="plate" placeholder="ABC1D23" {...form.register("plate")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="model">Modelo</Label>
-              <Input id="model" placeholder="Corolla" {...form.register("model")} />
+              <Label htmlFor="chassis">Chassi</Label>
+              <Input id="chassis" placeholder="9BW..." {...form.register("chassis")} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="renavam">Renavam</Label>
+              <Input id="renavam" placeholder="00000000000" {...form.register("renavam")} />
+            </div>
+            <div className="space-y-2">
+              <Label>&nbsp;</Label>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={lookupVehicle}
+                disabled={busyFipe}
+              >
+                {busyFipe ? (
+                  <>
+                    <Loader2Icon className="mr-2 size-4 animate-spin" />
+                    Buscando...
+                  </>
+                ) : (
+                  "Buscar dados do veículo"
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                A busca por placa/chassi/renavam pode exigir provedor externo (configurável).
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="year">Ano</Label>
+            {fipeOptionsAvailable ? (
+              <>
+                <div className="space-y-2">
+                  <Label>Marca</Label>
+                  <Select
+                    value={brandCode}
+                    onValueChange={(v) => {
+                      setBrandCode(v);
+                      setModelCode("");
+                      setYearCode("");
+                      const picked = brands.find((b) => b.code === v);
+                      form.setValue("make", picked?.name ?? "", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      form.setValue("model", "", { shouldDirty: true, shouldValidate: true });
+                      form.setValue("year", undefined, { shouldDirty: true, shouldValidate: true });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={brandsLoading ? "Carregando..." : "Selecione a marca"}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(brands ?? []).map((b) => (
+                        <SelectItem key={b.code} value={b.code}>
+                          {b.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Modelo</Label>
+                  <Select
+                    value={modelCode}
+                    onValueChange={(v) => {
+                      setModelCode(v);
+                      setYearCode("");
+                      const picked = models.find((m) => m.code === v);
+                      form.setValue("model", picked?.name ?? "", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      form.setValue("year", undefined, { shouldDirty: true, shouldValidate: true });
+                    }}
+                    disabled={!brandCode || modelsLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          !brandCode
+                            ? "Selecione a marca primeiro"
+                            : modelsLoading
+                              ? "Carregando..."
+                              : "Selecione o modelo"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(models ?? []).map((m) => (
+                        <SelectItem key={m.code} value={m.code}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ano</Label>
+                  <Select
+                    value={yearCode}
+                    onValueChange={(v) => {
+                      setYearCode(v);
+                      const picked = years.find((y) => y.code === v) ?? null;
+                      form.setValue("year", picked?.year ?? undefined, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                    disabled={!brandCode || !modelCode || yearsLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          !brandCode || !modelCode
+                            ? "Selecione marca e modelo"
+                            : yearsLoading
+                              ? "Carregando..."
+                              : "Selecione o ano"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(years ?? []).map((y) => (
+                        <SelectItem key={y.code} value={y.code}>
+                          {y.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.year ? (
+                    <p id="year-error" className="text-xs text-destructive" role="alert">
+                      {form.formState.errors.year.message}
+                    </p>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="make">Marca</Label>
+                  <Input id="make" placeholder="Toyota" {...form.register("make")} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="model">Modelo</Label>
+                  <Input id="model" placeholder="Corolla" {...form.register("model")} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year">Ano</Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="2020"
+                    aria-invalid={Boolean(form.formState.errors.year)}
+                    aria-describedby={form.formState.errors.year ? "year-error" : undefined}
+                    className={
+                      form.formState.errors.year
+                        ? "border-destructive focus-visible:ring-destructive/30"
+                        : undefined
+                    }
+                    {...form.register("year", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
+                  />
+                  {form.formState.errors.year ? (
+                    <p id="year-error" className="text-xs text-destructive" role="alert">
+                      {form.formState.errors.year.message}
+                    </p>
+                  ) : null}
+                  <p className="text-xs text-muted-foreground">
+                    FIPE indisponível para seleção em cascata. Você ainda pode preencher manualmente.
+                  </p>
+                </div>
+              </>
+            )}
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="version">Versão (opcional)</Label>
               <Input
-                id="year"
-                type="number"
-                inputMode="numeric"
-                placeholder="2020"
-                aria-invalid={Boolean(form.formState.errors.year)}
-                aria-describedby={form.formState.errors.year ? "year-error" : undefined}
-                className={form.formState.errors.year ? "border-destructive focus-visible:ring-destructive/30" : undefined}
-                {...form.register("year", {
-                  setValueAs: (v) => (v === "" ? undefined : Number(v)),
-                })}
+                id="version"
+                placeholder="Ex: XEi 2.0 AT"
+                {...form.register("version")}
               />
-              {form.formState.errors.year ? (
-                <p id="year-error" className="text-xs text-destructive" role="alert">
-                  {form.formState.errors.year.message}
-                </p>
-              ) : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="mileage">KM</Label>

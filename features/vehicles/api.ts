@@ -36,10 +36,16 @@ export async function createVehicle(args: {
     .from("vehicles")
     .insert({
       company_id: args.companyId,
-      created_by: args.userId,
+      // created_by é opcional e tem FK para `profiles`.
+      // Para não quebrar a criação caso o perfil ainda não exista em algum ambiente,
+      // não enviamos `created_by` no insert.
       title: args.values.title,
+      plate: (args.values.plate ?? "").trim() || null,
+      chassis: (args.values.chassis ?? "").trim() || null,
+      renavam: (args.values.renavam ?? "").trim() || null,
       make: args.values.make ?? null,
       model: args.values.model ?? null,
+      version: (args.values.version ?? "").trim() || null,
       year: args.values.year ?? null,
       price: args.values.price ?? null,
       ...(hasFipe
@@ -77,8 +83,12 @@ export async function updateVehicle(args: {
     .from("vehicles")
     .update({
       title: args.values.title,
+      plate: (args.values.plate ?? "").trim() || null,
+      chassis: (args.values.chassis ?? "").trim() || null,
+      renavam: (args.values.renavam ?? "").trim() || null,
       make: args.values.make ?? null,
       model: args.values.model ?? null,
+      version: (args.values.version ?? "").trim() || null,
       year: args.values.year ?? null,
       price: args.values.price ?? null,
       ...(hasFipe

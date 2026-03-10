@@ -36,8 +36,12 @@ export type VehicleRow = {
   company_id: string;
   created_by: string | null;
   title: string;
+  plate?: string | null;
+  chassis?: string | null;
+  renavam?: string | null;
   make: string | null;
   model: string | null;
+  version?: string | null;
   year: number | null;
   price: number | null;
   fipe_value?: number | null;

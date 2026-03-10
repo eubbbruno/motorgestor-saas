@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Loader2Icon } from "lucide-react";
 
 import { useMyProfile, useUpdateMyProfile } from "@/features/auth/hooks";
 import { Card } from "@/components/ui/card";
@@ -42,6 +43,8 @@ export default function ConfiguracoesPage() {
     }
   }
 
+  const busy = profile.isLoading || update.isPending;
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -51,39 +54,58 @@ export default function ConfiguracoesPage() {
         </p>
       </div>
 
-      <Card className="bg-background/60 p-6">
-        <div className="text-base font-medium">Minha conta</div>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 grid gap-4 md:max-w-xl">
-          <div className="space-y-2">
-            <Label htmlFor="full_name">Nome</Label>
-            <Input id="full_name" placeholder="Seu nome" {...form.register("full_name")} />
-            {form.formState.errors.full_name ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.full_name.message}
-              </p>
-            ) : null}
-          </div>
+      {profile.isError ? (
+        <Card className="bg-background/60 p-6">
+          <div className="text-base font-medium">Minha conta</div>
+          <p className="mt-2 text-sm text-destructive">
+            Não foi possível carregar suas informações. Verifique se você está logado e se o Supabase está configurado.
+          </p>
+        </Card>
+      ) : (
+        <Card className="bg-background/60 p-6">
+          <div className="text-base font-medium">Minha conta</div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Papel</div>
-              <div className="text-sm font-medium capitalize">
-                {profile.data?.role ?? "—"}
+          <div className="mt-4 grid gap-4 md:max-w-xl">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground">E-mail</div>
+                <div className="truncate text-sm font-medium">{profile.data?.email ?? "—"}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground">Papel</div>
+                <div className="text-sm font-medium capitalize">{profile.data?.role ?? "—"}</div>
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <div className="text-xs text-muted-foreground">Empresa (ID)</div>
+                <div className="truncate text-sm font-medium">{profile.data?.company_id ?? "—"}</div>
               </div>
             </div>
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Empresa</div>
-              <div className="truncate text-sm font-medium">
-                {profile.data?.company_id ?? "—"}
-              </div>
-            </div>
-          </div>
 
-          <Button type="submit" disabled={update.isPending || profile.isLoading}>
-            {update.isPending ? "Salvando..." : "Salvar"}
-          </Button>
-        </form>
-      </Card>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+              <fieldset disabled={busy} aria-busy={busy} className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Nome</Label>
+                  <Input id="full_name" placeholder="Seu nome" {...form.register("full_name")} />
+                  {form.formState.errors.full_name ? (
+                    <p className="text-xs text-destructive">{form.formState.errors.full_name.message}</p>
+                  ) : null}
+                </div>
+
+                <Button type="submit" disabled={busy}>
+                  {busy ? (
+                    <>
+                      <Loader2Icon className="mr-2 size-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    "Salvar"
+                  )}
+                </Button>
+              </fieldset>
+            </form>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

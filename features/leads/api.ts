@@ -38,7 +38,9 @@ export async function createLead(args: {
     .from("leads")
     .insert({
       company_id: args.companyId,
-      created_by: args.userId,
+      // created_by é opcional e tem FK para `profiles`.
+      // Para não quebrar a criação caso o perfil ainda não exista em algum ambiente,
+      // não enviamos `created_by` no insert.
       name: args.values.name,
       phone: args.values.phone ?? null,
       email,

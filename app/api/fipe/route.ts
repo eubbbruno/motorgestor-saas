@@ -2,9 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 const Schema = z.object({
-  make: z.string().min(1),
-  model: z.string().min(1),
-  year: z.number().int().min(1900).max(2100),
+  make: z.string().min(1).optional(),
+  model: z.string().min(1).optional(),
+  year: z.number().int().min(1900).max(2100).optional(),
+  brandCode: z.string().min(1).optional(),
+  modelCode: z.union([z.string().min(1), z.number()]).optional(),
+  yearCode: z.string().min(1).optional(),
 });
 
 type CacheEntry = {
@@ -87,13 +90,17 @@ export async function POST(req: NextRequest) {
   const parsed = Schema.safeParse(input);
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: "Informe marca, modelo e ano." },
+      { ok: false, error: "Informe marca/modelo/ano (ou selecione marca/modelo/ano na FIPE)." },
       { status: 400 },
     );
   }
 
-  const { make, model, year } = parsed.data;
-  const key = `${normalizeName(make)}|${normalizeName(model)}|${year}`;
+  const { make, model, year, brandCode, modelCode, yearCode } = parsed.data;
+
+  // Quando o form usa selects em cascata, usamos códigos (mais confiável que fuzzy match).
+  const key = brandCode && modelCode && yearCode
+    ? `code|${brandCode}|${String(modelCode)}|${yearCode}`
+    : `${normalizeName(make ?? "")}|${normalizeName(model ?? "")}|${year ?? ""}`;
 
   const now = Date.now();
   const cached = cache.get(key);
@@ -104,41 +111,57 @@ export async function POST(req: NextRequest) {
   const base = process.env.FIPE_API_BASE_URL ?? "https://parallelum.com.br/fipe/api/v1/carros";
 
   try {
-    const marcas = await fetchJson<Marca[]>(`${base}/marcas`, 6000);
-    const marca = pickBestByName(marcas, make);
-    if (!marca) {
-      return NextResponse.json(
-        { ok: false, error: "Marca não encontrada na FIPE." },
-        { status: 404 },
-      );
-    }
+    let marcaCodigo: string | null = brandCode ?? null;
+    let modeloCodigo: string | number | null = modelCode ?? null;
+    let anoCodigo: string | null = yearCode ?? null;
 
-    const modelosResp = await fetchJson<ModelosResponse>(
-      `${base}/marcas/${marca.codigo}/modelos`,
-      7000,
-    );
-    const modelo = pickBestByName(modelosResp.modelos ?? [], model);
-    if (!modelo) {
-      return NextResponse.json(
-        { ok: false, error: "Modelo não encontrado para essa marca na FIPE." },
-        { status: 404 },
-      );
-    }
+    if (!marcaCodigo || !modeloCodigo || !anoCodigo) {
+      if (!make || !model || !year) {
+        return NextResponse.json(
+          { ok: false, error: "Para buscar FIPE, informe marca, modelo e ano." },
+          { status: 400 },
+        );
+      }
 
-    const anos = await fetchJson<Ano[]>(
-      `${base}/marcas/${marca.codigo}/modelos/${modelo.codigo}/anos`,
-      7000,
-    );
-    const ano = anos.find((a) => normalizeName(a.nome).startsWith(String(year)));
-    if (!ano) {
-      return NextResponse.json(
-        { ok: false, error: "Ano não encontrado para esse modelo na FIPE." },
-        { status: 404 },
+      const marcas = await fetchJson<Marca[]>(`${base}/marcas`, 6000);
+      const marca = pickBestByName(marcas, make);
+      if (!marca) {
+        return NextResponse.json(
+          { ok: false, error: "Marca não encontrada na FIPE." },
+          { status: 404 },
+        );
+      }
+      marcaCodigo = marca.codigo;
+
+      const modelosResp = await fetchJson<ModelosResponse>(
+        `${base}/marcas/${marcaCodigo}/modelos`,
+        7000,
       );
+      const modelo = pickBestByName(modelosResp.modelos ?? [], model);
+      if (!modelo) {
+        return NextResponse.json(
+          { ok: false, error: "Modelo não encontrado para essa marca na FIPE." },
+          { status: 404 },
+        );
+      }
+      modeloCodigo = modelo.codigo;
+
+      const anos = await fetchJson<Ano[]>(
+        `${base}/marcas/${marcaCodigo}/modelos/${modeloCodigo}/anos`,
+        7000,
+      );
+      const ano = anos.find((a) => normalizeName(a.nome).startsWith(String(year)));
+      if (!ano) {
+        return NextResponse.json(
+          { ok: false, error: "Ano não encontrado para esse modelo na FIPE." },
+          { status: 404 },
+        );
+      }
+      anoCodigo = ano.codigo;
     }
 
     const valor = await fetchJson<ValorResponse>(
-      `${base}/marcas/${marca.codigo}/modelos/${modelo.codigo}/anos/${ano.codigo}`,
+      `${base}/marcas/${marcaCodigo}/modelos/${modeloCodigo}/anos/${anoCodigo}`,
       8000,
     );
 
@@ -164,6 +187,9 @@ export async function POST(req: NextRequest) {
       make,
       model,
       year,
+      brandCode,
+      modelCode,
+      yearCode,
       base: process.env.FIPE_API_BASE_URL ?? "(default)",
       message: err instanceof Error ? err.message : String(err),
     });
