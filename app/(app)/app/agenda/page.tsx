@@ -1,21 +1,28 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CalendarIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { Calendar, dateFnsLocalizer, type Event as RBCEvent, type View } from "react-big-calendar";
+import { format, parse, startOfWeek, getDay } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
+import { useQuery } from "@tanstack/react-query";
 
 import { useEvents, useCreateEvent, useDeleteEvent } from "@/features/events/hooks";
 import { EventFormSchema, type EventFormValues } from "@/features/events/schema";
 import { useLeads } from "@/features/leads/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +32,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+type TaskRow = {
+  id: string;
+  lead_id: string;
+  title: string;
+  status: "pending" | "done" | "cancelled";
+  due_date: string | null; // YYYY-MM-DD
+  leads?: Array<{ name: string }> | null;
+};
+
+type TaskCalendarEvent = RBCEvent & {
+  taskId: string;
+  leadId: string;
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => startOfWeek(new Date(), { locale: ptBR }),
+  getDay,
+  locales: { "pt-BR": ptBR },
+});
+
 export default function AgendaPage() {
+  const router = useRouter();
   const profile = useMyProfile();
   const leads = useLeads();
   const events = useEvents();
@@ -33,6 +63,9 @@ export default function AgendaPage() {
   const del = useDeleteEvent();
 
   const [open, setOpen] = React.useState(false);
+  const [taskFilter, setTaskFilter] = React.useState<"pending" | "all">("pending");
+  const [view, setView] = React.useState<View>("month");
+  const [date, setDate] = React.useState<Date>(new Date());
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(EventFormSchema),
@@ -63,6 +96,42 @@ export default function AgendaPage() {
     setOpen(false);
   }
 
+  const tasksQuery = useQuery({
+    queryKey: ["agenda", "lead_tasks", taskFilter],
+    queryFn: async () => {
+      const supabase = createSupabaseBrowserClient();
+      let q = supabase
+        .from("lead_tasks")
+        .select("id, lead_id, title, status, due_date, leads(name)")
+        .not("due_date", "is", null)
+        .order("due_date", { ascending: true });
+
+      if (taskFilter === "pending") q = q.eq("status", "pending");
+
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as TaskRow[];
+    },
+  });
+
+  const taskEvents = React.useMemo<TaskCalendarEvent[]>(() => {
+    const list = tasksQuery.data ?? [];
+    return list
+      .filter((t) => Boolean(t.due_date))
+      .map((t) => {
+        const d = new Date(`${t.due_date}T00:00:00`);
+        const leadName = t.leads?.[0]?.name ?? "Lead";
+        return {
+          title: `${t.title} · ${leadName}`,
+          start: d,
+          end: d,
+          allDay: true,
+          taskId: t.id,
+          leadId: t.lead_id,
+        };
+      });
+  }, [tasksQuery.data]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -77,6 +146,78 @@ export default function AgendaPage() {
           Novo evento
         </Button>
       </div>
+
+      <Card className="bg-background/60 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <div className="text-base font-medium">Calendário de tarefas</div>
+            <div className="text-sm text-muted-foreground">
+              Visualize vencimentos de follow-ups e clique para abrir o lead.
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Tabs value={taskFilter} onValueChange={(v) => setTaskFilter(v as "pending" | "all")}>
+              <TabsList>
+                <TabsTrigger value="pending">Pendentes</TabsTrigger>
+                <TabsTrigger value="all">Todas</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => tasksQuery.refetch()}
+              disabled={tasksQuery.isFetching}
+            >
+              {tasksQuery.isFetching ? "Atualizando..." : "Atualizar"}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          {tasksQuery.isLoading ? (
+            <div className="text-sm text-muted-foreground">Carregando calendário...</div>
+          ) : tasksQuery.isError ? (
+            <div className="text-sm text-destructive">
+              Não foi possível carregar tarefas do calendário. A migração `lead_tasks` já foi aplicada?
+            </div>
+          ) : (
+            <div className="rounded-xl border bg-background/40 p-3">
+              <Calendar
+                localizer={localizer}
+                culture="pt-BR"
+                events={taskEvents}
+                startAccessor="start"
+                endAccessor="end"
+                view={view}
+                onView={(v) => setView(v)}
+                date={date}
+                onNavigate={(d) => setDate(d)}
+                style={{ height: 520 }}
+                popup
+                onSelectEvent={(e) => {
+                  const ev = e as TaskCalendarEvent;
+                  router.push(`/app/leads/${ev.leadId}`);
+                  router.refresh();
+                }}
+                messages={{
+                  next: "Próximo",
+                  previous: "Anterior",
+                  today: "Hoje",
+                  month: "Mês",
+                  week: "Semana",
+                  day: "Dia",
+                  agenda: "Agenda",
+                  date: "Data",
+                  time: "Hora",
+                  event: "Evento",
+                  noEventsInRange: "Sem tarefas com vencimento neste período.",
+                  showMore: (total) => `+${total} mais`,
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </Card>
 
       <Card className="bg-background/60 p-4">
         {events.isLoading ? (

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "react-big-calendar/lib/css/react-big-calendar.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -44,6 +45,41 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* react-big-calendar: pequenos ajustes para combinar com o tema */
+.rbc-calendar {
+  font-family: var(--font-sans);
+}
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  border-color: hsl(var(--border));
+  background: color-mix(in oklab, hsl(var(--background)) 92%, transparent);
+  border-radius: calc(var(--radius) + 4px);
+  overflow: hidden;
+}
+.rbc-header,
+.rbc-month-row + .rbc-month-row {
+  border-color: hsl(var(--border));
+}
+.rbc-today {
+  background: color-mix(in oklab, hsl(var(--accent)) 55%, transparent);
+}
+.rbc-event,
+.rbc-day-slot .rbc-background-event {
+  background: color-mix(in oklab, hsl(var(--primary)) 86%, transparent);
+  border: none;
+  border-radius: 10px;
+  padding: 2px 6px;
+}
+.rbc-event.rbc-selected {
+  background: color-mix(in oklab, hsl(var(--primary)) 92%, black 8%);
+}
+.dark .rbc-month-view,
+.dark .rbc-time-view,
+.dark .rbc-agenda-view {
+  background: color-mix(in oklab, hsl(var(--background)) 70%, transparent);
 }
 
 :root {
