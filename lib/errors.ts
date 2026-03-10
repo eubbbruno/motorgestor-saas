@@ -32,6 +32,14 @@ export function getHumanErrorMessage(error: unknown): string | null {
     return "Sem permissão para concluir essa ação. Se for seu primeiro acesso, finalize o onboarding.";
   }
 
+  // Limites de plano
+  if (msg.includes("plan_limit_max_vehicles")) {
+    return "Você atingiu o limite de veículos do seu plano. Faça upgrade para continuar cadastrando.";
+  }
+  if (msg.includes("plan_limit_max_leads")) {
+    return "Você atingiu o limite de leads do seu plano. Faça upgrade para continuar cadastrando.";
+  }
+
   return raw;
 }
 

@@ -123,7 +123,8 @@ Para **banco existente** (incremental, sem destruir dados):
 4) `db/migrations/2026_leads_pipeline_status.sql` (status Kanban em `leads`)
 5) `db/migrations/2026_dashboard_metrics.sql` (função SQL de métricas do dashboard)
 6) `db/migrations/2026_dashboard_charts.sql` (função SQL para gráficos do dashboard)
-7) `db/rls.sql`
+7) `db/migrations/2026_saas_plans.sql` (planos + assinaturas + limites)
+8) `db/rls.sql`
 
 3) **Auth URLs**
 - Dev:

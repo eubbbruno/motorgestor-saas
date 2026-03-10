@@ -6,7 +6,7 @@ import { Container } from "@/components/site/container";
 
 const nav = [
   { href: "/recursos", label: "Recursos" },
-  { href: "/precos", label: "Preços" },
+  { href: "/planos", label: "Planos" },
   { href: "/integracoes", label: "Integrações" },
   { href: "/blog", label: "Blog" },
   { href: "/sobre", label: "Sobre" },
