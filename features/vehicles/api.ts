@@ -56,6 +56,7 @@ export async function createVehicle(args: {
           }
         : {}),
       ...(hasAi ? { description_ai: args.values.description_ai ?? null } : {}),
+      photo_paths: args.values.photo_paths ?? [],
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,
@@ -99,6 +100,7 @@ export async function updateVehicle(args: {
           }
         : {}),
       ...(hasAi ? { description_ai: args.values.description_ai ?? null } : {}),
+      photo_paths: args.values.photo_paths ?? [],
       mileage: args.values.mileage ?? null,
       fuel: args.values.fuel ?? null,
       transmission: args.values.transmission ?? null,

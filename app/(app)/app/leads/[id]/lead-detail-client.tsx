@@ -129,6 +129,9 @@ export function LeadDetailClient({ id }: { id: string }) {
           <Button asChild variant="outline">
             <Link href="/app/leads">Voltar</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href={`/app/proposta?leadId=${id}`}>Gerar proposta PDF</Link>
+          </Button>
           <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
             <TrashIcon className="mr-2 size-4" />
             Remover

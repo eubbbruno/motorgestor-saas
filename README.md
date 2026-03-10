@@ -120,12 +120,14 @@ Para **banco existente** (incremental, sem destruir dados):
 1) `db/migrations/2026_onboarding_companies.sql`
 2) `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
 3) `db/migrations/2026_vehicles_ai_description.sql` (campo IA em `vehicles`)
-4) `db/migrations/2026_leads_pipeline_status.sql` (status Kanban em `leads`)
-5) `db/migrations/2026_dashboard_metrics.sql` (função SQL de métricas do dashboard)
-6) `db/migrations/2026_dashboard_charts.sql` (função SQL para gráficos do dashboard)
-7) `db/migrations/2026_saas_plans.sql` (planos + assinaturas + limites)
-8) `db/migrations/2026_lead_events_timeline.sql` (timeline/comentários de leads)
-9) `db/rls.sql`
+4) `db/migrations/2026_vehicle_photos.sql` (paths de fotos em `vehicles`)
+5) `db/migrations/2026_leads_pipeline_status.sql` (status Kanban em `leads`)
+6) `db/migrations/2026_dashboard_metrics.sql` (função SQL de métricas do dashboard)
+7) `db/migrations/2026_dashboard_charts.sql` (função SQL para gráficos do dashboard)
+8) `db/migrations/2026_saas_plans.sql` (planos + assinaturas + limites)
+9) `db/migrations/2026_lead_events_timeline.sql` (timeline/comentários de leads)
+10) (Opcional) `db/migrations/2026_vehicle_photos_storage.sql` (bucket + policies do Storage)
+11) `db/rls.sql`
 
 3) **Auth URLs**
 - Dev:
@@ -139,7 +141,9 @@ Para **banco existente** (incremental, sem destruir dados):
 - Crie 2 usuários e 2 empresas e valide que **um não lê dados do outro**.
 
 5) (Opcional) **Storage para fotos de veículos**
-- Se você quiser upload (em vez de URLs públicas), crie um bucket e policies por `company_id`.
+- Para habilitar **upload real** no app:
+  - Rode `db/migrations/2026_vehicle_photos_storage.sql` (cria o bucket `vehicle-photos` e policies por `company_id`)
+  - Convenção de path: `company_id/<arquivo>`
 
 ---
 
@@ -213,6 +217,7 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
     - `db/migrations/2026_vehicles_fipe.sql` (campos FIPE em `vehicles`)
     - `db/migrations/2026_leads_pipeline_status.sql` (pipeline/kanban em `leads`)
     - `db/migrations/2026_vehicles_ai_description.sql` (descrição IA em `vehicles`)
+    - `db/migrations/2026_vehicle_photos.sql` (paths de fotos em `vehicles`)
     - `db/migrations/2026_dashboard_metrics.sql` (métricas do dashboard)
     - `db/migrations/2026_dashboard_charts.sql` (gráficos do dashboard)
     - `db/rls.sql`
@@ -221,7 +226,8 @@ Sem essas variáveis, o deploy **ainda deve buildar**, mas as telas que dependem
     - **Site URL**: `https://SEU-DOMINIO`
     - **Redirect URLs**: `https://SEU-DOMINIO/**`
 - **Storage (não é necessário para FIPE)**:
-  - Só configure bucket/policies se você for fazer **upload** de fotos de veículos.
+  - Só configure bucket/policies se você for fazer **upload** de fotos de veículos:
+    - `db/migrations/2026_vehicle_photos_storage.sql` (bucket `vehicle-photos` + policies por tenant)
 
 ### Vercel (produção)
 - **Environment Variables (obrigatório)**:

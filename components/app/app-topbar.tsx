@@ -6,6 +6,7 @@ import { ChevronDownIcon, MenuIcon } from "lucide-react";
 import { useUiStore } from "@/lib/stores/ui-store";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { GlobalSearch } from "@/components/app/global-search";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +50,10 @@ export function AppTopbar({
           <span className="font-medium text-foreground">Painel</span>{" "}
           <span className="hidden sm:inline">— MotorGestor</span>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <GlobalSearch />
       </div>
 
       <DropdownMenu>

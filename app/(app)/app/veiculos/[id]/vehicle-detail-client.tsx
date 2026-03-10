@@ -62,6 +62,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
         fipe_reference: vehicle.data.fipe_reference ?? "",
         fipe_code: vehicle.data.fipe_code ?? "",
         description_ai: vehicle.data.description_ai ?? "",
+        photo_paths: vehicle.data.photo_paths ?? [],
         mileage: vehicle.data.mileage ?? undefined,
         fuel: vehicle.data.fuel ?? "",
         transmission: vehicle.data.transmission ?? "",
@@ -84,6 +85,9 @@ export function VehicleDetailClient({ id }: { id: string }) {
           <Button asChild variant="outline">
             <Link href="/app/veiculos">Voltar</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href={`/app/proposta?vehicleId=${id}`}>Gerar proposta PDF</Link>
+          </Button>
           <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
             <TrashIcon className="mr-2 size-4" />
             Remover
@@ -103,6 +107,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
           submitLabel="Salvar alterações"
           defaultValues={defaultValues}
           onSubmit={onSubmit}
+          companyId={vehicle.data.company_id}
           loading={update.isPending}
         />
       ) : null}

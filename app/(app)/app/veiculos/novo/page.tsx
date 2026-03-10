@@ -52,6 +52,7 @@ export default function NovoVeiculoPage() {
         title="Cadastro do veículo"
         submitLabel="Cadastrar veículo"
         onSubmit={onSubmit}
+        companyId={profile.data?.company_id ?? null}
         loading={profile.isLoading || create.isPending}
       />
     </div>

@@ -3,10 +3,11 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, TrashIcon, UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { VehicleFormSchema, type VehicleFormValues } from "@/features/vehicles/schema";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,12 +30,14 @@ export function VehicleForm({
   submitLabel,
   defaultValues,
   onSubmit,
+  companyId,
   loading,
 }: {
   title: string;
   submitLabel: string;
   defaultValues?: Partial<VehicleFormValues>;
   onSubmit: (values: VehicleFormValues) => Promise<void> | void;
+  companyId?: string | null;
   loading?: boolean;
 }) {
   const form = useForm<VehicleFormValues>({
@@ -53,6 +56,7 @@ export function VehicleForm({
       fipe_reference: "",
       fipe_code: "",
       description_ai: "",
+      photo_paths: [],
       mileage: undefined,
       fuel: "",
       transmission: "",
@@ -92,6 +96,102 @@ export function VehicleForm({
   const busy = Boolean(loading || submitting);
   const busyFipe = Boolean(busy || fipeLoading);
   const busyAi = Boolean(busy || aiLoading);
+
+  const [uploading, setUploading] = React.useState(false);
+  const [photoUrls, setPhotoUrls] = React.useState<Record<string, string>>({});
+  const photoPaths = form.watch("photo_paths") ?? [];
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  function sanitizeFilename(name: string) {
+    return name
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9._-]/g, "")
+      .slice(0, 120);
+  }
+
+  async function refreshSignedUrls(paths: string[]) {
+    if (!paths.length) {
+      setPhotoUrls({});
+      return;
+    }
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const entries = await Promise.all(
+        paths.map(async (p) => {
+          const { data } = await supabase
+            .storage
+            .from("vehicle-photos")
+            .createSignedUrl(p, 60 * 60);
+          return [p, data?.signedUrl ?? ""] as const;
+        }),
+      );
+      const next = Object.fromEntries(entries.filter(([, url]) => Boolean(url)));
+      setPhotoUrls(next);
+    } catch {
+      // ignore
+    }
+  }
+
+  React.useEffect(() => {
+    void refreshSignedUrls(photoPaths);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoPaths.join("|")]);
+
+  async function onUploadFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    if (!companyId) {
+      toast.error("Empresa não identificada. Finalize o onboarding antes de enviar fotos.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const uploaded: string[] = [];
+
+      for (const file of Array.from(files)) {
+        const safeName = sanitizeFilename(file.name || "foto.jpg");
+        const id =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : String(Date.now());
+        const path = `${companyId}/${id}-${safeName}`;
+        const { error } = await supabase.storage.from("vehicle-photos").upload(path, file, {
+          upsert: false,
+          contentType: file.type || undefined,
+        });
+        if (error) throw error;
+        uploaded.push(path);
+      }
+
+      const next = [...photoPaths, ...uploaded];
+      form.setValue("photo_paths", next, { shouldDirty: true, shouldValidate: true });
+      toast.success("Fotos enviadas.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Não foi possível enviar as fotos.";
+      toast.error("Upload falhou.", { description: message });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removePhoto(path: string) {
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.storage.from("vehicle-photos").remove([path]);
+    } catch {
+      // não bloqueia remoção no form
+    } finally {
+      const next = (form.getValues("photo_paths") ?? []).filter((p) => p !== path);
+      form.setValue("photo_paths", next, { shouldDirty: true, shouldValidate: true });
+      setPhotoUrls((prev) => {
+        const cp = { ...prev };
+        delete cp[path];
+        return cp;
+      });
+    }
+  }
 
   async function fetchFipeOptions(params?: { brandCode?: string; modelCode?: string }) {
     const sp = new URLSearchParams();
@@ -414,6 +514,78 @@ export function VehicleForm({
               <p className="text-xs text-muted-foreground">
                 A busca por placa/chassi/renavam pode exigir provedor externo (configurável).
               </p>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium">Fotos do veículo</div>
+                  <div className="text-xs text-muted-foreground">
+                    Envie fotos reais (Supabase Storage). Você pode remover depois.
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="sm:w-auto"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={busy || uploading}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2Icon className="mr-2 size-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <UploadIcon className="mr-2 size-4" />
+                      Upload
+                    </>
+                  )}
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    void onUploadFiles(e.currentTarget.files);
+                    e.currentTarget.value = "";
+                  }}
+                />
+              </div>
+
+              {photoPaths.length ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {photoPaths.map((p) => {
+                    const url = photoUrls[p];
+                    return (
+                      <div key={p} className="group relative overflow-hidden rounded-lg border bg-background/60">
+                        {url ? (
+                          <img src={url} alt="Foto do veículo" className="h-40 w-full object-cover" />
+                        ) : (
+                          <div className="flex h-40 w-full items-center justify-center text-sm text-muted-foreground">
+                            Carregando...
+                          </div>
+                        )}
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="outline"
+                          className="absolute right-2 top-2 opacity-0 transition group-hover:opacity-100"
+                          onClick={() => void removePhoto(p)}
+                          aria-label="Remover foto"
+                        >
+                          <TrashIcon className="size-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-xs text-muted-foreground">Nenhuma foto enviada ainda.</div>
+              )}
             </div>
 
             {fipeOptionsAvailable ? (

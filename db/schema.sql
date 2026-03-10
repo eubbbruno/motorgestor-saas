@@ -66,6 +66,7 @@ create table if not exists public.vehicles (
   fipe_reference text,
   fipe_code text,
   description_ai text,
+  photo_paths text[] not null default '{}',
   mileage int,
   fuel text,
   transmission text,

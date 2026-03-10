@@ -21,6 +21,7 @@ export const VehicleFormSchema = z.object({
   fipe_reference: z.string().optional(),
   fipe_code: z.string().optional(),
   description_ai: z.string().optional(),
+  photo_paths: z.array(z.string()).optional(),
   mileage: z.number().int().min(0).optional(),
   fuel: z.string().optional(),
   transmission: z.string().optional(),
