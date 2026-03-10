@@ -8,6 +8,7 @@ import { Loader2Icon, MessageCircleIcon } from "lucide-react";
 import { useLeads, useUpdateLeadStatus } from "@/features/leads/hooks";
 import { useVehicles } from "@/features/vehicles/hooks";
 import type { LeadRow } from "@/types/models";
+import { buildLeadWhatsAppText, buildWhatsAppLink } from "@/lib/whatsapp";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -44,14 +45,6 @@ function formatBRL(value: number) {
     currency: "BRL",
     maximumFractionDigits: 0,
   }).format(value);
-}
-
-function waLink(phone?: string | null) {
-  if (!phone) return null;
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length < 10) return null;
-  const withCountry = digits.startsWith("55") ? digits : `55${digits}`;
-  return `https://wa.me/${withCountry}`;
 }
 
 export default function PipelinePage() {
@@ -163,7 +156,10 @@ export default function PipelinePage() {
 
                     {list.map((l) => {
                       const v = l.vehicle_id ? vehicleById.get(l.vehicle_id) : null;
-                      const link = waLink(l.phone);
+                      const link = buildWhatsAppLink({
+                        phone: l.phone,
+                        text: buildLeadWhatsAppText({ leadName: l.name, vehicleTitle: v?.title ?? null }),
+                      });
                       const isMoving = movingId === l.id;
                       const isDragging = draggingId === l.id;
 
@@ -192,24 +188,28 @@ export default function PipelinePage() {
                               ) : null}
                             </div>
 
-                            {isMoving ? (
-                              <Loader2Icon className="mt-0.5 size-4 animate-spin text-muted-foreground" />
-                            ) : null}
-                          </div>
+                            <div className="flex items-center gap-2">
+                              {link ? (
+                                <Button asChild variant="ghost" size="icon" aria-label="Conversar no WhatsApp">
+                                  <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-emerald-600 hover:text-emerald-700"
+                                  >
+                                    <MessageCircleIcon className="size-4" />
+                                  </a>
+                                </Button>
+                              ) : (
+                                <Button variant="ghost" size="icon" disabled aria-label="WhatsApp indisponível">
+                                  <MessageCircleIcon className="size-4" />
+                                </Button>
+                              )}
 
-                          <div className="mt-3 flex items-center gap-2">
-                            <Button
-                              asChild
-                              size="sm"
-                              variant="outline"
-                              disabled={!link}
-                              className="w-full"
-                            >
-                              <a href={link ?? "#"} target="_blank" rel="noreferrer">
-                                <MessageCircleIcon className="mr-2 size-4" />
-                                WhatsApp
-                              </a>
-                            </Button>
+                              {isMoving ? (
+                                <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+                              ) : null}
+                            </div>
                           </div>
                         </Card>
                       );

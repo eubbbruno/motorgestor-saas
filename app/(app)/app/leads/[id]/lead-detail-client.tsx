@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
-import { Loader2Icon, MessageSquareTextIcon, PhoneCallIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
+import { Loader2Icon, MessageCircleIcon, MessageSquareTextIcon, PhoneCallIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 
 import { LeadForm } from "@/features/leads/lead-form";
 import type { LeadFormValues } from "@/features/leads/schema";
 import { useLead, useUpdateLead, useDeleteLead } from "@/features/leads/hooks";
 import { useCreateLeadEvent, useLeadEvents } from "@/features/leads/events-hooks";
 import { useCreateLeadTask, useDeleteTask, useLeadTasks, usePatchTask } from "@/features/leads/tasks-hooks";
+import { useVehicles } from "@/features/vehicles/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { buildLeadWhatsAppText, buildWhatsAppLink } from "@/lib/whatsapp";
 import {
   Dialog,
   DialogContent,
@@ -52,6 +54,7 @@ function formatDate(value: string) {
 export function LeadDetailClient({ id }: { id: string }) {
   const router = useRouter();
   const lead = useLead(id);
+  const vehicles = useVehicles();
   const update = useUpdateLead();
   const del = useDeleteLead();
   const events = useLeadEvents(id);
@@ -64,6 +67,22 @@ export function LeadDetailClient({ id }: { id: string }) {
   const [note, setNote] = React.useState("");
   const [taskTitle, setTaskTitle] = React.useState("");
   const [taskDue, setTaskDue] = React.useState<string>("");
+
+  const vehicleTitle = React.useMemo(() => {
+    const vid = lead.data?.vehicle_id ?? null;
+    if (!vid) return null;
+    const v = (vehicles.data ?? []).find((x) => x.id === vid);
+    return v?.title ?? null;
+  }, [lead.data?.vehicle_id, vehicles.data]);
+
+  const whatsappLink = React.useMemo(() => {
+    return buildWhatsAppLink({
+      phone: lead.data?.phone ?? null,
+      text: lead.data
+        ? buildLeadWhatsAppText({ leadName: lead.data.name, vehicleTitle })
+        : null,
+    });
+  }, [lead.data, vehicleTitle]);
 
   async function onSubmit(values: LeadFormValues) {
     const prev = lead.data?.status ?? null;
@@ -168,6 +187,16 @@ export function LeadDetailClient({ id }: { id: string }) {
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link href="/app/leads">Voltar</Link>
+          </Button>
+          <Button
+            asChild
+            className="bg-emerald-600 text-white hover:bg-emerald-600/90"
+            disabled={!whatsappLink}
+          >
+            <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
+              <MessageCircleIcon className="mr-2 size-4" />
+              Conversar no WhatsApp
+            </a>
           </Button>
           <Button asChild variant="outline">
             <Link href={`/app/proposta?leadId=${id}`}>Gerar proposta PDF</Link>
