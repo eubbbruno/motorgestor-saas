@@ -3,9 +3,13 @@ import {
   ArrowRightIcon,
   BarChart3Icon,
   BotIcon,
+  CalendarIcon,
   CheckIcon,
+  FileUpIcon,
+  FileTextIcon,
+  ImageIcon,
+  MessageCircleIcon,
   SparklesIcon,
-  TrendingUpIcon,
   TriangleAlertIcon,
   WalletIcon,
   XIcon,
@@ -13,6 +17,11 @@ import {
 
 import { Container } from "@/components/site/container";
 import { DashboardMockup } from "@/components/site/dashboard-mockup";
+import {
+  AgendaScreenshot,
+  LeadTimelineScreenshot,
+  PipelineScreenshot,
+} from "@/components/site/product-screenshots";
 import {
   AiMiniMockup,
   FipeMiniMockup,
@@ -31,22 +40,46 @@ const features = [
     mockup: PipelineMiniMockup,
   },
   {
+    icon: CalendarIcon,
+    title: "Agenda de follow-ups",
+    description: "Calendário mensal + tarefas atrasadas e próximas com 1 clique.",
+    mockup: MetricsMiniMockup,
+  },
+  {
+    icon: MessageCircleIcon,
+    title: "WhatsApp integrado",
+    description: "Modelos prontos + copiar mensagem + histórico na timeline do lead.",
+    mockup: AiMiniMockup,
+  },
+  {
     icon: WalletIcon,
     title: "FIPE integrada",
     description: "Busque o valor de referência e padronize seu cadastro de veículos.",
     mockup: FipeMiniMockup,
   },
   {
-    icon: BotIcon,
-    title: "IA para mensagens",
-    description: "Gere textos de WhatsApp e descrições de anúncio com 1 clique (mock/OpenAI).",
-    mockup: AiMiniMockup,
+    icon: FileTextIcon,
+    title: "Fotos e proposta PDF",
+    description: "Upload de fotos do veículo e proposta pronta para salvar em PDF.",
+    mockup: MetricsMiniMockup,
   },
   {
-    icon: TrendingUpIcon,
-    title: "Métricas em tempo real",
-    description: "Conversão, valor em negociação, fechados e ticket médio — sem planilha.",
+    icon: ImageIcon,
+    title: "Gerador de anúncios (OLX/Webmotors)",
+    description: "Gere anúncio pronto para copiar, com fotos e botão de “melhorar com IA”.",
+    mockup: PipelineMiniMockup,
+  },
+  {
+    icon: FileUpIcon,
+    title: "Importação de leads (CSV)",
+    description: "Upload, mapeamento de colunas e importação em lote com validação.",
     mockup: MetricsMiniMockup,
+  },
+  {
+    icon: BotIcon,
+    title: "IA opcional",
+    description: "Descrição de veículo e mensagens com `AI_PROVIDER=mock` ou OpenAI.",
+    mockup: AiMiniMockup,
   },
 ];
 
@@ -84,12 +117,12 @@ export default function HomePage() {
               </Badge>
 
               <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.1]">
-                Gerencie vendas de veículos com mais organização e menos planilhas.
+                Organize seus leads e vendas de veículos em um único sistema.
               </h1>
 
               <p className="text-pretty text-base text-muted-foreground sm:text-lg">
-                Um sistema simples para pipeline, FIPE e comunicação por WhatsApp — com
-                métricas que mostram o que fazer agora para fechar mais.
+                CRM automotivo com pipeline, FIPE automática, WhatsApp integrado e gestão completa
+                de anúncios.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -103,15 +136,15 @@ export default function HomePage() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="#demo">Ver demonstração</Link>
+                  <Link href="#screens">Ver demonstração</Link>
                 </Button>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 {[
-                  ["Setup em minutos", "Crie conta e comece."],
-                  ["FIPE automática", "Padronize valor."],
-                  ["Funil claro", "Controle de etapas."],
+                  ["Importe sua base", "CSV com mapeamento."],
+                  ["WhatsApp com histórico", "Fica tudo registrado."],
+                  ["Anúncios prontos", "OLX e Webmotors."],
                 ].map(([title, desc]) => (
                   <div key={title} className="rounded-xl border bg-background p-4 shadow-sm">
                     <div className="text-sm font-medium">{title}</div>
@@ -121,13 +154,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div id="demo" className="scroll-mt-24">
+            <div id="screens" className="scroll-mt-24">
               <div className="relative">
                 <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(800px_circle_at_0%_0%,rgba(16,185,129,.10),transparent_60%),radial-gradient(800px_circle_at_100%_20%,rgba(59,130,246,.10),transparent_60%)]" />
                 <DashboardMockup />
               </div>
               <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                {["Pipeline + Dashboard", "Evolução mensal", "Valor fechado por mês", "RLS (multi-tenant)"].map(
+                {["Dashboard real do produto", "Pipeline", "Timeline + WhatsApp", "Agenda de tarefas"].map(
                   (t) => (
                     <span key={t} className="rounded-full border bg-background px-3 py-1">
                       {t}
@@ -146,22 +179,23 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
               <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Problema → solução
+                Problemas
               </div>
               <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                O que trava a venda no dia a dia.
+                Problemas que o MotorGestor resolve
               </h2>
               <p className="text-muted-foreground">
-                Três pontos comuns que derrubam conversão em revendas pequenas — e como o
-                MotorGestor resolve de forma objetiva.
+                Quando o atendimento e o estoque ficam espalhados, a conversão cai. O MotorGestor
+                organiza rotina e histórico para você saber o que fazer agora.
               </p>
             </div>
 
-            <div className="grid gap-4 lg:col-span-7 sm:grid-cols-3">
+            <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
               {[
-                ["Leads perdidos no WhatsApp", "Sem histórico e sem próximo passo."],
-                ["Preço de veículos confuso", "Sem FIPE e sem padrão de cadastro."],
-                ["Falta de controle do funil", "Sem etapas e sem visão de conversão."],
+                ["Leads perdidos no WhatsApp", "Sem histórico, sem templates e sem acompanhamento."],
+                ["Controle ruim de veículos", "Cadastro inconsistente, fotos espalhadas e pouco contexto."],
+                ["Anúncios espalhados em vários sites", "OLX/Webmotors com textos e fotos repetidos manualmente."],
+                ["Falta de acompanhamento de clientes", "Sem tarefas, agenda e próximos passos claros."],
               ].map(([title, desc]) => (
                 <Card key={title} className="rounded-xl bg-background p-5 shadow-sm">
                   <div className="flex items-start gap-3">
@@ -193,7 +227,7 @@ export default function HomePage() {
                     {[
                       ["Pipeline visual", "Etapas claras + arrastar e soltar."],
                       ["FIPE automática", "Valor de referência no cadastro."],
-                      ["IA para mensagens", "Resposta rápida com padrão."],
+                      ["WhatsApp integrado", "Templates + histórico no lead."],
                     ].map(([t, d]) => (
                       <div key={t} className="rounded-xl border bg-background p-4">
                         <div className="flex items-center gap-2">
@@ -220,10 +254,10 @@ export default function HomePage() {
                 Features
               </div>
               <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Quatro peças que mudam sua rotina.
+                Uma stack de vendas completa para revendas pequenas.
               </h2>
               <p className="text-muted-foreground">
-                Visual, direto e feito para o dia a dia de uma operação enxuta.
+                Pipeline, follow-ups, WhatsApp, FIPE, fotos e anúncios. Tudo no mesmo lugar.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg">
@@ -263,6 +297,87 @@ export default function HomePage() {
         </Container>
       </section>
 
+      {/* SECTION 4 — Screenshots */}
+      <section className="border-y bg-muted/30 py-18 sm:py-24">
+        <Container className="max-w-7xl">
+          <div className="grid gap-10">
+            <div className="grid gap-4 lg:grid-cols-12 lg:items-end">
+              <div className="space-y-3 lg:col-span-6">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Screenshots
+                </div>
+                <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                  Veja o produto em ação.
+                </h2>
+                <p className="text-muted-foreground">
+                  Dashboard, Pipeline, Timeline do lead e Agenda: o essencial para vender com rotina.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row lg:col-span-6 lg:justify-end">
+                <Button asChild size="lg">
+                  <Link href="/cadastro">
+                    Começar grátis <ArrowRightIcon className="ml-2 size-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/login">Entrar</Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid gap-6">
+              <div className="grid gap-4 lg:grid-cols-12 lg:items-center">
+                <div className="space-y-2 lg:col-span-5">
+                  <div className="text-sm font-medium">Pipeline (Kanban)</div>
+                  <div className="text-sm text-muted-foreground">
+                    Arraste leads entre etapas e mantenha o funil sempre atualizado.
+                  </div>
+                </div>
+                <div className="lg:col-span-7">
+                  <PipelineScreenshot />
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-12 lg:items-center">
+                <div className="space-y-2 lg:col-span-5">
+                  <div className="text-sm font-medium">Dashboard</div>
+                  <div className="text-sm text-muted-foreground">
+                    Métricas reais de leads e valor negociado/fechado — sem planilha.
+                  </div>
+                </div>
+                <div className="lg:col-span-7">
+                  <DashboardMockup />
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-12 lg:items-center">
+                <div className="space-y-2 lg:col-span-5">
+                  <div className="text-sm font-medium">Timeline do lead</div>
+                  <div className="text-sm text-muted-foreground">
+                    Histórico de atendimento (comentários, status e WhatsApp) com data e contexto.
+                  </div>
+                </div>
+                <div className="lg:col-span-7">
+                  <LeadTimelineScreenshot />
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-12 lg:items-center">
+                <div className="space-y-2 lg:col-span-5">
+                  <div className="text-sm font-medium">Agenda de follow-ups</div>
+                  <div className="text-sm text-muted-foreground">
+                    Vencimentos no calendário + listas de atrasadas e próximas tarefas.
+                  </div>
+                </div>
+                <div className="lg:col-span-7">
+                  <AgendaScreenshot />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
       {/* SECTION 4 — subtle gradient */}
       <section className="relative overflow-hidden py-18 sm:py-24">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_0%_40%,rgba(16,185,129,.10),transparent_55%)]" />
@@ -296,13 +411,13 @@ export default function HomePage() {
             <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
               <div className="space-y-3 lg:col-span-5">
                 <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Planos (preview)
+                  Planos
                 </div>
                 <h3 className="text-balance text-2xl font-semibold tracking-tight">
-                  Comece simples. Evolua quando precisar.
+                  Plano Free e Pro.
                 </h3>
                 <p className="text-muted-foreground">
-                  Placeholder por enquanto — estrutura pronta para você evoluir depois com billing.
+                  Comece no Free e faça upgrade quando sua operação crescer.
                 </p>
               </div>
               <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
@@ -311,7 +426,7 @@ export default function HomePage() {
                     name: "Free",
                     price: "R$ 0",
                     desc: "Para testar a rotina e organizar os primeiros leads.",
-                    items: ["Pipeline básico", "Cadastro de veículos", "Agenda simples", "Métricas essenciais"],
+                    items: ["Pipeline", "Cadastro de veículos", "Agenda de follow-ups", "Proposta PDF"],
                     cta: "Começar grátis",
                     variant: "outline" as const,
                   },
@@ -319,7 +434,7 @@ export default function HomePage() {
                     name: "Pro",
                     price: "R$ 79/mês",
                     desc: "Para operar todos os dias com velocidade e padrão.",
-                    items: ["FIPE integrada", "IA para mensagens", "Relatórios", "Suporte prioritário"],
+                    items: ["FIPE integrada", "WhatsApp + histórico", "Gerador de anúncios", "Importação CSV"],
                     cta: "Assinar Pro",
                     variant: "default" as const,
                   },
@@ -350,9 +465,6 @@ export default function HomePage() {
                           {p.cta} <ArrowRightIcon className="ml-2 size-4" />
                         </Link>
                       </Button>
-                      <div className="mt-3 text-center text-xs text-muted-foreground">
-                        Placeholder • ajuste valores depois
-                      </div>
                     </div>
                   </Card>
                 ))}
@@ -369,13 +481,13 @@ export default function HomePage() {
                     Comece a organizar suas vendas hoje.
                   </h3>
                   <p className="text-muted-foreground">
-                    Coloque pipeline e dados no centro da operação. Menos improviso, mais previsibilidade.
+                    Coloque pipeline, follow-ups e WhatsApp no centro da operação. Menos improviso, mais previsibilidade.
                   </p>
                 </div>
                 <div className="lg:col-span-4 lg:justify-self-end">
                   <Button asChild size="lg" className="w-full">
                     <Link href="/cadastro">
-                      Começar grátis <ArrowRightIcon className="ml-2 size-4" />
+                      Criar conta grátis <ArrowRightIcon className="ml-2 size-4" />
                     </Link>
                   </Button>
                   <div className="mt-3 text-center text-xs text-muted-foreground">
