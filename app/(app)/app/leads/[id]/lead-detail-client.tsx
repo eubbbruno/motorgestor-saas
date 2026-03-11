@@ -4,7 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
-import { Loader2Icon, MessageCircleIcon, MessageSquareTextIcon, PhoneCallIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
+import {
+  CheckIcon,
+  CopyIcon,
+  Loader2Icon,
+  MessageCircleIcon,
+  MessageSquareTextIcon,
+  PhoneCallIcon,
+  RefreshCcwIcon,
+  TrashIcon,
+} from "lucide-react";
 
 import { LeadForm } from "@/features/leads/lead-form";
 import type { LeadFormValues } from "@/features/leads/schema";
@@ -19,7 +28,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { buildLeadWhatsAppText, buildWhatsAppLink } from "@/lib/whatsapp";
+import {
+  buildLeadWhatsAppTemplateText,
+  buildWhatsAppLink,
+  copyTextToClipboard,
+  type WhatsAppLeadTemplateKey,
+} from "@/lib/whatsapp";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +42,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type EventType = "created" | "note" | "status_change" | "call" | "visit" | "sale";
 
@@ -68,6 +88,10 @@ export function LeadDetailClient({ id }: { id: string }) {
   const [taskTitle, setTaskTitle] = React.useState("");
   const [taskDue, setTaskDue] = React.useState<string>("");
 
+  const [waOpen, setWaOpen] = React.useState(false);
+  const [waTemplate, setWaTemplate] = React.useState<WhatsAppLeadTemplateKey>("initial");
+  const [copied, setCopied] = React.useState(false);
+
   const vehicleTitle = React.useMemo(() => {
     const vid = lead.data?.vehicle_id ?? null;
     if (!vid) return null;
@@ -75,14 +99,18 @@ export function LeadDetailClient({ id }: { id: string }) {
     return v?.title ?? null;
   }, [lead.data?.vehicle_id, vehicles.data]);
 
-  const whatsappLink = React.useMemo(() => {
-    return buildWhatsAppLink({
-      phone: lead.data?.phone ?? null,
-      text: lead.data
-        ? buildLeadWhatsAppText({ leadName: lead.data.name, vehicleTitle })
-        : null,
+  const waText = React.useMemo(() => {
+    if (!lead.data) return "";
+    return buildLeadWhatsAppTemplateText({
+      template: waTemplate,
+      leadName: lead.data.name,
+      vehicleTitle,
     });
-  }, [lead.data, vehicleTitle]);
+  }, [lead.data, vehicleTitle, waTemplate]);
+
+  const whatsappLink = React.useMemo(() => {
+    return buildWhatsAppLink({ phone: lead.data?.phone ?? null, text: waText });
+  }, [lead.data?.phone, waText]);
 
   async function onSubmit(values: LeadFormValues) {
     const prev = lead.data?.status ?? null;
@@ -188,16 +216,60 @@ export function LeadDetailClient({ id }: { id: string }) {
           <Button asChild variant="outline">
             <Link href="/app/leads">Voltar</Link>
           </Button>
-          <Button
-            asChild
-            className="bg-emerald-600 text-white hover:bg-emerald-600/90"
-            disabled={!whatsappLink}
-          >
-            <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
-              <MessageCircleIcon className="mr-2 size-4" />
-              Conversar no WhatsApp
-            </a>
-          </Button>
+          <div className="flex">
+            <Button
+              asChild
+              className="rounded-r-none bg-emerald-600 text-white hover:bg-emerald-600/90"
+              disabled={!whatsappLink}
+            >
+              <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
+                <MessageCircleIcon className="mr-2 size-4" />
+                Conversar no WhatsApp
+              </a>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className="rounded-l-none border-l border-emerald-700/30 bg-emerald-600 text-white hover:bg-emerald-600/90"
+                  disabled={!lead.data?.phone}
+                  size="icon"
+                  aria-label="Opções de mensagem"
+                  type="button"
+                >
+                  <MessageSquareTextIcon className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-56">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setWaTemplate("initial");
+                    setCopied(false);
+                    setWaOpen(true);
+                  }}
+                >
+                  Mensagem inicial
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setWaTemplate("follow_up");
+                    setCopied(false);
+                    setWaOpen(true);
+                  }}
+                >
+                  Follow-up
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setWaTemplate("proposal");
+                    setCopied(false);
+                    setWaOpen(true);
+                  }}
+                >
+                  Proposta
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <Button asChild variant="outline">
             <Link href={`/app/proposta?leadId=${id}`}>Gerar proposta PDF</Link>
           </Button>
@@ -469,6 +541,58 @@ export function LeadDetailClient({ id }: { id: string }) {
               {del.isPending ? "Removendo..." : "Remover"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={waOpen}
+        onOpenChange={(open) => {
+          setWaOpen(open);
+          if (!open) setCopied(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mensagem para WhatsApp</DialogTitle>
+            <DialogDescription>
+              Escolha o texto, copie com um clique ou abra direto no WhatsApp.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="rounded-lg border bg-background/60 p-3 text-sm whitespace-pre-wrap">
+              {waText || "—"}
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  void copyTextToClipboard(waText)
+                    .then(() => {
+                      setCopied(true);
+                      toast.success("Mensagem copiada.");
+                      setTimeout(() => setCopied(false), 1500);
+                    })
+                    .catch(() => toast.error("Não foi possível copiar."));
+                }}
+                disabled={!waText}
+              >
+                {copied ? <CheckIcon className="mr-2 size-4" /> : <CopyIcon className="mr-2 size-4" />}
+                {copied ? "Copiado" : "Copiar mensagem"}
+              </Button>
+
+              <Button asChild type="button" disabled={!whatsappLink}>
+                <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
+                  <MessageCircleIcon className="mr-2 size-4" />
+                  Abrir no WhatsApp
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter showCloseButton />
         </DialogContent>
       </Dialog>
     </div>

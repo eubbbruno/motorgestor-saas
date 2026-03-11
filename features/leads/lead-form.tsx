@@ -57,6 +57,14 @@ export function LeadForm({
   loading?: boolean;
 }) {
   const vehicles = useVehicles();
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(LeadFormSchema),
@@ -85,7 +93,7 @@ export function LeadForm({
     try {
       await onSubmit(values);
     } finally {
-      setSubmitting(false);
+      if (mountedRef.current) setSubmitting(false);
     }
   }
 
@@ -134,6 +142,7 @@ export function LeadForm({
         throw new Error(body && "error" in body ? body.error : "IA indisponível.");
       }
 
+      if (!mountedRef.current) return;
       setAiShort(body.short);
       setAiLong(body.long);
       setAiOpen(true);
@@ -142,7 +151,7 @@ export function LeadForm({
       const message = err instanceof Error ? err.message : "IA indisponível.";
       toast.error("Não foi possível gerar a mensagem.", { description: message });
     } finally {
-      setAiLoading(false);
+      if (mountedRef.current) setAiLoading(false);
     }
   }
 

@@ -63,7 +63,7 @@ export default function AgendaPage() {
   const del = useDeleteEvent();
 
   const [open, setOpen] = React.useState(false);
-  const [taskFilter, setTaskFilter] = React.useState<"pending" | "all">("pending");
+  const [taskFilter, setTaskFilter] = React.useState<"pending" | "all" | "overdue">("pending");
   const [view, setView] = React.useState<View>("month");
   const [date, setDate] = React.useState<Date>(new Date());
 
@@ -106,7 +106,7 @@ export default function AgendaPage() {
         .not("due_date", "is", null)
         .order("due_date", { ascending: true });
 
-      if (taskFilter === "pending") q = q.eq("status", "pending");
+      if (taskFilter === "pending" || taskFilter === "overdue") q = q.eq("status", "pending");
 
       const { data, error } = await q;
       if (error) throw error;
@@ -114,9 +114,16 @@ export default function AgendaPage() {
     },
   });
 
+  const todayISO = React.useMemo(() => new Date().toISOString().slice(0, 10), []);
+
   const taskEvents = React.useMemo<TaskCalendarEvent[]>(() => {
     const list = tasksQuery.data ?? [];
-    return list
+    const filtered =
+      taskFilter === "overdue"
+        ? list.filter((t) => t.status === "pending" && Boolean(t.due_date) && String(t.due_date) < todayISO)
+        : list;
+
+    return filtered
       .filter((t) => Boolean(t.due_date))
       .map((t) => {
         const d = new Date(`${t.due_date}T00:00:00`);
@@ -130,7 +137,33 @@ export default function AgendaPage() {
           leadId: t.lead_id,
         };
       });
-  }, [tasksQuery.data]);
+  }, [tasksQuery.data, taskFilter, todayISO]);
+
+  const { overdueTasks, upcomingTasks } = React.useMemo(() => {
+    const list = (tasksQuery.data ?? []).filter((t) => t.status === "pending" && Boolean(t.due_date));
+    const overdue = list
+      .filter((t) => String(t.due_date) < todayISO)
+      .slice()
+      .sort((a, b) => (String(a.due_date) > String(b.due_date) ? 1 : -1))
+      .slice(0, 8);
+
+    const upcoming = list
+      .filter((t) => String(t.due_date) >= todayISO)
+      .slice()
+      .sort((a, b) => (String(a.due_date) > String(b.due_date) ? 1 : -1))
+      .slice(0, 8);
+
+    return { overdueTasks: overdue, upcomingTasks: upcoming };
+  }, [tasksQuery.data, todayISO]);
+
+  function formatDue(value: string | null) {
+    if (!value) return "—";
+    try {
+      return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(`${value}T00:00:00`));
+    } catch {
+      return value;
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -156,10 +189,14 @@ export default function AgendaPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Tabs value={taskFilter} onValueChange={(v) => setTaskFilter(v as "pending" | "all")}>
+            <Tabs
+              value={taskFilter}
+              onValueChange={(v) => setTaskFilter(v as "pending" | "all" | "overdue")}
+            >
               <TabsList>
                 <TabsTrigger value="pending">Pendentes</TabsTrigger>
                 <TabsTrigger value="all">Todas</TabsTrigger>
+                <TabsTrigger value="overdue">Atrasadas</TabsTrigger>
               </TabsList>
             </Tabs>
             <Button
@@ -217,6 +254,78 @@ export default function AgendaPage() {
             </div>
           )}
         </div>
+
+        {tasksQuery.isLoading || tasksQuery.isError ? null : (
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border bg-background/40 p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium">Tarefas atrasadas</div>
+                <div className="text-xs text-muted-foreground">{overdueTasks.length}</div>
+              </div>
+              <div className="mt-3 space-y-2">
+                {overdueTasks.length ? (
+                  overdueTasks.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        router.push(`/app/leads/${t.lead_id}`);
+                        router.refresh();
+                      }}
+                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/60 px-3 py-2 text-left hover:bg-background/80"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{t.title}</div>
+                        <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {t.leads?.[0]?.name ?? "Lead"}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-xs font-medium text-destructive">
+                        {formatDue(t.due_date)}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground">Nenhuma tarefa atrasada.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-background/40 p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium">Próximas tarefas</div>
+                <div className="text-xs text-muted-foreground">{upcomingTasks.length}</div>
+              </div>
+              <div className="mt-3 space-y-2">
+                {upcomingTasks.length ? (
+                  upcomingTasks.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        router.push(`/app/leads/${t.lead_id}`);
+                        router.refresh();
+                      }}
+                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/60 px-3 py-2 text-left hover:bg-background/80"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{t.title}</div>
+                        <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {t.leads?.[0]?.name ?? "Lead"}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-xs font-medium text-muted-foreground">
+                        {formatDue(t.due_date)}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground">Sem tarefas pendentes com vencimento.</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
 
       <Card className="bg-background/60 p-4">
