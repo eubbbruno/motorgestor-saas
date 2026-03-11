@@ -34,6 +34,7 @@ import {
   copyTextToClipboard,
   type WhatsAppLeadTemplateKey,
 } from "@/lib/whatsapp";
+import { useLeadWhatsAppHistory } from "@/features/leads/whatsapp-history-hooks";
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type EventType = "created" | "note" | "status_change" | "call" | "visit" | "sale";
+type EventType = "created" | "note" | "status_change" | "call" | "visit" | "sale" | "whatsapp";
 
 const eventLabels: Record<EventType, string> = {
   created: "Criado",
@@ -58,6 +59,7 @@ const eventLabels: Record<EventType, string> = {
   call: "Ligação",
   visit: "Visita",
   sale: "Venda",
+  whatsapp: "WhatsApp",
 };
 
 function formatDate(value: string) {
@@ -79,6 +81,7 @@ export function LeadDetailClient({ id }: { id: string }) {
   const del = useDeleteLead();
   const events = useLeadEvents(id);
   const createEvent = useCreateLeadEvent();
+  const waHistory = useLeadWhatsAppHistory(id);
   const tasks = useLeadTasks(id);
   const createTask = useCreateLeadTask();
   const patchTask = usePatchTask();
@@ -111,6 +114,25 @@ export function LeadDetailClient({ id }: { id: string }) {
   const whatsappLink = React.useMemo(() => {
     return buildWhatsAppLink({ phone: lead.data?.phone ?? null, text: waText });
   }, [lead.data?.phone, waText]);
+
+  async function logWhatsAppInteraction(template: WhatsAppLeadTemplateKey) {
+    if (!lead.data) return;
+    const msg = buildLeadWhatsAppTemplateText({
+      template,
+      leadName: lead.data.name,
+      vehicleTitle,
+    });
+    try {
+      await createEvent.mutateAsync({
+        leadId: id,
+        type: "whatsapp",
+        message: msg,
+      });
+      void waHistory.refetch();
+    } catch {
+      // não bloqueia uso do WhatsApp
+    }
+  }
 
   async function onSubmit(values: LeadFormValues) {
     const prev = lead.data?.status ?? null;
@@ -244,6 +266,7 @@ export function LeadDetailClient({ id }: { id: string }) {
                   onClick={() => {
                     setWaTemplate("initial");
                     setCopied(false);
+                    void logWhatsAppInteraction("initial");
                     setWaOpen(true);
                   }}
                 >
@@ -253,6 +276,7 @@ export function LeadDetailClient({ id }: { id: string }) {
                   onClick={() => {
                     setWaTemplate("follow_up");
                     setCopied(false);
+                    void logWhatsAppInteraction("follow_up");
                     setWaOpen(true);
                   }}
                 >
@@ -262,6 +286,7 @@ export function LeadDetailClient({ id }: { id: string }) {
                   onClick={() => {
                     setWaTemplate("proposal");
                     setCopied(false);
+                    void logWhatsAppInteraction("proposal");
                     setWaOpen(true);
                   }}
                 >
@@ -372,7 +397,12 @@ export function LeadDetailClient({ id }: { id: string }) {
                     <div key={e.id} className="rounded-lg border bg-background/60 p-4">
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <div className="text-sm font-medium">
-                          {eventLabels[(e.type as EventType) ?? "note"] ?? e.type}
+                          <span className="inline-flex items-center gap-2">
+                            {e.type === "whatsapp" ? (
+                              <MessageCircleIcon className="size-4 text-emerald-600" />
+                            ) : null}
+                            {eventLabels[(e.type as EventType) ?? "note"] ?? (e.type === "whatsapp" ? "WhatsApp" : e.type)}
+                          </span>
                         </div>
                         <div className="text-xs text-muted-foreground">{formatDate(e.created_at)}</div>
                       </div>
@@ -387,6 +417,74 @@ export function LeadDetailClient({ id }: { id: string }) {
               ) : (
                 <div className="text-sm text-muted-foreground">
                   Nenhum evento ainda. Adicione um comentário para começar o histórico.
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className="bg-background/60 p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <MessageCircleIcon className="size-4 text-emerald-600" />
+                <div className="text-base font-medium">Histórico WhatsApp</div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => waHistory.refetch()}
+                disabled={waHistory.isFetching}
+              >
+                {waHistory.isFetching ? (
+                  <>
+                    <Loader2Icon className="mr-2 size-4 animate-spin" />
+                    Atualizando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCcwIcon className="mr-2 size-4" />
+                    Atualizar
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {waHistory.isLoading ? (
+                <div className="text-sm text-muted-foreground">Carregando histórico...</div>
+              ) : waHistory.isError ? (
+                <div className="text-sm text-destructive">
+                  Não foi possível carregar o histórico. A migração `lead_events_whatsapp` já foi aplicada?
+                </div>
+              ) : waHistory.data?.length ? (
+                waHistory.data.slice(0, 10).map((h) => (
+                  <div key={h.id} className="rounded-lg border bg-background/60 p-4">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="text-xs text-muted-foreground">{formatDate(h.created_at)}</div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          void copyTextToClipboard(h.message ?? "")
+                            .then(() => toast.success("Mensagem copiada."))
+                            .catch(() => toast.error("Não foi possível copiar."))
+                        }
+                        disabled={!h.message}
+                      >
+                        <CopyIcon className="mr-2 size-4" />
+                        Copiar
+                      </Button>
+                    </div>
+                    {h.message ? (
+                      <div className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                        {h.message}
+                      </div>
+                    ) : null}
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  Nenhuma interação registrada ainda. Use as opções de WhatsApp para criar um histórico.
                 </div>
               )}
             </div>

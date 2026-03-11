@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { z } from "zod";
 
 const CreateSchema = z.object({
-  type: z.enum(["created", "note", "status_change", "call", "visit", "sale"]),
+  type: z.enum(["created", "note", "status_change", "call", "visit", "sale", "whatsapp"]),
   message: z.string().trim().min(1, "Informe uma mensagem.").max(2000).optional().nullable(),
 });
 

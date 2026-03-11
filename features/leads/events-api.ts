@@ -6,7 +6,8 @@ export type LeadEventType =
   | "status_change"
   | "call"
   | "visit"
-  | "sale";
+  | "sale"
+  | "whatsapp";
 
 export type LeadEventRow = {
   id: string;
