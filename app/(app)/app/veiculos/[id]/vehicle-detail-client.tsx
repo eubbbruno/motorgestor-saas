@@ -4,12 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
-import { TrashIcon } from "lucide-react";
+import { CopyIcon, ExternalLinkIcon, Loader2Icon, SparklesIcon, TrashIcon } from "lucide-react";
 
 import { useVehicle, useUpdateVehicle, useDeleteVehicle } from "@/features/vehicles/hooks";
 import { VehicleForm } from "@/features/vehicles/vehicle-form";
 import type { VehicleFormValues } from "@/features/vehicles/schema";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { buildListingDescription, suggestListingTitle } from "@/lib/vehicle-listing";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +25,28 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+async function copyText(text: string) {
+  const value = (text ?? "").toString();
+  if (!value) return;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+  } catch {
+    // fallback
+  }
+  const el = document.createElement("textarea");
+  el.value = value;
+  el.setAttribute("readonly", "true");
+  el.style.position = "fixed";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+}
+
 export function VehicleDetailClient({ id }: { id: string }) {
   const router = useRouter();
   const vehicle = useVehicle(id);
@@ -26,6 +54,13 @@ export function VehicleDetailClient({ id }: { id: string }) {
   const del = useDeleteVehicle();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [adOpen, setAdOpen] = React.useState(false);
+  const [adTitle, setAdTitle] = React.useState("");
+  const [adCity, setAdCity] = React.useState("");
+  const [adHighlights, setAdHighlights] = React.useState("");
+  const [adDescription, setAdDescription] = React.useState("");
+  const [adLoadingAi, setAdLoadingAi] = React.useState(false);
+  const [photoUrls, setPhotoUrls] = React.useState<Record<string, string>>({});
 
   async function onSubmit(values: VehicleFormValues) {
     const v = await update.mutateAsync({ id, values });
@@ -72,6 +107,123 @@ export function VehicleDetailClient({ id }: { id: string }) {
       }
     : undefined;
 
+  const rawPhotoPaths = vehicle.data?.photo_paths;
+  const photoPaths = React.useMemo(() => rawPhotoPaths ?? [], [rawPhotoPaths]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      if (!adOpen) return;
+      if (!photoPaths.length) {
+        if (!cancelled) setPhotoUrls({});
+        return;
+      }
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const entries = await Promise.all(
+          photoPaths.map(async (p) => {
+            const { data } = await supabase.storage.from("vehicle-photos").createSignedUrl(p, 60 * 60);
+            return [p, data?.signedUrl ?? ""] as const;
+          }),
+        );
+        if (!cancelled) setPhotoUrls(Object.fromEntries(entries.filter(([, url]) => Boolean(url))));
+      } catch {
+        if (!cancelled) setPhotoUrls({});
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [adOpen, photoPaths]);
+
+  React.useEffect(() => {
+    if (!adOpen) return;
+    if (!vehicle.data) return;
+
+    const v = vehicle.data;
+    const suggested = suggestListingTitle({
+      title: v.title,
+      make: v.make,
+      model: v.model,
+      version: v.version ?? null,
+      year: v.year,
+      transmission: v.transmission,
+    });
+
+    const initialHighlights = [
+      v.plate ? `Placa: ${v.plate}` : "",
+      v.fipe_value != null ? "FIPE disponível" : "",
+      v.description_ai ? "Descrição com IA disponível" : "",
+    ]
+      .filter(Boolean)
+      .slice(0, 3)
+      .join("\n");
+
+    const desc = buildListingDescription({
+      title: v.title,
+      make: v.make,
+      model: v.model,
+      version: v.version ?? null,
+      year: v.year,
+      mileage: v.mileage,
+      fuel: v.fuel,
+      transmission: v.transmission,
+      color: v.color,
+      price: v.price,
+      fipe_value: v.fipe_value ?? null,
+      fipe_reference: v.fipe_reference ?? null,
+      notes: (v.description_ai ?? v.notes) ?? null,
+      city: "",
+      highlights: initialHighlights,
+    });
+
+    setAdTitle(suggested || v.title);
+    setAdCity("");
+    setAdHighlights(initialHighlights);
+    setAdDescription(desc);
+  }, [adOpen, vehicle.data]);
+
+  async function improveWithAi() {
+    if (!vehicle.data) return;
+    if (adLoadingAi) return;
+
+    setAdLoadingAi(true);
+    try {
+      const v = vehicle.data;
+      const price = v.price != null ? Number(v.price) : v.fipe_value != null ? Number(v.fipe_value) : null;
+      const res = await fetch("/api/ai/vehicle-description", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          title: adTitle || v.title,
+          make: v.make,
+          model: v.model,
+          year: v.year,
+          price,
+          mileage: v.mileage,
+          fuel: v.fuel,
+          transmission: v.transmission,
+          color: v.color,
+          notes: (adHighlights ? `Diferenciais:\n${adHighlights}\n\n` : "") + (v.notes ?? ""),
+        }),
+      });
+      const body = (await res.json().catch(() => null)) as
+        | { ok: true; description: string; provider: string }
+        | { ok: false; error: string };
+      if (!res.ok || !body || body.ok === false) {
+        throw new Error(body && "error" in body ? body.error : "IA indisponível.");
+      }
+      setAdDescription(body.description);
+      toast.success("Descrição melhorada com IA.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "IA indisponível.";
+      toast.error("Não foi possível melhorar a descrição.", { description: message });
+    } finally {
+      setAdLoadingAi(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -84,6 +236,15 @@ export function VehicleDetailClient({ id }: { id: string }) {
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link href="/app/veiculos">Voltar</Link>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setAdOpen(true);
+            }}
+            disabled={!vehicle.data}
+          >
+            Gerar anúncio
           </Button>
           <Button asChild variant="outline">
             <Link href={`/app/proposta?vehicleId=${id}`}>Gerar proposta PDF</Link>
@@ -128,6 +289,180 @@ export function VehicleDetailClient({ id }: { id: string }) {
               {del.isPending ? "Removendo..." : "Remover"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={adOpen} onOpenChange={setAdOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Gerador de anúncio (OLX / Webmotors)</DialogTitle>
+            <DialogDescription>
+              Gere um anúncio pronto para copiar e publicar. Ajuste o texto conforme necessário.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-5 lg:grid-cols-12">
+            <div className="space-y-4 lg:col-span-8">
+              <div className="space-y-2">
+                <Label htmlFor="ad-title">Título sugerido</Label>
+                <Input
+                  id="ad-title"
+                  value={adTitle}
+                  onChange={(e) => setAdTitle(e.target.value)}
+                  placeholder="Título do anúncio"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="ad-city">Cidade</Label>
+                  <Input
+                    id="ad-city"
+                    value={adCity}
+                    onChange={(e) => setAdCity(e.target.value)}
+                    placeholder="Ex: Londrina/PR"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ad-highlights">Diferenciais (1 por linha)</Label>
+                  <Textarea
+                    id="ad-highlights"
+                    rows={4}
+                    value={adHighlights}
+                    onChange={(e) => setAdHighlights(e.target.value)}
+                    placeholder="Ex:\nRevisões em dia\nManual + chave reserva\nPneus novos"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <Label htmlFor="ad-desc">Descrição completa</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (!vehicle.data) return;
+                      const v = vehicle.data;
+                      setAdDescription(
+                        buildListingDescription({
+                          title: adTitle || v.title,
+                          make: v.make,
+                          model: v.model,
+                          version: v.version ?? null,
+                          year: v.year,
+                          mileage: v.mileage,
+                          fuel: v.fuel,
+                          transmission: v.transmission,
+                          color: v.color,
+                          price: v.price,
+                          fipe_value: v.fipe_value ?? null,
+                          fipe_reference: v.fipe_reference ?? null,
+                          notes: (v.description_ai ?? v.notes) ?? null,
+                          city: adCity,
+                          highlights: adHighlights,
+                        }),
+                      );
+                      toast.success("Descrição atualizada.");
+                    }}
+                  >
+                    Regerar
+                  </Button>
+                </div>
+                <Textarea
+                  id="ad-desc"
+                  rows={12}
+                  value={adDescription}
+                  onChange={(e) => setAdDescription(e.target.value)}
+                  placeholder="Descrição do anúncio"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 lg:col-span-4">
+              <Card className="bg-background/60 p-4">
+                <div className="text-sm font-medium">Ações</div>
+                <div className="mt-3 grid gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      void copyText(`${adTitle}\n\n${adDescription}`)
+                        .then(() => toast.success("Anúncio copiado."))
+                        .catch(() => toast.error("Não foi possível copiar."))
+                    }
+                    disabled={!adTitle && !adDescription}
+                  >
+                    <CopyIcon className="mr-2 size-4" />
+                    Copiar anúncio
+                  </Button>
+
+                  <Button asChild type="button" variant="outline">
+                    <a href="https://www.olx.com.br/anunciar" target="_blank" rel="noreferrer">
+                      <ExternalLinkIcon className="mr-2 size-4" />
+                      Abrir OLX
+                    </a>
+                  </Button>
+
+                  <Button asChild type="button" variant="outline">
+                    <a href="https://www.webmotors.com.br/sell" target="_blank" rel="noreferrer">
+                      <ExternalLinkIcon className="mr-2 size-4" />
+                      Abrir Webmotors
+                    </a>
+                  </Button>
+
+                  <Button type="button" onClick={improveWithAi} disabled={adLoadingAi}>
+                    {adLoadingAi ? (
+                      <>
+                        <Loader2Icon className="mr-2 size-4 animate-spin" />
+                        Melhorando...
+                      </>
+                    ) : (
+                      <>
+                        <SparklesIcon className="mr-2 size-4" />
+                        Melhorar descrição com IA
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="bg-background/60 p-4">
+                <div className="text-sm font-medium">Fotos do veículo</div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {photoPaths.length ? (
+                    photoPaths.slice(0, 8).map((p) => {
+                      const url = photoUrls[p];
+                      return (
+                        <div key={p} className="overflow-hidden rounded-lg border bg-background/60">
+                          {url ? (
+                            // Signed URLs podem variar por ambiente; `next/image` exigiria configurar host remoto.
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={url} alt="Foto do veículo" className="h-24 w-full object-cover" />
+                          ) : (
+                            <div className="flex h-24 items-center justify-center text-xs text-muted-foreground">
+                              Carregando...
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="col-span-2 text-sm text-muted-foreground">
+                      Nenhuma foto cadastrada ainda.
+                    </div>
+                  )}
+                </div>
+                {photoPaths.length > 8 ? (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    Mostrando 8 de {photoPaths.length} fotos.
+                  </div>
+                ) : null}
+              </Card>
+            </div>
+          </div>
+
+          <DialogFooter showCloseButton />
         </DialogContent>
       </Dialog>
     </div>
