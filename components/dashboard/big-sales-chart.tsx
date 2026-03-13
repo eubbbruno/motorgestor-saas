@@ -71,7 +71,11 @@ function PremiumTooltip({
   );
 }
 
-export function BigSalesChart() {
+export function BigSalesChart({
+  heightClassName = "h-[320px] sm:h-[340px]",
+}: {
+  heightClassName?: string;
+}) {
   const charts = useDashboardCharts();
   const reduceMotion = useReducedMotion();
 
@@ -117,7 +121,7 @@ export function BigSalesChart() {
           initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mt-5 h-[360px] w-full"
+          className={["relative mt-5 w-full", heightClassName].join(" ")}
         >
           {charts.isLoading ? (
             <div className="text-sm text-white/55">Carregando...</div>

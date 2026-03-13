@@ -78,7 +78,7 @@ export default function AppDashboardPage() {
       <div className="relative">
         <EpicDashboardBackground className="rounded-none" />
         <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-10">
-          <motion.div variants={item} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <motion.div variants={item} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
                 <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.10)]" />
@@ -103,37 +103,43 @@ export default function AppDashboardPage() {
             </div>
           </motion.div>
 
-          <motion.div variants={item} className="space-y-3">
+          <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Big chart central</div>
-              <p className="text-sm text-white/60">Conversão e evolução do funil com brilho radial.</p>
+              <div className="text-base font-semibold tracking-tight text-white">Visão principal</div>
+              <p className="text-sm text-white/60">
+                Painel central de performance + widgets de execução, no estilo editorial premium.
+              </p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-              <BigSalesChart />
-              <div className="space-y-6">
-                <FipeQuickWidget />
-                <PipelineSummaryWidget />
+            <div className="grid items-stretch gap-6 lg:grid-cols-[1.8fr_1fr]">
+              <BigSalesChart heightClassName="h-[320px] sm:h-[360px]" />
+              <div className="grid gap-6 auto-rows-fr">
+                <div className="min-h-[220px]">
+                  <FipeQuickWidget />
+                </div>
+                <div className="min-h-[220px]">
+                  <PipelineSummaryWidget />
+                </div>
+                <div className="min-h-[220px]">
+                  <NextAgendaWidget />
+                </div>
               </div>
             </div>
           </motion.div>
 
-          <motion.div variants={item} className="space-y-3">
+          <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
               <div className="text-base font-semibold tracking-tight text-white">Widgets</div>
-              <p className="text-sm text-white/60">Contexto rápido com ações imediatas.</p>
+              <p className="text-sm text-white/60">
+                Blocos organizados em linhas, com largura e hierarquia consistentes.
+              </p>
             </div>
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-4">
-                <NextAgendaWidget />
-              </div>
-
               <div className="lg:col-span-4">
                 <RecentLeadsWidget />
               </div>
               <div className="lg:col-span-4">
                 <RecentVehiclesWidget />
               </div>
-
               <div className="lg:col-span-4">
                 <PendingTasksWidget />
               </div>
@@ -178,12 +184,12 @@ export default function AppDashboardPage() {
             </div>
           </motion.div>
 
-          <motion.div variants={item} className="space-y-3">
+          <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
               <div className="text-base font-semibold tracking-tight text-white">Hub</div>
               <p className="text-sm text-white/60">Atalhos para navegação rápida.</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {modules.map((m) => {
                 const Icon = m.icon;
                 return (
