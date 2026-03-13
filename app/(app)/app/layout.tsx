@@ -22,22 +22,20 @@ export default async function AppLayout({
     profile?.role === "admin" ? "Admin" : profile?.role === "vendedor" ? "Vendedor" : "";
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(900px_circle_at_0%_0%,rgba(16,185,129,.10),transparent_55%),radial-gradient(900px_circle_at_100%_10%,rgba(59,130,246,.10),transparent_55%)]">
-      <div className="flex min-h-screen">
-        <AppSidebar />
-        <MobileSidebar />
+    <div className="dark min-h-screen bg-[#05060a] text-white">
+      <AppSidebar />
+      <MobileSidebar />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+      <div className="min-h-screen lg:pl-80">
+        <div className="sticky top-0 z-40">
           <AppTopbar
             name={profile?.full_name ?? user.email}
             email={profile?.email ?? user.email}
             roleLabel={roleLabel}
           />
-          <GuidedOnboardingModal />
-          <div className="flex-1 px-4 py-8 lg:px-8 lg:py-10">
-            <div className="mx-auto w-full max-w-7xl">{children}</div>
-          </div>
         </div>
+        <GuidedOnboardingModal />
+        <main className="px-4 py-6 lg:px-10 lg:py-10">{children}</main>
       </div>
     </div>
   );
