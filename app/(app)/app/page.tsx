@@ -14,7 +14,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics } from "@/features/dashboard/hooks";
 import { EpicDashboardBackground } from "@/components/dashboard/epic-dashboard-background";
-import { PremiumSurface } from "@/components/dashboard/premium-surface";
 import { BigSalesChart } from "@/components/dashboard/big-sales-chart";
 import { FipeQuickWidget } from "@/components/dashboard/fipe-quick-widget";
 import {
@@ -25,6 +24,8 @@ import {
   RecentVehiclesWidget,
   usePendingTasks,
 } from "@/components/dashboard/dashboard-widgets";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { DashboardKpiStrip } from "@/components/dashboard/dashboard-kpi-strip";
 
 export default function AppDashboardPage() {
   const metrics = useDashboardMetrics();
@@ -104,18 +105,25 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Visão principal</div>
-              <p className="text-sm text-white/60">
-                Painel central de performance + widgets de execução, no estilo editorial premium.
-              </p>
-            </div>
-            <div className="grid items-stretch gap-6 lg:grid-cols-[1.9fr_1fr]">
-              <BigSalesChart heightClassName="h-[280px] sm:h-[320px] lg:h-[340px]" />
-              <div className="grid gap-6 auto-rows-fr">
-                <FipeQuickWidget compact />
-                <PipelineSummaryWidget compact />
-                <NextAgendaWidget compact />
+            <div className="grid gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-8">
+                <DashboardPanel
+                  title="Performance do funil"
+                  description="Leads/mês e valor fechado (FIPE) — últimos 6 meses."
+                  icon={<BarChart3Icon className="size-4" />}
+                >
+                  <div className="space-y-4">
+                    <DashboardKpiStrip />
+                    <BigSalesChart showHeader={false} heightClassName="h-[280px] sm:h-[320px] lg:h-[330px]" />
+                  </div>
+                </DashboardPanel>
+              </div>
+              <div className="lg:col-span-4">
+                <div className="grid gap-6 auto-rows-fr">
+                  <FipeQuickWidget compact />
+                  <PipelineSummaryWidget compact />
+                  <NextAgendaWidget compact />
+                </div>
               </div>
             </div>
           </motion.div>
@@ -171,9 +179,11 @@ export default function AppDashboardPage() {
           <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
               <div className="text-base font-semibold tracking-tight text-white">Hub</div>
-              <p className="text-sm text-white/60">Atalhos para navegação rápida.</p>
+              <p className="text-sm text-white/60">Ações e atalhos principais (sem cara de cards repetidos).</p>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-8">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {modules.map((m) => {
                 const Icon = m.icon;
                 return (
@@ -197,6 +207,27 @@ export default function AppDashboardPage() {
                   </Link>
                 );
               })}
+                </div>
+              </div>
+              <div className="lg:col-span-4">
+                <DashboardPanel
+                  title="Ações rápidas"
+                  description="Crie, registre e avance o pipeline."
+                  icon={<LayoutGridIcon className="size-4" />}
+                >
+                  <div className="grid gap-3">
+                    <Button asChild className="w-full bg-white text-black hover:bg-white/90">
+                      <Link href="/app/leads/novo">Novo lead</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10">
+                      <Link href="/app/veiculos/novo">Novo veículo</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10">
+                      <Link href="/app/pipeline">Ver pipeline</Link>
+                    </Button>
+                  </div>
+                </DashboardPanel>
+              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -222,37 +253,26 @@ function MiniStatWidget({
 }) {
   const reduceMotionLocal = useReducedMotion();
   return (
-    <PremiumSurface>
-      <motion.div
+    <div className="h-full">
+      <DashboardPanel title={title} description={subtitle} icon={icon} right={href ? (
+        <Button asChild size="sm" variant="outline" className="border-white/10 bg-white/5 text-white hover:bg-white/10">
+          <Link href={href}>Abrir</Link>
+        </Button>
+      ) : null}>
+        <motion.div
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotionLocal ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">{title}</div>
-            <div className="text-sm text-white/60">{subtitle}</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-              {icon}
-            </div>
-            {href ? (
-              <Button asChild size="sm" variant="outline" className="border-white/10 bg-white/5 text-white hover:bg-white/10">
-                <Link href={href}>Abrir</Link>
-              </Button>
-            ) : null}
-          </div>
-        </div>
-        <div className="mt-3 text-3xl font-semibold tracking-tight text-white">{value}</div>
-        <div className="mt-2 space-y-1 text-xs text-white/55">
+        <div className="text-3xl font-semibold tracking-tight text-white">{value}</div>
+        <div className="mt-3 space-y-1 text-xs text-white/55">
           {lines.map((l, idx) => (
             <div key={idx}>{l}</div>
           ))}
         </div>
       </motion.div>
-    </PremiumSurface>
+      </DashboardPanel>
+    </div>
   );
 }
 

@@ -78,8 +78,10 @@ const NEON_VALUE_GLOW = "rgba(168,85,247,0.30)";
 
 export function BigSalesChart({
   heightClassName = "h-[320px] sm:h-[340px]",
+  showHeader = true,
 }: {
   heightClassName?: string;
+  showHeader?: boolean;
 }) {
   const charts = useDashboardCharts();
   const reduceMotion = useReducedMotion();
@@ -108,25 +110,27 @@ export function BigSalesChart({
           <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.20),transparent_62%)] blur-2xl" />
         </div>
 
-        <div className="relative flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-              Big Sales Chart
+        {showHeader ? (
+          <div className="relative flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+                Big Sales Chart
+              </div>
+              <div className="text-sm text-white/60">
+                Leads por mês + valor fechado (FIPE) nos últimos 6 meses.
+              </div>
             </div>
-            <div className="text-sm text-white/60">
-              Leads por mês + valor fechado (FIPE) nos últimos 6 meses.
+            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+              <TrendingUpIcon className="size-4" />
             </div>
           </div>
-          <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-            <TrendingUpIcon className="size-4" />
-          </div>
-        </div>
+        ) : null}
 
         <motion.div
           initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className={["relative mt-5 w-full", heightClassName].join(" ")}
+          className={[showHeader ? "relative mt-5 w-full" : "relative w-full", heightClassName].join(" ")}
         >
           {charts.isLoading ? (
             <div className="text-sm text-white/55">Carregando...</div>
