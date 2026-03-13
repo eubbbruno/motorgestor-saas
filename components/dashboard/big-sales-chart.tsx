@@ -71,6 +71,11 @@ function PremiumTooltip({
   );
 }
 
+const NEON_LEADS = "rgba(34,211,238,0.95)"; // cyan
+const NEON_LEADS_GLOW = "rgba(34,211,238,0.35)";
+const NEON_VALUE = "rgba(168,85,247,0.95)"; // violet
+const NEON_VALUE_GLOW = "rgba(168,85,247,0.30)";
+
 export function BigSalesChart({
   heightClassName = "h-[320px] sm:h-[340px]",
 }: {
@@ -99,8 +104,8 @@ export function BigSalesChart({
     <PremiumSurface>
       <div className="relative overflow-hidden p-6">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-28 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.26),transparent_60%)] blur-2xl" />
-          <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(16,185,129,0.22),transparent_60%)] blur-2xl" />
+          <div className="absolute -top-28 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.22),transparent_62%)] blur-2xl" />
+          <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.20),transparent_62%)] blur-2xl" />
         </div>
 
         <div className="relative flex items-start justify-between gap-4">
@@ -132,16 +137,22 @@ export function BigSalesChart({
               <ComposedChart data={data} margin={{ left: 8, right: 12, top: 10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="bigLeadsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.38} />
-                    <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.03} />
+                    <stop offset="0%" stopColor={NEON_LEADS} stopOpacity={0.26} />
+                    <stop offset="100%" stopColor={NEON_LEADS} stopOpacity={0.02} />
+                  </linearGradient>
+                  <linearGradient id="bigCursor" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                <XAxis dataKey="monthLabel" tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }} />
+                <XAxis dataKey="monthLabel" tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis
                   yAxisId="left"
                   tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }}
                   width={40}
+                  axisLine={false}
+                  tickLine={false}
                 />
                 <YAxis
                   yAxisId="right"
@@ -154,27 +165,56 @@ export function BigSalesChart({
                     return `${n}`;
                   }}
                   width={48}
+                  axisLine={false}
+                  tickLine={false}
                 />
-                <Tooltip cursor={{ fill: "rgba(255,255,255,0.06)" }} content={<PremiumTooltip />} />
+                <Tooltip cursor={{ fill: "url(#bigCursor)" }} content={<PremiumTooltip />} />
+                {/* Glow strokes (behind) */}
                 <Area
                   yAxisId="left"
                   type="monotone"
                   name="Leads"
                   dataKey="leads"
-                  stroke="var(--chart-1)"
-                  strokeWidth={2}
+                  stroke={NEON_LEADS_GLOW}
+                  strokeWidth={6}
+                  fill="transparent"
+                  dot={false}
+                  activeDot={false}
+                  isAnimationActive={false}
+                />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  name="Leads"
+                  dataKey="leads"
+                  stroke={NEON_LEADS}
+                  strokeWidth={2.5}
                   fill="url(#bigLeadsFill)"
+                  dot={false}
+                  activeDot={{ r: 5, fill: NEON_LEADS, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
                   isAnimationActive={!reduceMotion}
                   animationDuration={950}
+                />
+                {/* Glow strokes (behind) */}
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  name="Valor fechado"
+                  dataKey="closedValue"
+                  stroke={NEON_VALUE_GLOW}
+                  strokeWidth={6}
+                  dot={false}
+                  isAnimationActive={false}
                 />
                 <Line
                   yAxisId="right"
                   type="monotone"
                   name="Valor fechado"
                   dataKey="closedValue"
-                  stroke="var(--chart-4)"
-                  strokeWidth={2}
+                  stroke={NEON_VALUE}
+                  strokeWidth={2.5}
                   dot={false}
+                  activeDot={{ r: 4, fill: NEON_VALUE, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
                   isAnimationActive={!reduceMotion}
                   animationDuration={1050}
                 />

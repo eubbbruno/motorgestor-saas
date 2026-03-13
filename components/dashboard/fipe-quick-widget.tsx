@@ -27,7 +27,7 @@ function formatBRL(value: number) {
   }).format(value);
 }
 
-export function FipeQuickWidget() {
+export function FipeQuickWidget({ compact = false }: { compact?: boolean }) {
   const reduceMotion = useReducedMotion();
   const [brandCode, setBrandCode] = React.useState<string>("");
   const [modelCode, setModelCode] = React.useState<string>("");
@@ -153,7 +153,7 @@ export function FipeQuickWidget() {
 
   return (
     <PremiumSurface>
-      <div className="relative overflow-hidden p-6">
+      <div className={compact ? "relative overflow-hidden p-5" : "relative overflow-hidden p-6"}>
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 -right-28 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.24),transparent_60%)] blur-2xl" />
           <div className="absolute -bottom-24 -left-28 h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.22),transparent_60%)] blur-2xl" />
@@ -175,9 +175,9 @@ export function FipeQuickWidget() {
           initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: reduceMotion ? 0 : 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mt-4 space-y-3"
+          className={compact ? "relative mt-4 space-y-2.5" : "relative mt-4 space-y-3"}
         >
-          <div className="grid gap-2">
+          <div className={compact ? "grid gap-1.5" : "grid gap-2"}>
             <Select value={brandCode} onValueChange={setBrandCode} disabled={loadingBrands}>
               <SelectTrigger className="w-full border-white/10 bg-white/5 text-white data-placeholder:text-white/40">
                 <SelectValue placeholder={loadingBrands ? "Carregando marcas..." : "Marca"} />

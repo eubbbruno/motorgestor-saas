@@ -110,18 +110,12 @@ export default function AppDashboardPage() {
                 Painel central de performance + widgets de execução, no estilo editorial premium.
               </p>
             </div>
-            <div className="grid items-stretch gap-6 lg:grid-cols-[1.8fr_1fr]">
-              <BigSalesChart heightClassName="h-[320px] sm:h-[360px]" />
+            <div className="grid items-stretch gap-6 lg:grid-cols-[1.9fr_1fr]">
+              <BigSalesChart heightClassName="h-[280px] sm:h-[320px] lg:h-[340px]" />
               <div className="grid gap-6 auto-rows-fr">
-                <div className="min-h-[220px]">
-                  <FipeQuickWidget />
-                </div>
-                <div className="min-h-[220px]">
-                  <PipelineSummaryWidget />
-                </div>
-                <div className="min-h-[220px]">
-                  <NextAgendaWidget />
-                </div>
+                <FipeQuickWidget compact />
+                <PipelineSummaryWidget compact />
+                <NextAgendaWidget compact />
               </div>
             </div>
           </motion.div>
@@ -133,54 +127,44 @@ export default function AppDashboardPage() {
                 Blocos organizados em linhas, com largura e hierarquia consistentes.
               </p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-4">
-                <RecentLeadsWidget />
-              </div>
-              <div className="lg:col-span-4">
-                <RecentVehiclesWidget />
-              </div>
-              <div className="lg:col-span-4">
-                <PendingTasksWidget />
-              </div>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <RecentLeadsWidget />
+              <RecentVehiclesWidget />
+              <PendingTasksWidget />
+            </div>
 
-              <div className="lg:col-span-4">
-                <MiniStatWidget
-                  title="Conversões"
-                  subtitle="Fechados / total"
-                  icon={<BarChart3Icon className="size-4" />}
-                  value={metrics.isLoading ? "—" : pct(metrics.data?.taxa_conversao ?? 0)}
-                  lines={[
-                    `Fechados: ${metrics.isLoading ? "—" : metrics.data?.leads_fechados ?? 0}`,
-                    `Total: ${metrics.isLoading ? "—" : metrics.data?.total_leads ?? 0}`,
-                  ]}
-                />
-              </div>
-              <div className="lg:col-span-4">
-                <MiniStatWidget
-                  title="Follow-ups"
-                  subtitle="Tarefas pendentes"
-                  icon={<LayoutGridIcon className="size-4" />}
-                  value={pendingTasks.isLoading ? "—" : followupsCount}
-                  lines={[
-                    pendingTasks.isError ? "Não foi possível carregar." : "Abra a agenda para executar.",
-                    "Padronize: próximo passo por lead.",
-                  ]}
-                  href="/app/agenda"
-                />
-              </div>
-              <div className="lg:col-span-4">
-                <MiniStatWidget
-                  title="Métricas"
-                  subtitle="Valores (FIPE)"
-                  icon={<WalletIcon className="size-4" />}
-                  value={metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_fechado ?? 0)}
-                  lines={[
-                    `Negociação: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_em_negociacao ?? 0)}`,
-                    `Ticket: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.ticket_medio ?? 0)}`,
-                  ]}
-                />
-              </div>
+            <div className="mt-6 grid gap-6 lg:grid-cols-3">
+              <MiniStatWidget
+                title="Conversões"
+                subtitle="Fechados / total"
+                icon={<BarChart3Icon className="size-4" />}
+                value={metrics.isLoading ? "—" : pct(metrics.data?.taxa_conversao ?? 0)}
+                lines={[
+                  `Fechados: ${metrics.isLoading ? "—" : metrics.data?.leads_fechados ?? 0}`,
+                  `Total: ${metrics.isLoading ? "—" : metrics.data?.total_leads ?? 0}`,
+                ]}
+              />
+              <MiniStatWidget
+                title="Follow-ups"
+                subtitle="Tarefas pendentes"
+                icon={<LayoutGridIcon className="size-4" />}
+                value={pendingTasks.isLoading ? "—" : followupsCount}
+                lines={[
+                  pendingTasks.isError ? "Não foi possível carregar." : "Abra a agenda para executar.",
+                  "Padronize: próximo passo por lead.",
+                ]}
+                href="/app/agenda"
+              />
+              <MiniStatWidget
+                title="Métricas"
+                subtitle="Valores (FIPE)"
+                icon={<WalletIcon className="size-4" />}
+                value={metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_fechado ?? 0)}
+                lines={[
+                  `Negociação: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_em_negociacao ?? 0)}`,
+                  `Ticket: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.ticket_medio ?? 0)}`,
+                ]}
+              />
             </div>
           </motion.div>
 

@@ -75,7 +75,7 @@ function WidgetHeader({
   );
 }
 
-export function PipelineSummaryWidget() {
+export function PipelineSummaryWidget({ compact = false }: { compact?: boolean }) {
   const reduceMotion = useReducedMotion();
   const charts = useDashboardCharts();
   const funnel = charts.data?.funnel ?? [];
@@ -87,7 +87,7 @@ export function PipelineSummaryWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className={compact ? "p-5" : "p-6"}
       >
         <WidgetHeader
           title="Pipeline"
@@ -101,7 +101,7 @@ export function PipelineSummaryWidget() {
           ) : charts.isError ? (
             <div className="text-sm text-red-300">Não foi possível carregar o pipeline.</div>
           ) : (
-            funnel.slice(0, 6).map((s) => {
+            funnel.slice(0, compact ? 4 : 6).map((s) => {
               const pct = Math.round((Number(s.count ?? 0) / total) * 100);
               return (
                 <div key={s.status} className="space-y-1">
@@ -109,7 +109,7 @@ export function PipelineSummaryWidget() {
                     <span className="truncate">{s.label}</span>
                     <span className="font-medium text-white/80">{s.count}</span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10">
+                  <div className={compact ? "h-1.5 w-full overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10" : "h-2 w-full overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10"}>
                     <div
                       className="h-full rounded-full bg-linear-to-r from-emerald-400/55 via-blue-400/35 to-violet-400/25"
                       style={{ width: `${Math.max(4, pct)}%` }}
@@ -125,7 +125,7 @@ export function PipelineSummaryWidget() {
   );
 }
 
-export function NextAgendaWidget() {
+export function NextAgendaWidget({ compact = false }: { compact?: boolean }) {
   const reduceMotion = useReducedMotion();
   const events = useEvents();
   const upcoming = React.useMemo(() => {
@@ -133,8 +133,8 @@ export function NextAgendaWidget() {
     const list = (events.data ?? [])
       .filter((e) => new Date(e.start_at).getTime() >= now)
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
-    return list.slice(0, 4);
-  }, [events.data]);
+    return list.slice(0, compact ? 3 : 4);
+  }, [compact, events.data]);
 
   return (
     <PremiumSurface>
@@ -142,7 +142,7 @@ export function NextAgendaWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className={compact ? "p-5" : "p-6"}
       >
         <WidgetHeader
           title="Agenda"
