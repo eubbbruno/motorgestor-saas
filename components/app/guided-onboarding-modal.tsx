@@ -161,7 +161,10 @@ export function GuidedOnboardingModal() {
         else setOpen(true);
       }}
     >
-      <DialogContent className="max-w-3xl rounded-xl bg-background/80 p-0 shadow-xl backdrop-blur" showCloseButton>
+      <DialogContent
+        className="max-w-3xl rounded-2xl border-white/10 bg-black/70 p-0 shadow-[0_50px_140px_rgba(0,0,0,0.80)] backdrop-blur"
+        showCloseButton
+      >
         <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
           <div className="border-b p-6 lg:border-b-0 lg:border-r">
             <DialogHeader>
