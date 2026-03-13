@@ -75,9 +75,9 @@ export default function AppDashboardPage() {
 
   return (
     <div className="dark">
-      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080b] p-5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_50px_120px_rgba(0,0,0,0.75)] sm:p-8">
-        <EpicDashboardBackground />
-        <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-8">
+      <div className="relative">
+        <EpicDashboardBackground className="rounded-none" />
+        <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-10">
           <motion.div variants={item} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
@@ -108,7 +108,13 @@ export default function AppDashboardPage() {
               <div className="text-base font-semibold tracking-tight text-white">Big chart central</div>
               <p className="text-sm text-white/60">Conversão e evolução do funil com brilho radial.</p>
             </div>
-            <BigSalesChart />
+            <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+              <BigSalesChart />
+              <div className="space-y-6">
+                <FipeQuickWidget />
+                <PipelineSummaryWidget />
+              </div>
+            </div>
           </motion.div>
 
           <motion.div variants={item} className="space-y-3">
@@ -116,13 +122,7 @@ export default function AppDashboardPage() {
               <div className="text-base font-semibold tracking-tight text-white">Widgets</div>
               <p className="text-sm text-white/60">Contexto rápido com ações imediatas.</p>
             </div>
-            <div className="grid gap-4 lg:grid-cols-12">
-              <div className="lg:col-span-4">
-                <FipeQuickWidget />
-              </div>
-              <div className="lg:col-span-4">
-                <PipelineSummaryWidget />
-              </div>
+            <div className="grid gap-6 lg:grid-cols-12">
               <div className="lg:col-span-4">
                 <NextAgendaWidget />
               </div>
@@ -133,6 +133,7 @@ export default function AppDashboardPage() {
               <div className="lg:col-span-4">
                 <RecentVehiclesWidget />
               </div>
+
               <div className="lg:col-span-4">
                 <PendingTasksWidget />
               </div>
