@@ -15,7 +15,6 @@ import {
 import { TrendingUpIcon } from "lucide-react";
 
 import { useDashboardCharts } from "@/features/dashboard/hooks";
-import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 function formatMonth(value: string) {
   const [y, m] = value.split("-").map(Number);
@@ -103,131 +102,129 @@ export function BigSalesChart({
   }, [charts.data?.closed_value_monthly, charts.data?.leads_monthly]);
 
   return (
-    <PremiumSurface>
-      <div className="relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-28 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.22),transparent_62%)] blur-2xl" />
-          <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.20),transparent_62%)] blur-2xl" />
-        </div>
+    <div className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-28 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.22),transparent_62%)] blur-2xl" />
+        <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.20),transparent_62%)] blur-2xl" />
+      </div>
 
-        {showHeader ? (
-          <div className="relative flex items-start justify-between gap-4">
-            <div className="space-y-1">
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-                Big Sales Chart
-              </div>
-              <div className="text-sm text-white/60">
-                Leads por mês + valor fechado (FIPE) nos últimos 6 meses.
-              </div>
+      {showHeader ? (
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+              Big Sales Chart
             </div>
-            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-              <TrendingUpIcon className="size-4" />
+            <div className="text-sm text-white/60">
+              Leads por mês + valor fechado (FIPE) nos últimos 6 meses.
             </div>
           </div>
-        ) : null}
+          <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+            <TrendingUpIcon className="size-4" />
+          </div>
+        </div>
+      ) : null}
 
-        <motion.div
-          initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className={[showHeader ? "relative mt-5 w-full" : "relative w-full", heightClassName].join(" ")}
-        >
-          {charts.isLoading ? (
-            <div className="text-sm text-white/55">Carregando...</div>
-          ) : charts.isError ? (
-            <div className="text-sm text-red-300">Não foi possível carregar o gráfico.</div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={data} margin={{ left: 8, right: 12, top: 10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="bigLeadsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={NEON_LEADS} stopOpacity={0.26} />
-                    <stop offset="100%" stopColor={NEON_LEADS} stopOpacity={0.02} />
-                  </linearGradient>
-                  <linearGradient id="bigCursor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                <XAxis dataKey="monthLabel" tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }}
-                  width={40}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }}
-                  tickFormatter={(v) => {
-                    const n = Number(v ?? 0);
-                    if (n >= 1_000_000) return `${Math.round(n / 1_000_000)}M`;
-                    if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
-                    return `${n}`;
-                  }}
-                  width={48}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip cursor={{ fill: "url(#bigCursor)" }} content={<PremiumTooltip />} />
-                {/* Glow strokes (behind) */}
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  name="Leads"
-                  dataKey="leads"
-                  stroke={NEON_LEADS_GLOW}
-                  strokeWidth={6}
-                  fill="transparent"
-                  dot={false}
-                  activeDot={false}
-                  isAnimationActive={false}
-                />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  name="Leads"
-                  dataKey="leads"
-                  stroke={NEON_LEADS}
-                  strokeWidth={2.5}
-                  fill="url(#bigLeadsFill)"
-                  dot={false}
-                  activeDot={{ r: 5, fill: NEON_LEADS, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
-                  isAnimationActive={!reduceMotion}
-                  animationDuration={950}
-                />
-                {/* Glow strokes (behind) */}
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  name="Valor fechado"
-                  dataKey="closedValue"
-                  stroke={NEON_VALUE_GLOW}
-                  strokeWidth={6}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  name="Valor fechado"
-                  dataKey="closedValue"
-                  stroke={NEON_VALUE}
-                  strokeWidth={2.5}
-                  dot={false}
-                  activeDot={{ r: 4, fill: NEON_VALUE, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
-                  isAnimationActive={!reduceMotion}
-                  animationDuration={1050}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          )}
-        </motion.div>
-      </div>
-    </PremiumSurface>
+      <motion.div
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className={[showHeader ? "relative mt-5 w-full" : "relative w-full", heightClassName].join(" ")}
+      >
+        {charts.isLoading ? (
+          <div className="text-sm text-white/55">Carregando...</div>
+        ) : charts.isError ? (
+          <div className="text-sm text-red-300">Não foi possível carregar o gráfico.</div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={data} margin={{ left: 8, right: 12, top: 10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="bigLeadsFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={NEON_LEADS} stopOpacity={0.26} />
+                  <stop offset="100%" stopColor={NEON_LEADS} stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="bigCursor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+              <XAxis dataKey="monthLabel" tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis
+                yAxisId="left"
+                tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }}
+                width={40}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tick={{ fill: "rgba(255,255,255,0.58)", fontSize: 12 }}
+                tickFormatter={(v) => {
+                  const n = Number(v ?? 0);
+                  if (n >= 1_000_000) return `${Math.round(n / 1_000_000)}M`;
+                  if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
+                  return `${n}`;
+                }}
+                width={48}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip cursor={{ fill: "url(#bigCursor)" }} content={<PremiumTooltip />} />
+              {/* Glow strokes (behind) */}
+              <Area
+                yAxisId="left"
+                type="monotone"
+                name="Leads"
+                dataKey="leads"
+                stroke={NEON_LEADS_GLOW}
+                strokeWidth={6}
+                fill="transparent"
+                dot={false}
+                activeDot={false}
+                isAnimationActive={false}
+              />
+              <Area
+                yAxisId="left"
+                type="monotone"
+                name="Leads"
+                dataKey="leads"
+                stroke={NEON_LEADS}
+                strokeWidth={2.5}
+                fill="url(#bigLeadsFill)"
+                dot={false}
+                activeDot={{ r: 5, fill: NEON_LEADS, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
+                isAnimationActive={!reduceMotion}
+                animationDuration={950}
+              />
+              {/* Glow strokes (behind) */}
+              <Line
+                yAxisId="right"
+                type="monotone"
+                name="Valor fechado"
+                dataKey="closedValue"
+                stroke={NEON_VALUE_GLOW}
+                strokeWidth={6}
+                dot={false}
+                isAnimationActive={false}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                name="Valor fechado"
+                dataKey="closedValue"
+                stroke={NEON_VALUE}
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 4, fill: NEON_VALUE, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
+                isAnimationActive={!reduceMotion}
+                animationDuration={1050}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        )}
+      </motion.div>
+    </div>
   );
 }
 

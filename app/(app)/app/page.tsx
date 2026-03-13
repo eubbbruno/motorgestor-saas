@@ -24,8 +24,8 @@ import {
   RecentVehiclesWidget,
   usePendingTasks,
 } from "@/components/dashboard/dashboard-widgets";
-import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { DashboardKpiStrip } from "@/components/dashboard/dashboard-kpi-strip";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 export default function AppDashboardPage() {
   const metrics = useDashboardMetrics();
@@ -107,16 +107,27 @@ export default function AppDashboardPage() {
           <motion.div variants={item} className="space-y-4">
             <div className="grid gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
-                <DashboardPanel
-                  title="Performance do funil"
-                  description="Leads/mês e valor fechado (FIPE) — últimos 6 meses."
-                  icon={<BarChart3Icon className="size-4" />}
-                >
-                  <div className="space-y-4">
-                    <DashboardKpiStrip />
-                    <BigSalesChart showHeader={false} heightClassName="h-[280px] sm:h-[320px] lg:h-[330px]" />
+                <PremiumSurface>
+                  <div className="relative overflow-hidden p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+                          Performance do funil
+                        </div>
+                        <div className="text-sm text-white/60">
+                          Leads/mês e valor fechado (FIPE) — últimos 6 meses.
+                        </div>
+                      </div>
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+                        <BarChart3Icon className="size-4" />
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-4">
+                      <DashboardKpiStrip />
+                      <BigSalesChart showHeader={false} heightClassName="h-[280px] sm:h-[320px] lg:h-[330px]" />
+                    </div>
                   </div>
-                </DashboardPanel>
+                </PremiumSurface>
               </div>
               <div className="lg:col-span-4">
                 <div className="grid gap-6 auto-rows-fr">
@@ -210,23 +221,42 @@ export default function AppDashboardPage() {
                 </div>
               </div>
               <div className="lg:col-span-4">
-                <DashboardPanel
-                  title="Ações rápidas"
-                  description="Crie, registre e avance o pipeline."
-                  icon={<LayoutGridIcon className="size-4" />}
-                >
-                  <div className="grid gap-3">
-                    <Button asChild className="w-full bg-white text-black hover:bg-white/90">
-                      <Link href="/app/leads/novo">Novo lead</Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10">
-                      <Link href="/app/veiculos/novo">Novo veículo</Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10">
-                      <Link href="/app/pipeline">Ver pipeline</Link>
-                    </Button>
+                <PremiumSurface>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+                          Ações rápidas
+                        </div>
+                        <div className="text-sm text-white/60">
+                          Crie, registre e avance o pipeline.
+                        </div>
+                      </div>
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+                        <LayoutGridIcon className="size-4" />
+                      </div>
+                    </div>
+                    <div className="mt-4 grid gap-3">
+                      <Button asChild className="w-full bg-white text-black hover:bg-white/90">
+                        <Link href="/app/leads/novo">Novo lead</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10"
+                      >
+                        <Link href="/app/veiculos/novo">Novo veículo</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10"
+                      >
+                        <Link href="/app/pipeline">Ver pipeline</Link>
+                      </Button>
+                    </div>
                   </div>
-                </DashboardPanel>
+                </PremiumSurface>
               </div>
             </div>
           </motion.div>
@@ -253,26 +283,44 @@ function MiniStatWidget({
 }) {
   const reduceMotionLocal = useReducedMotion();
   return (
-    <div className="h-full">
-      <DashboardPanel title={title} description={subtitle} icon={icon} right={href ? (
-        <Button asChild size="sm" variant="outline" className="border-white/10 bg-white/5 text-white hover:bg-white/10">
-          <Link href={href}>Abrir</Link>
-        </Button>
-      ) : null}>
-        <motion.div
+    <PremiumSurface>
+      <motion.div
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotionLocal ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="p-6"
       >
-        <div className="text-3xl font-semibold tracking-tight text-white">{value}</div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+              {title}
+            </div>
+            <div className="text-sm text-white/60">{subtitle}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+              {icon}
+            </div>
+            {href ? (
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+              >
+                <Link href={href}>Abrir</Link>
+              </Button>
+            ) : null}
+          </div>
+        </div>
+        <div className="mt-3 text-3xl font-semibold tracking-tight text-white">{value}</div>
         <div className="mt-3 space-y-1 text-xs text-white/55">
           {lines.map((l, idx) => (
             <div key={idx}>{l}</div>
           ))}
         </div>
       </motion.div>
-      </DashboardPanel>
-    </div>
+    </PremiumSurface>
   );
 }
 

@@ -43,8 +43,9 @@ export function DashboardKpiStrip() {
       {items.map((it) => (
         <div
           key={it.label}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
+          className="relative overflow-hidden rounded-xl px-1.5 py-1"
         >
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/15 to-white/0" />
           <div className={["pointer-events-none absolute inset-0 bg-linear-to-br", it.accent].join(" ")} />
           <div className="relative flex items-center justify-between gap-3">
             <div className="min-w-0">
@@ -55,7 +56,7 @@ export function DashboardKpiStrip() {
                 {it.value}
               </div>
             </div>
-            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-transparent text-white/70 ring-1 ring-white/10">
               {it.icon}
             </div>
           </div>

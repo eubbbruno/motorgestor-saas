@@ -240,10 +240,12 @@ export function FipeQuickWidget({ compact = false }: { compact?: boolean }) {
             )}
           </Button>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="border-t border-white/10 pt-3">
             {quote ? (
               <div className="space-y-1">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/55">Preço médio</div>
+                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
+                  Preço médio
+                </div>
                 <div className="text-3xl font-semibold tracking-tight text-white">
                   {formatBRL(quote.value)}
                 </div>
