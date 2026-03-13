@@ -41,6 +41,45 @@ export default function AppDashboardPage() {
 
   const pct = (value: number) => `${Math.round(value * 100)}%`;
 
+  const modules = [
+    {
+      title: "Veículos",
+      description: "Estoque, fotos, FIPE e anúncio pronto para publicar.",
+      href: "/app/veiculos",
+      icon: CarIcon,
+    },
+    {
+      title: "Leads",
+      description: "CRM com timeline, tarefas, WhatsApp e histórico.",
+      href: "/app/leads",
+      icon: UsersIcon,
+    },
+    {
+      title: "Pipeline",
+      description: "Kanban do funil com drag and drop por etapas.",
+      href: "/app/pipeline",
+      icon: LayoutGridIcon,
+    },
+    {
+      title: "Agenda",
+      description: "Calendário e próximos follow-ups do time.",
+      href: "/app/agenda",
+      icon: CalendarIcon,
+    },
+    {
+      title: "Relatórios",
+      description: "Visão executiva e números para decisão.",
+      href: "/app/relatorios",
+      icon: BarChart3Icon,
+    },
+    {
+      title: "Billing",
+      description: "Plano, limites e consumo atual da empresa.",
+      href: "/app/billing",
+      icon: WalletIcon,
+    },
+  ] as const;
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -59,6 +98,43 @@ export default function AppDashboardPage() {
               Novo veículo <ArrowRightIcon className="ml-2 size-4" />
             </Link>
           </Button>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <div className="text-base font-semibold tracking-tight">Home do sistema</div>
+          <p className="text-sm text-muted-foreground">
+            Acesso rápido aos módulos principais do MotorGestor.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {modules.map((m) => {
+            const Icon = m.icon;
+            return (
+              <Card
+                key={m.href}
+                className="group rounded-xl bg-background/50 p-6 shadow-sm transition hover:shadow-md"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">{m.title}</div>
+                    <div className="text-sm text-muted-foreground">{m.description}</div>
+                  </div>
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground transition group-hover:text-foreground">
+                    <Icon className="size-4" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Button asChild variant="outline" className="w-full justify-between">
+                    <Link href={m.href}>
+                      Abrir <ArrowRightIcon className="size-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
 

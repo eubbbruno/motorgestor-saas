@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { AppTopbar } from "@/components/app/app-topbar";
 import { MobileSidebar } from "@/components/app/mobile-sidebar";
+import { GuidedOnboardingModal } from "@/components/app/guided-onboarding-modal";
 import { getUserAndProfile } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export default async function AppLayout({
             email={profile?.email ?? user.email}
             roleLabel={roleLabel}
           />
+          <GuidedOnboardingModal />
           <div className="flex-1 px-4 py-8 lg:px-8 lg:py-10">
             <div className="mx-auto w-full max-w-7xl">{children}</div>
           </div>

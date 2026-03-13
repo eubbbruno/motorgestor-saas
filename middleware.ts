@@ -2,13 +2,6 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_ROUTES = ["/login", "/cadastro"];
-const ONBOARDING_ALLOWLIST = [
-  "/app/onboarding",
-  "/app/veiculos/novo",
-  "/app/leads/novo",
-  "/app/pipeline",
-  "/app/importar-leads",
-];
 
 export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -70,44 +63,6 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/app/onboarding";
       url.search = "";
       return NextResponse.redirect(url);
-    }
-  }
-
-  // Onboarding guiado: se a empresa ainda não tem veículos OU leads, força /app/onboarding
-  if (isApp && user) {
-    const allowed = ONBOARDING_ALLOWLIST.some(
-      (p) => pathname === p || pathname.startsWith(`${p}/`),
-    );
-
-    if (!allowed) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const companyId = profile?.company_id ?? null;
-      if (companyId) {
-        const [{ count: vehiclesCount }, { count: leadsCount }] = await Promise.all([
-          supabase
-            .from("vehicles")
-            .select("id", { count: "exact", head: true })
-            .eq("company_id", companyId),
-          supabase
-            .from("leads")
-            .select("id", { count: "exact", head: true })
-            .eq("company_id", companyId),
-        ]);
-
-        const vehicles = Number(vehiclesCount ?? 0);
-        const leads = Number(leadsCount ?? 0);
-
-        if (vehicles === 0 || leads === 0) {
-          url.pathname = "/app/onboarding";
-          url.search = "";
-          return NextResponse.redirect(url);
-        }
-      }
     }
   }
 
