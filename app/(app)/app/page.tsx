@@ -107,27 +107,29 @@ export default function AppDashboardPage() {
           <motion.div variants={item} className="space-y-4">
             <div className="grid gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
-                <PremiumSurface>
-                  <div className="relative overflow-hidden p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-                          Performance do funil
-                        </div>
-                        <div className="text-sm text-white/60">
-                          Leads/mês e valor fechado (FIPE) — últimos 6 meses.
-                        </div>
+                <div className="relative">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
+                        Performance do funil
                       </div>
-                      <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-                        <BarChart3Icon className="size-4" />
+                      <div className="text-sm text-white/60">
+                        Leads/mês e valor fechado (FIPE) — últimos 6 meses.
                       </div>
                     </div>
-                    <div className="mt-4 space-y-4">
-                      <DashboardKpiStrip />
-                      <BigSalesChart showHeader={false} heightClassName="h-[280px] sm:h-[320px] lg:h-[330px]" />
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
+                      <BarChart3Icon className="size-4" />
                     </div>
                   </div>
-                </PremiumSurface>
+
+                  <div className="mt-4 space-y-4">
+                    <DashboardKpiStrip />
+                    <BigSalesChart
+                      showHeader={false}
+                      heightClassName="h-[300px] sm:h-[320px] lg:h-[340px]"
+                    />
+                  </div>
+                </div>
               </div>
               <div className="lg:col-span-4">
                 <div className="grid gap-6 auto-rows-fr">

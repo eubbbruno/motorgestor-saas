@@ -102,10 +102,10 @@ export function BigSalesChart({
   }, [charts.data?.closed_value_monthly, charts.data?.leads_monthly]);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-28 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.22),transparent_62%)] blur-2xl" />
-        <div className="absolute -bottom-40 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.20),transparent_62%)] blur-2xl" />
+        <div className="absolute -top-32 left-1/2 h-[420px] w-[760px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.12),transparent_64%)] blur-3xl" />
+        <div className="absolute -bottom-48 left-1/3 h-[420px] w-[520px] rounded-full bg-[radial-gradient(circle_at_50%_30%,rgba(168,85,247,0.10),transparent_64%)] blur-3xl" />
       </div>
 
       {showHeader ? (
