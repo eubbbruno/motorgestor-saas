@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 type CsvRow = Record<string, string>;
 
@@ -237,14 +239,21 @@ export default function ImportarLeadsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Importar leads</h1>
-        <p className="text-sm text-muted-foreground">
-          Faça upload de um CSV e importe seus leads com status <span className="font-medium">novo</span>.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Onboarding"
+        title="Importar leads"
+        description="Faça upload de um CSV e importe seus leads com status novo."
+      />
 
-      <Card className="bg-background/60 p-6">
+      <PremiumSurface>
+      <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
+        <div className="mb-5 flex flex-wrap gap-2 text-xs text-mg-fg-muted">
+          {["1) Upload", "2) Mapeamento", "3) Importar"].map((t) => (
+            <span key={t} className="rounded-full border border-mg-border bg-mg-surface/60 px-3 py-1.5">
+              {t}
+            </span>
+          ))}
+        </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
             <Label htmlFor="csv">CSV</Label>
@@ -291,7 +300,7 @@ export default function ImportarLeadsPage() {
         {headers.length ? (
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
-              <div className="text-sm font-medium">Mapeamento de colunas</div>
+              <div className="text-sm font-medium text-foreground">Mapeamento de colunas</div>
               <div className="grid gap-3">
                 {systemFields.map((f) => (
                   <div key={f.key} className="grid gap-1.5">
@@ -328,8 +337,8 @@ export default function ImportarLeadsPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="text-sm font-medium">Prévia</div>
-              <Card className="bg-background/40 p-3">
+              <div className="text-sm font-medium text-foreground">Prévia</div>
+              <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-3 backdrop-blur">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -352,10 +361,10 @@ export default function ImportarLeadsPage() {
                     ))}
                   </TableBody>
                 </Table>
-              </Card>
+              </div>
 
               {result ? (
-                <div className="rounded-xl border bg-background/40 p-4 text-sm">
+                <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-4 text-sm backdrop-blur">
                   <div className="font-medium">Resultado</div>
                   <div className="mt-1 text-muted-foreground">
                     Total: {result.total} · Importados:{" "}
@@ -372,6 +381,7 @@ export default function ImportarLeadsPage() {
           </div>
         )}
       </Card>
+      </PremiumSurface>
     </div>
   );
 }

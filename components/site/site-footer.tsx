@@ -26,8 +26,9 @@ const links = {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t">
-      <Container className="py-12">
+    <footer className="relative border-t">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,transparent,rgba(16,185,129,.25),rgba(59,130,246,.25),transparent)]" />
+      <Container className="py-14">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 font-semibold">
@@ -46,13 +47,13 @@ export function SiteFooter() {
 
           {Object.entries(links).map(([title, items]) => (
             <div key={title} className="space-y-3">
-              <div className="text-sm font-medium">{title}</div>
+              <div className="text-sm font-medium tracking-tight">{title}</div>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {items.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="transition-colors hover:text-foreground"
+                      className="transition-colors hover:text-foreground hover:underline hover:underline-offset-4"
                     >
                       {item.label}
                     </Link>

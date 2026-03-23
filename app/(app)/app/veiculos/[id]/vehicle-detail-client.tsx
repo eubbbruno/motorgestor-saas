@@ -16,6 +16,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 import {
   Dialog,
   DialogContent,
@@ -226,35 +228,33 @@ export function VehicleDetailClient({ id }: { id: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Veículo</h1>
-          <p className="text-sm text-muted-foreground">
-            Edite as informações e mantenha o status do estoque atualizado.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/app/veiculos">Voltar</Link>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setAdOpen(true);
-            }}
-            disabled={!vehicle.data}
-          >
-            Gerar anúncio
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={`/app/proposta?vehicleId=${id}`}>Gerar proposta PDF</Link>
-          </Button>
-          <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
-            <TrashIcon className="mr-2 size-4" />
-            Remover
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        kicker="Estoque"
+        title={vehicle.data?.title ? `Veículo · ${vehicle.data.title}` : "Veículo"}
+        description="Edite as informações e mantenha o status do estoque atualizado."
+        right={
+          <div className="grid w-full gap-2 sm:flex sm:w-auto sm:items-center">
+            <Button asChild variant="outline" className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
+              <Link href="/app/veiculos">Voltar</Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+              onClick={() => setAdOpen(true)}
+              disabled={!vehicle.data}
+            >
+              Gerar anúncio
+            </Button>
+            <Button asChild variant="outline" className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
+              <Link href={`/app/proposta?vehicleId=${id}`}>Gerar proposta PDF</Link>
+            </Button>
+            <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+              <TrashIcon className="mr-2 size-4" />
+              Remover
+            </Button>
+          </div>
+        }
+      />
 
       {vehicle.isLoading ? (
         <div className="text-sm text-muted-foreground">Carregando...</div>
@@ -380,7 +380,8 @@ export function VehicleDetailClient({ id }: { id: string }) {
             </div>
 
             <div className="space-y-4 lg:col-span-4">
-              <Card className="bg-background/60 p-4">
+              <PremiumSurface>
+                <Card className="rounded-2xl border-0 bg-transparent p-4 shadow-none">
                 <div className="text-sm font-medium">Ações</div>
                 <div className="mt-3 grid gap-2">
                   <Button
@@ -425,9 +426,11 @@ export function VehicleDetailClient({ id }: { id: string }) {
                     )}
                   </Button>
                 </div>
-              </Card>
+                </Card>
+              </PremiumSurface>
 
-              <Card className="bg-background/60 p-4">
+              <PremiumSurface>
+                <Card className="rounded-2xl border-0 bg-transparent p-4 shadow-none">
                 <div className="text-sm font-medium">Fotos do veículo</div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   {photoPaths.length ? (
@@ -458,7 +461,8 @@ export function VehicleDetailClient({ id }: { id: string }) {
                     Mostrando 8 de {photoPaths.length} fotos.
                   </div>
                 ) : null}
-              </Card>
+                </Card>
+              </PremiumSurface>
             </div>
           </div>
 

@@ -8,6 +8,7 @@ import { useCreateVehicle } from "@/features/vehicles/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
 import type { VehicleFormValues } from "@/features/vehicles/schema";
 import { getHumanErrorMessage } from "@/lib/errors";
+import { PageHeader } from "@/components/app/page-header";
 
 export default function NovoVeiculoPage() {
   const router = useRouter();
@@ -40,13 +41,11 @@ export default function NovoVeiculoPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Novo veículo</h1>
-        <p className="text-sm text-muted-foreground">
-          Cadastre seu veículo com as informações essenciais para atendimento e
-          negociação.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Estoque"
+        title="Novo veículo"
+        description="Cadastre o veículo com as informações essenciais para atendimento e negociação."
+      />
 
       <VehicleForm
         title="Cadastro do veículo"

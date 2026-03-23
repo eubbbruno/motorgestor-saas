@@ -32,6 +32,7 @@ import {
 } from "@/components/dashboard/dashboard-widgets";
 import { DashboardKpiStrip } from "@/components/dashboard/dashboard-kpi-strip";
 import { PremiumSurface } from "@/components/dashboard/premium-surface";
+import { DashboardSectionHeading } from "@/components/dashboard/dashboard-section-heading";
 
 export default function AppDashboardPage() {
   const metrics = useDashboardMetrics();
@@ -83,13 +84,13 @@ export default function AppDashboardPage() {
       <div className="relative">
         <EpicDashboardBackground className="rounded-none" />
         <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-8 sm:space-y-10">
-          <motion.div variants={item} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <motion.div variants={item} className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 backdrop-blur">
                 <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.10)]" />
                 Operação em tempo real
               </div>
-              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
                 Dashboard
               </h1>
               <p className="text-sm text-white/60">
@@ -116,19 +117,16 @@ export default function AppDashboardPage() {
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <div className="relative">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-                        Performance do funil
+                  <DashboardSectionHeading
+                    kicker="Visão geral"
+                    title="Performance do funil"
+                    description="Leads/mês e valor fechado (FIPE) — últimos 6 meses."
+                    right={
+                      <div className="flex size-10 items-center justify-center rounded-2xl bg-white/5 text-white/70 ring-1 ring-white/10">
+                        <BarChart3Icon className="size-4" />
                       </div>
-                      <div className="text-sm text-white/60">
-                        Leads/mês e valor fechado (FIPE) — últimos 6 meses.
-                      </div>
-                    </div>
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-                      <BarChart3Icon className="size-4" />
-                    </div>
-                  </div>
+                    }
+                  />
 
                   <div className="mt-4 space-y-4">
                     <DashboardKpiStrip />
@@ -157,12 +155,10 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Hoje</div>
-              <p className="text-sm text-white/60">
-                O que você precisa ver para vender mais rápido.
-              </p>
-            </div>
+            <DashboardSectionHeading
+              title="Hoje"
+              description="O que você precisa ver para vender mais rápido."
+            />
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <RecentActivityWidget />
@@ -185,12 +181,10 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">A fazer agora</div>
-              <p className="text-sm text-white/60">
-                3 ações objetivas para mover o funil hoje.
-              </p>
-            </div>
+            <DashboardSectionHeading
+              title="A fazer agora"
+              description="3 ações objetivas para mover o funil hoje."
+            />
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <DoNowWidget />
@@ -204,12 +198,10 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Widgets</div>
-              <p className="text-sm text-white/60">
-                Blocos organizados em linhas, com largura e hierarquia consistentes.
-              </p>
-            </div>
+            <DashboardSectionHeading
+              title="Widgets"
+              description="Blocos organizados em linhas, com largura e hierarquia consistentes."
+            />
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
               <RecentLeadsWidget />
               <RecentVehiclesWidget />
@@ -253,10 +245,10 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Hub</div>
-              <p className="text-sm text-white/60">Ações e atalhos principais (sem cara de cards repetidos).</p>
-            </div>
+            <DashboardSectionHeading
+              title="Hub"
+              description="Ações e atalhos principais (sem cara de cards repetidos)."
+            />
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,8 +258,9 @@ export default function AppDashboardPage() {
                   <Link
                     key={m.href}
                     href={m.href}
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:bg-white/10 hover:shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
+                    className="group relative rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:bg-white/10 hover:shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
                   >
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/16 to-white/0" />
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="text-sm font-medium text-white">{m.title}</div>

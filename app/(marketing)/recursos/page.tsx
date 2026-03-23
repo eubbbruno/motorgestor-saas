@@ -10,10 +10,10 @@ import {
 
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { MarketingCard } from "@/components/site/marketing-card";
 
 const features = [
   {
@@ -76,15 +76,15 @@ export default function RecursosPage() {
         <Container>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => (
-              <Card key={f.title} className="bg-background/60 p-6">
+              <MarketingCard key={f.title} className="p-6">
                 <f.icon className="size-5 text-emerald-300" />
                 <div className="mt-3 font-medium">{f.title}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{f.description}</p>
-              </Card>
+              </MarketingCard>
             ))}
           </div>
 
-          <Card className="mt-10 bg-background/60 p-8">
+          <MarketingCard className="mt-10 p-8">
             <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
               <div className="space-y-2 lg:col-span-7">
                 <div className="flex flex-wrap items-center gap-2">
@@ -131,7 +131,7 @@ export default function RecursosPage() {
                 </Button>
               </div>
             </div>
-          </Card>
+          </MarketingCard>
         </Container>
       </section>
     </>

@@ -17,15 +17,20 @@ export function PageHero({
   className?: string;
 }) {
   return (
-    <section className={cn("py-12 sm:py-16", className)}>
+    <section className={cn("relative overflow-hidden py-12 sm:py-18", className)}>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_30%_0%,rgba(59,130,246,.08),transparent_55%),radial-gradient(900px_circle_at_70%_30%,rgba(16,185,129,.08),transparent_55%)]" />
       <Container>
-        <div className="mx-auto max-w-3xl space-y-4 text-center">
+        <div className="mx-auto max-w-3xl space-y-5 text-center">
           {eyebrow ? (
-            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {eyebrow}
+            <div className="inline-flex items-center justify-center gap-2">
+              <span className="h-px w-6 bg-foreground/10" />
+              <div className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                {eyebrow}
+              </div>
+              <span className="h-px w-6 bg-foreground/10" />
             </div>
           ) : null}
-          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.05]">
             {title}
           </h1>
           {subtitle ? (

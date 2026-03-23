@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 type FipeOption = { code: string; name: string };
 type FipeYearOption = { code: string; name: string; year: number };
@@ -459,8 +460,14 @@ export function VehicleForm({
   }
 
   return (
-    <Card className="bg-background/60 p-6">
-      <div className="text-base font-medium">{title}</div>
+    <PremiumSurface>
+      <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div className="text-base font-medium text-foreground">{title}</div>
+        <div className="text-xs text-mg-fg-muted">
+          Dica: use a seleção FIPE para padronizar marca/modelo/ano.
+        </div>
+      </div>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-4">
         <fieldset disabled={busy} aria-busy={busy} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -498,7 +505,7 @@ export function VehicleForm({
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
                 onClick={lookupVehicle}
                 disabled={busyFipe}
               >
@@ -898,7 +905,7 @@ export function VehicleForm({
                 variant="outline"
                 onClick={generateDescriptionAi}
                 disabled={busyAi}
-                className="sm:w-auto"
+                  className="sm:w-auto border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
               >
                 {busyAi ? (
                   <>
@@ -940,7 +947,8 @@ export function VehicleForm({
           </Button>
         </fieldset>
       </form>
-    </Card>
+      </Card>
+    </PremiumSurface>
   );
 }
 

@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 const Schema = z.object({
   email: z.string().email("Informe um e-mail válido."),
@@ -95,12 +96,13 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
             </p>
           </div>
 
-          <Card className="rounded-xl border bg-background/70 p-5 shadow-sm backdrop-blur sm:p-7">
+          <PremiumSurface>
+          <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none sm:p-7">
             <div className="space-y-4">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full justify-center bg-background/60"
+                className="w-full justify-center border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
                 onClick={onGoogle}
                 disabled={loading || oauthLoading}
               >
@@ -211,6 +213,7 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
               </form>
             </div>
           </Card>
+          </PremiumSurface>
         </div>
       </div>
     </div>

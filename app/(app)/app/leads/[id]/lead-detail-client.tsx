@@ -49,6 +49,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 type EventType = "created" | "note" | "status_change" | "call" | "visit" | "sale" | "whatsapp";
 
@@ -272,41 +274,43 @@ export function LeadDetailClient({ id }: { id: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Lead</h1>
-          <p className="text-sm text-muted-foreground">
-            Atualize status, notas e mantenha histórico do atendimento.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/app/leads">Voltar</Link>
-          </Button>
-          <div className="flex">
+      <PageHeader
+        kicker="CRM"
+        title={lead.data?.name ? `Lead · ${lead.data.name}` : "Lead"}
+        description="Atualize status, notas e mantenha histórico do atendimento."
+        right={
+          <div className="grid w-full gap-2 sm:flex sm:w-auto sm:items-center">
             <Button
               asChild
-              className="rounded-r-none bg-emerald-600 text-white hover:bg-emerald-600/90"
-              disabled={!whatsappLink}
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
             >
-              <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
-                <MessageCircleIcon className="mr-2 size-4" />
-                Conversar no WhatsApp
-              </a>
+              <Link href="/app/leads">Voltar</Link>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  className="rounded-l-none border-l border-emerald-700/30 bg-emerald-600 text-white hover:bg-emerald-600/90"
-                  disabled={!lead.data?.phone}
-                  size="icon"
-                  aria-label="Opções de mensagem"
-                  type="button"
-                >
-                  <MessageSquareTextIcon className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-56">
+            <div className="flex w-full sm:w-auto">
+              <Button
+                asChild
+                className="w-full rounded-r-none bg-emerald-500 text-black hover:bg-emerald-400"
+                disabled={!whatsappLink}
+              >
+                <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
+                  <MessageCircleIcon className="mr-2 size-4" />
+                  Conversar no WhatsApp
+                </a>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className="rounded-l-none border-l border-black/10 bg-emerald-500 text-black hover:bg-emerald-400"
+                    disabled={!lead.data?.phone}
+                    size="icon"
+                    aria-label="Opções de mensagem"
+                    type="button"
+                  >
+                    <MessageSquareTextIcon className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-56">
                 <DropdownMenuItem
                   onClick={() => {
                     setWaTemplate("initial");
@@ -381,16 +385,21 @@ export function LeadDetailClient({ id }: { id: string }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+            >
+              <Link href={`/app/proposta?leadId=${id}`}>Gerar proposta PDF</Link>
+            </Button>
+            <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+              <TrashIcon className="mr-2 size-4" />
+              Remover
+            </Button>
           </div>
-          <Button asChild variant="outline">
-            <Link href={`/app/proposta?leadId=${id}`}>Gerar proposta PDF</Link>
-          </Button>
-          <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
-            <TrashIcon className="mr-2 size-4" />
-            Remover
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {lead.isLoading ? (
         <div className="text-sm text-muted-foreground">Carregando...</div>
@@ -406,7 +415,8 @@ export function LeadDetailClient({ id }: { id: string }) {
             loading={update.isPending}
           />
 
-          <Card className="bg-background/60 p-6">
+          <PremiumSurface>
+            <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
                 <MessageSquareTextIcon className="size-4 text-muted-foreground" />
@@ -507,12 +517,14 @@ export function LeadDetailClient({ id }: { id: string }) {
                 </div>
               )}
             </div>
-          </Card>
+            </Card>
+          </PremiumSurface>
 
-          <Card className="bg-background/60 p-6">
+          <PremiumSurface>
+            <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
-                <MessageCircleIcon className="size-4 text-emerald-600" />
+                <MessageCircleIcon className="size-4 text-emerald-400" />
                 <div className="text-base font-medium">Histórico WhatsApp</div>
               </div>
               <Button
@@ -575,9 +587,11 @@ export function LeadDetailClient({ id }: { id: string }) {
                 </div>
               )}
             </div>
-          </Card>
+            </Card>
+          </PremiumSurface>
 
-          <Card className="bg-background/60 p-6">
+          <PremiumSurface>
+            <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-0.5">
                 <div className="text-base font-medium">Tarefas / Follow-ups</div>
@@ -706,7 +720,8 @@ export function LeadDetailClient({ id }: { id: string }) {
                 </div>
               )}
             </div>
-          </Card>
+            </Card>
+          </PremiumSurface>
         </>
       ) : null}
 

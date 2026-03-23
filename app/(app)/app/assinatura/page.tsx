@@ -6,18 +6,20 @@ import { CreditCardIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 export default function AssinaturaPage() {
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Assinatura</h1>
-        <p className="text-sm text-muted-foreground">
-          No MVP, o gerenciamento de cobrança é simplificado.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Billing"
+        title="Assinatura"
+        description="No MVP, o gerenciamento de cobrança é simplificado."
+      />
 
-      <Card className="bg-background/60 p-6">
+      <PremiumSurface>
+        <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -32,7 +34,7 @@ export default function AssinaturaPage() {
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border bg-background/60 p-4">
+          <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-4 backdrop-blur">
             <div className="text-sm font-medium">O que inclui</div>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
               <li>Veículos e leads ilimitados</li>
@@ -40,7 +42,7 @@ export default function AssinaturaPage() {
               <li>RLS por empresa</li>
             </ul>
           </div>
-          <div className="rounded-lg border bg-background/60 p-4">
+          <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-4 backdrop-blur">
             <div className="text-sm font-medium">Upgrade</div>
             <p className="mt-2 text-sm text-muted-foreground">
               Quer mais usuários e relatórios? Fale com a equipe para migrar para Pro.
@@ -55,7 +57,8 @@ export default function AssinaturaPage() {
             </div>
           </div>
         </div>
-      </Card>
+        </Card>
+      </PremiumSurface>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export function DashboardKpiStrip() {
       {items.map((it) => (
         <div
           key={it.label}
-          className="relative overflow-hidden rounded-xl px-1.5 py-1"
+          className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm backdrop-blur transition hover:bg-white/8 hover:shadow-[0_24px_80px_-60px_rgba(0,0,0,0.75)]"
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/15 to-white/0" />
           <div className={["pointer-events-none absolute inset-0 bg-linear-to-br", it.accent].join(" ")} />
@@ -52,11 +52,11 @@ export function DashboardKpiStrip() {
               <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
                 {it.label}
               </div>
-              <div className="mt-1 truncate text-base font-semibold tracking-tight text-white">
+              <div className="mt-1 truncate text-lg font-semibold tracking-tight text-white sm:text-xl">
                 {it.value}
               </div>
             </div>
-            <div className="flex size-9 items-center justify-center rounded-xl bg-transparent text-white/70 ring-1 ring-white/10">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/75 ring-1 ring-white/10 transition group-hover:bg-white/10">
               {it.icon}
             </div>
           </div>

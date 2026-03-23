@@ -165,6 +165,7 @@ export function GuidedOnboardingModal() {
         className="w-[calc(100vw-1.5rem)] max-w-3xl max-h-[85vh] overflow-hidden rounded-xl border-white/10 bg-black/70 p-0 shadow-[0_50px_140px_rgba(0,0,0,0.80)] backdrop-blur sm:rounded-2xl"
         showCloseButton
       >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/18 to-white/0" />
         <div className="grid h-full max-h-[85vh] gap-0 md:grid-cols-[1fr_1.1fr]">
           <div className="overflow-y-auto border-b p-4 md:border-b-0 md:border-r sm:p-6">
             <DialogHeader>
@@ -238,7 +239,7 @@ export function GuidedOnboardingModal() {
 
             <div className="mt-4 space-y-3">
               {nextStep ? (
-                <Card className="rounded-xl bg-background/50 p-4">
+                <Card className="rounded-2xl border-white/10 bg-white/5 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="text-base font-semibold tracking-tight">{nextStep.title}</div>

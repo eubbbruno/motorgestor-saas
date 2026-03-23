@@ -3,9 +3,9 @@ import { CheckIcon } from "lucide-react";
 
 import { PageHero } from "@/components/site/page-hero";
 import { Container } from "@/components/site/container";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MarketingCard } from "@/components/site/marketing-card";
 
 const plans = [
   {
@@ -75,10 +75,10 @@ export default function PrecosPage() {
         <Container>
           <div className="grid gap-5 lg:grid-cols-3">
             {plans.map((p) => (
-              <Card
+              <MarketingCard
                 key={p.name}
                 className={[
-                  "bg-background/60 p-6",
+                  "p-6",
                   p.highlight
                     ? "relative border-emerald-400/40 shadow-[0_0_0_1px_rgba(52,211,153,.25),0_30px_80px_-50px_rgba(16,185,129,.55)]"
                     : "",
@@ -117,7 +117,7 @@ export default function PrecosPage() {
                     <Link href="/cadastro">Escolher {p.name}</Link>
                   </Button>
                 </div>
-              </Card>
+              </MarketingCard>
             ))}
           </div>
 

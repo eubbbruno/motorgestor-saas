@@ -8,6 +8,7 @@ import { useCreateLead } from "@/features/leads/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
 import type { LeadFormValues } from "@/features/leads/schema";
 import { getHumanErrorMessage } from "@/lib/errors";
+import { PageHeader } from "@/components/app/page-header";
 
 export default function NovoLeadPage() {
   const router = useRouter();
@@ -40,12 +41,11 @@ export default function NovoLeadPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Novo lead</h1>
-        <p className="text-sm text-muted-foreground">
-          Registre o contato e mantenha o próximo passo claro.
-        </p>
-      </div>
+      <PageHeader
+        kicker="CRM"
+        title="Novo lead"
+        description="Registre o contato e mantenha o próximo passo claro."
+      />
 
       <LeadForm
         title="Cadastro do lead"

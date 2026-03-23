@@ -6,6 +6,8 @@ import { BarChart3Icon, CarIcon, UsersIcon } from "lucide-react";
 import { useVehicles } from "@/features/vehicles/hooks";
 import { useLeads } from "@/features/leads/hooks";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 export default function RelatoriosPage() {
   const vehicles = useVehicles();
@@ -20,15 +22,15 @@ export default function RelatoriosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Relatórios</h1>
-        <p className="text-sm text-muted-foreground">
-          Indicadores essenciais para acompanhar sua operação.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Insights"
+        title="Relatórios"
+        description="Indicadores essenciais para acompanhar sua operação."
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-background/60 p-5">
+        <PremiumSurface>
+          <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Estoque</div>
             <CarIcon className="size-4 text-muted-foreground" />
@@ -37,8 +39,10 @@ export default function RelatoriosPage() {
             {vehicles.isLoading ? "—" : vehicles.data?.length ?? 0}
           </div>
           <div className="mt-1 text-xs text-muted-foreground">Veículos cadastrados.</div>
-        </Card>
-        <Card className="bg-background/60 p-5">
+          </Card>
+        </PremiumSurface>
+        <PremiumSurface>
+          <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Leads</div>
             <UsersIcon className="size-4 text-muted-foreground" />
@@ -47,8 +51,10 @@ export default function RelatoriosPage() {
             {leads.isLoading ? "—" : leads.data?.length ?? 0}
           </div>
           <div className="mt-1 text-xs text-muted-foreground">Total registrados.</div>
-        </Card>
-        <Card className="bg-background/60 p-5">
+          </Card>
+        </PremiumSurface>
+        <PremiumSurface>
+          <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Conversão</div>
             <BarChart3Icon className="size-4 text-muted-foreground" />
@@ -57,17 +63,20 @@ export default function RelatoriosPage() {
           <div className="mt-1 text-xs text-muted-foreground">
             {conv.fechado} fechados de {conv.total} leads.
           </div>
-        </Card>
+          </Card>
+        </PremiumSurface>
       </div>
 
-      <Card className="bg-background/60 p-6">
+      <PremiumSurface>
+        <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
         <div className="text-base font-medium">Interpretação rápida</div>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
           <li>Se há muitos “novos”, foque em velocidade de resposta.</li>
           <li>Se a conversão é baixa, revise proposta e agenda de follow-up.</li>
           <li>Estoque parado pede ajuste de preço/descrição e reativação de leads.</li>
         </ul>
-      </Card>
+        </Card>
+      </PremiumSurface>
     </div>
   );
 }

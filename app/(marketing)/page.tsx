@@ -29,8 +29,9 @@ import {
   PipelineMiniMockup,
 } from "@/components/site/mini-mockups";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { MarketingCard } from "@/components/site/marketing-card";
+import { SectionHeading } from "@/components/site/section-heading";
 
 const features = [
   {
@@ -108,10 +109,10 @@ export default function HomePage() {
   return (
     <>
       {/* SECTION 1 — white */}
-      <section className="relative overflow-hidden bg-[#05060a] py-14 text-white sm:py-24">
+      <section className="relative overflow-hidden bg-[#05060a] py-16 text-white sm:py-24">
         {/* Video background (cinematográfico). Sem áudio; com fallback e overlay para legibilidade. */}
         <video
-          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-30 motion-reduce:hidden"
+          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-30 motion-reduce:hidden object-[55%_35%]"
           autoPlay
           muted
           loop
@@ -123,8 +124,9 @@ export default function HomePage() {
         >
           <source src="/hero-bg-motorgestor.mp4" type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.55),rgba(5,6,10,0.94))]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.50),rgba(5,6,10,0.94))]" />
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_80%,rgba(0,0,0,0.65),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-size-[56px_56px]" />
         <Container className="max-w-7xl">
           <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
             <div className="space-y-6 pt-2">
@@ -132,11 +134,11 @@ export default function HomePage() {
                 SaaS B2B para revendas e vendedores autônomos
               </Badge>
 
-              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.06]">
+              <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.02]">
                 Responda leads mais rápido e feche mais carros — sem planilhas.
               </h1>
 
-              <p className="text-pretty text-base text-white/70 sm:text-lg">
+              <p className="text-pretty text-base text-white/70 sm:text-xl">
                 MotorGestor organiza seu atendimento em um funil claro, com WhatsApp + histórico e follow-ups para você não perder timing.
               </p>
 
@@ -169,10 +171,23 @@ export default function HomePage() {
                 ].map((t) => (
                   <span
                     key={t}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur"
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur"
                   >
                     {t}
                   </span>
+                ))}
+              </div>
+
+              <div className="grid gap-3 pt-1 sm:grid-cols-3">
+                {[
+                  ["Tempo de setup", "10–20 min"],
+                  ["Rotina diária", "5 min/dia"],
+                  ["Primeira venda", "mais previsível"],
+                ].map(([k, v]) => (
+                  <div key={k} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
+                    <div className="text-[11px] font-medium uppercase tracking-wider text-white/60">{k}</div>
+                    <div className="mt-1 text-sm font-semibold text-white">{v}</div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -197,19 +212,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2 — how it works */}
-      <section className="bg-background py-14 sm:py-24">
+      <section className="bg-background py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-5">
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Como funciona
-              </div>
-              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Uma rotina simples para vender todos os dias.
-              </h2>
-              <p className="text-muted-foreground">
-                Você não precisa “virar refém do WhatsApp”. Precisa de um processo leve que te diga o que fazer agora.
-              </p>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Como funciona"
+                title="Uma rotina simples para vender todos os dias."
+                lead="Você não precisa virar refém do WhatsApp. Precisa de um processo leve que te diga o que fazer agora."
+              />
             </div>
 
             <div className="grid gap-4 lg:col-span-7 sm:grid-cols-3">
@@ -230,7 +241,7 @@ export default function HomePage() {
                   desc: "Proposta PDF + follow-up para não perder timing.",
                 },
               ].map((s) => (
-                <Card key={s.title} className="rounded-xl bg-background p-6 shadow-sm">
+                <MarketingCard key={s.title}>
                   <div className="flex items-start gap-3">
                     <div className="rounded-xl border bg-background p-2">
                       <s.icon className="size-4 text-muted-foreground" />
@@ -240,7 +251,7 @@ export default function HomePage() {
                       <p className="text-sm text-muted-foreground">{s.desc}</p>
                     </div>
                   </div>
-                </Card>
+                </MarketingCard>
               ))}
             </div>
           </div>
@@ -248,19 +259,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2.5 — for who */}
-      <section className="border-y bg-muted/30 py-14 sm:py-24">
+      <section className="border-y bg-muted/30 py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-5">
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Para quem é
-              </div>
-              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Feito para quem vende carro com volume e precisa de previsibilidade.
-              </h2>
-              <p className="text-muted-foreground">
-                Revendas pequenas, vendedores autônomos e times enxutos que querem vender mais com menos bagunça.
-              </p>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Para quem é"
+                title="Feito para quem vende carro com volume e precisa de previsibilidade."
+                lead="Revendas pequenas, vendedores autônomos e times enxutos que querem vender mais com menos bagunça."
+              />
             </div>
 
             <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
@@ -270,10 +277,10 @@ export default function HomePage() {
                 ["Operação com anúncios", "Texto/fotos prontos e proposta rápida para ganhar velocidade."],
                 ["Quem quer padrão", "Funil + follow-ups: cada lead com próximo passo definido."],
               ].map(([title, desc]) => (
-                <Card key={title} className="rounded-xl bg-background p-6 shadow-sm">
+                <MarketingCard key={title}>
                   <div className="font-medium">{title}</div>
                   <div className="mt-2 text-sm text-muted-foreground">{desc}</div>
-                </Card>
+                </MarketingCard>
               ))}
             </div>
           </div>
@@ -281,19 +288,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2.75 — expected results */}
-      <section className="bg-background py-14 sm:py-24">
+      <section className="bg-background py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-5">
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Resultados esperados
-              </div>
-              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Quando você cria rotina, a conversão sobe.
-              </h2>
-              <p className="text-muted-foreground">
-                Não é “mágica”: é processo. Com funil + follow-ups, você responde mais rápido e perde menos oportunidade.
-              </p>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Resultados esperados"
+                title="Quando você cria rotina, a conversão sobe."
+                lead="Não é mágica: é processo. Com funil + follow-ups, você responde mais rápido e perde menos oportunidade."
+              />
             </div>
 
             <div className="grid gap-4 lg:col-span-7 sm:grid-cols-3">
@@ -302,10 +305,10 @@ export default function HomePage() {
                 ["Menos lead perdido", "Histórico e tarefas impedem que conversas sumam."],
                 ["Funil andando", "Você sabe quem está em negociação e o que falta para fechar."],
               ].map(([title, desc]) => (
-                <Card key={title} className="rounded-xl bg-background p-6 shadow-sm">
+                <MarketingCard key={title}>
                   <div className="text-sm font-medium">{title}</div>
                   <div className="mt-2 text-sm text-muted-foreground">{desc}</div>
-                </Card>
+                </MarketingCard>
               ))}
             </div>
           </div>
@@ -313,20 +316,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2 — subtle background */}
-      <section className="border-y bg-muted/30 py-14 sm:py-24">
+      <section className="border-y bg-muted/30 py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-5">
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Problemas
-              </div>
-              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Problemas que o MotorGestor resolve
-              </h2>
-              <p className="text-muted-foreground">
-                Quando o atendimento e o estoque ficam espalhados, a conversão cai. O MotorGestor
-                organiza rotina e histórico para você saber o que fazer agora.
-              </p>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Problemas"
+                title="Problemas que o MotorGestor resolve"
+                lead="Quando o atendimento e o estoque ficam espalhados, a conversão cai. O MotorGestor organiza rotina e histórico para você saber o que fazer agora."
+              />
             </div>
 
             <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
@@ -336,7 +334,7 @@ export default function HomePage() {
                 ["Anúncios espalhados em vários sites", "OLX/Webmotors com textos e fotos repetidos manualmente."],
                 ["Falta de acompanhamento de clientes", "Sem tarefas, agenda e próximos passos claros."],
               ].map(([title, desc]) => (
-                <Card key={title} className="rounded-xl bg-background p-5 shadow-sm">
+                <MarketingCard key={title} subtle>
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 rounded-lg border bg-background p-2">
                       <XIcon className="size-4 text-destructive" />
@@ -346,12 +344,12 @@ export default function HomePage() {
                       <p className="text-sm text-muted-foreground">{desc}</p>
                     </div>
                   </div>
-                </Card>
+                </MarketingCard>
               ))}
             </div>
 
             <div className="lg:col-span-12">
-              <Card className="rounded-xl bg-background p-6 shadow-sm">
+              <MarketingCard className="p-7 sm:p-8">
                 <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
                   <div className="space-y-2 lg:col-span-5">
                     <div className="flex items-center gap-2 text-sm font-medium">
@@ -368,7 +366,7 @@ export default function HomePage() {
                       ["FIPE automática", "Valor de referência no cadastro."],
                       ["WhatsApp integrado", "Templates + histórico no lead."],
                     ].map(([t, d]) => (
-                      <div key={t} className="rounded-xl border bg-background p-4">
+                      <div key={t} className="rounded-2xl border border-foreground/10 bg-background/60 p-4">
                         <div className="flex items-center gap-2">
                           <CheckIcon className="size-4 text-emerald-500" />
                           <div className="text-sm font-medium">{t}</div>
@@ -378,43 +376,40 @@ export default function HomePage() {
                     ))}
                   </div>
                 </div>
-              </Card>
+              </MarketingCard>
             </div>
           </div>
         </Container>
       </section>
 
       {/* SECTION 3 — white */}
-      <section className="bg-background py-14 sm:py-24">
+      <section className="bg-background py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-5">
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Features
-              </div>
-              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Uma stack de vendas completa para revendas pequenas.
-              </h2>
-              <p className="text-muted-foreground">
-                Pipeline, follow-ups, WhatsApp, FIPE, fotos e anúncios. Tudo no mesmo lugar.
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg">
-                  <Link href="/cadastro">
-                    Começar grátis <ArrowRightIcon className="ml-2 size-4" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="/precos">Ver planos</Link>
-                </Button>
-              </div>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Features"
+                title="Uma stack de vendas completa para revendas pequenas."
+                lead="Pipeline, follow-ups, WhatsApp, FIPE, fotos e anúncios. Tudo no mesmo lugar."
+              >
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button asChild size="lg">
+                    <Link href="/cadastro">
+                      Começar grátis <ArrowRightIcon className="ml-2 size-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/precos">Ver planos</Link>
+                  </Button>
+                </div>
+              </SectionHeading>
             </div>
 
             <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
               {features.map((f) => (
-                <Card
+                <MarketingCard
                   key={f.title}
-                  className="rounded-xl bg-background p-6 shadow-sm transition hover:shadow-md"
+                  className="p-6"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
@@ -429,7 +424,7 @@ export default function HomePage() {
                   <div className="mt-4">
                     <f.mockup />
                   </div>
-                </Card>
+                </MarketingCard>
               ))}
             </div>
           </div>
@@ -437,20 +432,16 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4 — Screenshots */}
-      <section className="border-y bg-muted/30 py-14 sm:py-24">
+      <section className="border-y bg-muted/30 py-16 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10">
             <div className="grid gap-4 lg:grid-cols-12 lg:items-end">
-              <div className="space-y-3 lg:col-span-6">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Screenshots
-                </div>
-                <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Veja o produto em ação.
-                </h2>
-                <p className="text-muted-foreground">
-                  Dashboard, Pipeline, Timeline do lead e Agenda: o essencial para vender com rotina.
-                </p>
+              <div className="lg:col-span-6">
+                <SectionHeading
+                  eyebrow="Screenshots"
+                  title="Veja o produto em ação."
+                  lead="Dashboard, Pipeline, Timeline do lead e Agenda: o essencial para vender com rotina."
+                />
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:col-span-6 lg:justify-end">
                 <Button asChild size="lg">
@@ -518,46 +509,41 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4 — subtle gradient */}
-      <section className="relative overflow-hidden py-14 sm:py-24">
+      <section className="relative overflow-hidden py-16 sm:py-24">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_0%_40%,rgba(16,185,129,.10),transparent_55%)]" />
         <Container className="max-w-7xl">
           <div className="grid gap-14">
             <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
-              <div className="space-y-3 lg:col-span-5">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Social proof
-                </div>
-                <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Um padrão de operação que escala com o time.
-                </h2>
-                <p className="text-muted-foreground">
-                  Depoimentos mock por enquanto — mas no estilo de SaaS premium: objetivo, elegante e focado em resultado.
-                </p>
+              <div className="lg:col-span-5">
+                <SectionHeading
+                  eyebrow="Social proof"
+                  title="Um padrão de operação que escala com o time."
+                  lead="Depoimentos mock por enquanto — no formato objetivo e focado em resultado."
+                />
               </div>
               <div className="grid gap-4 lg:col-span-7 lg:grid-cols-3">
                 {testimonials.map((t) => (
-                  <Card key={t.name} className="rounded-xl bg-background/60 p-6 shadow-sm backdrop-blur">
-                    <div className="text-sm leading-relaxed text-foreground/90">“{t.quote}”</div>
-                    <div className="mt-4">
-                      <div className="text-sm font-medium">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.role}</div>
+                  <MarketingCard key={t.name} className="p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="size-9 rounded-xl border border-foreground/10 bg-background/70" />
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{t.name}</div>
+                        <div className="truncate text-xs text-muted-foreground">{t.role}</div>
+                      </div>
                     </div>
-                  </Card>
+                    <div className="mt-4 text-sm leading-relaxed text-foreground/90">“{t.quote}”</div>
+                  </MarketingCard>
                 ))}
               </div>
             </div>
 
             <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
-              <div className="space-y-3 lg:col-span-5">
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Planos
-                </div>
-                <h3 className="text-balance text-2xl font-semibold tracking-tight">
-                  Plano Free e Pro.
-                </h3>
-                <p className="text-muted-foreground">
-                  Comece no Free e faça upgrade quando sua operação crescer.
-                </p>
+              <div className="lg:col-span-5">
+                <SectionHeading
+                  eyebrow="Planos"
+                  title="Comece no Free e faça upgrade quando virar rotina."
+                  lead="Planos simples, pensados para operação enxuta. Sem complexidade desnecessária."
+                />
               </div>
               <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
                 {[
@@ -578,9 +564,14 @@ export default function HomePage() {
                     variant: "default" as const,
                   },
                 ].map((p) => (
-                  <Card
+                  <MarketingCard
                     key={p.name}
-                    className="rounded-xl border bg-background/60 p-6 shadow-sm backdrop-blur"
+                    className={[
+                      "p-6",
+                      p.name === "Pro"
+                        ? "border-emerald-400/25 shadow-[0_0_0_1px_rgba(52,211,153,.18),0_18px_60px_-40px_rgba(16,185,129,.45)]"
+                        : "",
+                    ].join(" ")}
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -605,12 +596,12 @@ export default function HomePage() {
                         </Link>
                       </Button>
                     </div>
-                  </Card>
+                  </MarketingCard>
                 ))}
               </div>
             </div>
 
-            <Card className="relative overflow-hidden rounded-xl border bg-background/60 p-10 shadow-sm backdrop-blur">
+            <MarketingCard className="p-8 sm:p-10">
               <div className="pointer-events-none absolute -left-28 -top-28 size-96 rounded-full bg-emerald-400/10 blur-3xl" />
               <div className="pointer-events-none absolute -right-28 -bottom-28 size-96 rounded-full bg-blue-500/10 blur-3xl" />
 
@@ -634,7 +625,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-            </Card>
+            </MarketingCard>
           </div>
         </Container>
       </section>

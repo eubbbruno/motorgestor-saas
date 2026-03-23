@@ -5,6 +5,8 @@ import { UsersIcon } from "lucide-react";
 
 import { useLeads } from "@/features/leads/hooks";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 export default function ClientesPage() {
   const leads = useLeads();
@@ -16,14 +18,14 @@ export default function ClientesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Clientes</h1>
-        <p className="text-sm text-muted-foreground">
-          No MVP, “clientes” são leads marcados como <span className="font-medium">ganho</span>.
-        </p>
-      </div>
+      <PageHeader
+        kicker="CRM"
+        title="Clientes"
+        description="No MVP, clientes são leads marcados como ganho."
+      />
 
-      <Card className="bg-background/60 p-6">
+      <PremiumSurface>
+        <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
         {leads.isLoading ? (
           <div className="text-sm text-muted-foreground">Carregando...</div>
         ) : clientes.length ? (
@@ -31,7 +33,7 @@ export default function ClientesPage() {
             {clientes.map((c) => (
               <div
                 key={c.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-background/60 px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-mg-border bg-mg-surface/55 px-4 py-3 backdrop-blur"
               >
                 <div className="min-w-0">
                   <div className="truncate font-medium">{c.name}</div>
@@ -48,7 +50,8 @@ export default function ClientesPage() {
             Nenhum cliente ainda. Quando um lead virar venda, marque como “ganho”.
           </div>
         )}
-      </Card>
+        </Card>
+      </PremiumSurface>
     </div>
   );
 }

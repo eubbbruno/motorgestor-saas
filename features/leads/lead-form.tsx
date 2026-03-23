@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 import {
   Dialog,
   DialogContent,
@@ -156,8 +157,14 @@ export function LeadForm({
   }
 
   return (
-    <Card className="bg-background/60 p-6">
-      <div className="text-base font-medium">{title}</div>
+    <PremiumSurface>
+      <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div className="text-base font-medium text-foreground">{title}</div>
+        <div className="text-xs text-mg-fg-muted">
+          Campos essenciais primeiro. Você pode completar detalhes depois.
+        </div>
+      </div>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-4">
         <fieldset disabled={busy} aria-busy={busy} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -282,27 +289,35 @@ export function LeadForm({
             />
           </div>
 
-          <Button type="button" variant="outline" className="w-full" onClick={generateWhatsapp} disabled={busyAi}>
-            {busyAi ? (
-              <>
-                <Loader2Icon className="mr-2 size-4 animate-spin" />
-                Gerando mensagem...
-              </>
-            ) : (
-              "Gerar mensagem WhatsApp"
-            )}
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+              onClick={generateWhatsapp}
+              disabled={busyAi}
+            >
+              {busyAi ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Gerando mensagem...
+                </>
+              ) : (
+                "Gerar mensagem WhatsApp"
+              )}
+            </Button>
 
-          <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? (
-              <>
-                <Loader2Icon className="mr-2 size-4 animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              submitLabel
-            )}
-          </Button>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? (
+                <>
+                  <Loader2Icon className="mr-2 size-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                submitLabel
+              )}
+            </Button>
+          </div>
         </fieldset>
       </form>
 
@@ -340,7 +355,8 @@ export function LeadForm({
           <DialogFooter showCloseButton />
         </DialogContent>
       </Dialog>
-    </Card>
+      </Card>
+    </PremiumSurface>
   );
 }
 
