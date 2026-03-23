@@ -40,12 +40,12 @@ export function AppTopbar({
   const current = appNav.find((i) => pathname === i.href || (i.href !== "/app" && pathname.startsWith(i.href)));
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-white/10 bg-black/40 px-4 text-white backdrop-blur-lg lg:px-8">
+    <div className="flex h-16 items-center justify-between border-b border-mg-border bg-mg-bg/70 px-4 text-foreground backdrop-blur-lg lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <Button
           size="icon"
           variant="outline"
-          className="border-white/10 bg-white/5 text-white hover:bg-white/10 lg:hidden"
+          className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2 lg:hidden"
           onClick={toggleSidebar}
           aria-label="Abrir menu"
         >
@@ -54,10 +54,10 @@ export function AppTopbar({
         <div className="flex min-w-0 items-center gap-2">
           <span className="hidden size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.10)] sm:inline-block" />
           <div className="min-w-0">
-            <div className="truncate text-sm font-medium text-white">
+            <div className="truncate text-sm font-medium text-foreground">
               {current?.label ?? "Painel"}
             </div>
-            <div className="hidden truncate text-xs text-white/55 sm:block">
+            <div className="hidden truncate text-xs text-mg-fg-muted sm:block">
               MotorGestor · {roleLabel || "Conta"}
             </div>
           </div>
@@ -76,20 +76,20 @@ export function AppTopbar({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2 border-white/10 bg-white/5 text-white hover:bg-white/10">
+          <Button variant="outline" className="gap-2 border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
             <Avatar className="size-6">
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <span className="hidden text-sm sm:inline">{name ?? "Conta"}</span>
-            <ChevronDownIcon className="size-4 text-white/60" />
+            <ChevronDownIcon className="size-4 text-mg-fg-muted" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-64 border-white/10 bg-black/80 text-white backdrop-blur">
+        <DropdownMenuContent align="end" className="min-w-64 border-mg-border bg-mg-bg/90 text-foreground backdrop-blur">
           <div className="px-2 py-1.5 text-sm">
             <div className="font-medium">{name ?? "Usuário"}</div>
-            <div className="text-xs text-white/60">{email ?? ""}</div>
+            <div className="text-xs text-mg-fg-muted">{email ?? ""}</div>
             {roleLabel ? (
-              <div className="mt-1 text-xs text-white/60">{roleLabel}</div>
+              <div className="mt-1 text-xs text-mg-fg-muted">{roleLabel}</div>
             ) : null}
           </div>
           <DropdownMenuSeparator />

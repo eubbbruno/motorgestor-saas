@@ -31,6 +31,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 type TaskRow = {
   id: string;
@@ -167,24 +169,24 @@ export default function AgendaPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Agenda</h1>
-          <p className="text-sm text-muted-foreground">
-            Retornos, visitas e test-drives com contexto.
-          </p>
-        </div>
-        <Button onClick={() => setOpen(true)}>
-          <PlusIcon className="mr-2 size-4" />
-          Novo evento
-        </Button>
-      </div>
+      <PageHeader
+        kicker="Rotina"
+        title="Agenda"
+        description="Retornos, visitas e test-drives com contexto."
+        right={
+          <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">
+            <PlusIcon className="mr-2 size-4" />
+            Novo evento
+          </Button>
+        }
+      />
 
-      <Card className="bg-background/60 p-4">
+      <PremiumSurface>
+      <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <div className="text-base font-medium">Calendário de tarefas</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-mg-fg-muted">
               Visualize vencimentos de follow-ups e clique para abrir o lead.
             </div>
           </div>
@@ -212,13 +214,13 @@ export default function AgendaPage() {
 
         <div className="mt-4">
           {tasksQuery.isLoading ? (
-            <div className="text-sm text-muted-foreground">Carregando calendário...</div>
+            <div className="text-sm text-mg-fg-muted">Carregando calendário...</div>
           ) : tasksQuery.isError ? (
-            <div className="text-sm text-destructive">
+            <div className="text-sm text-red-300">
               Não foi possível carregar tarefas do calendário. A migração `lead_tasks` já foi aplicada?
             </div>
           ) : (
-            <div className="rounded-xl border bg-background/40 p-3">
+            <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-3 backdrop-blur">
               <Calendar
                 localizer={localizer}
                 culture="pt-BR"
@@ -229,7 +231,7 @@ export default function AgendaPage() {
                 onView={(v) => setView(v)}
                 date={date}
                 onNavigate={(d) => setDate(d)}
-                style={{ height: 520 }}
+                style={{ height: 460 }}
                 popup
                 onSelectEvent={(e) => {
                   const ev = e as TaskCalendarEvent;
@@ -257,10 +259,10 @@ export default function AgendaPage() {
 
         {tasksQuery.isLoading || tasksQuery.isError ? null : (
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border bg-background/40 p-4">
+            <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium">Tarefas atrasadas</div>
-                <div className="text-xs text-muted-foreground">{overdueTasks.length}</div>
+                <div className="text-xs text-mg-fg-muted">{overdueTasks.length}</div>
               </div>
               <div className="mt-3 space-y-2">
                 {overdueTasks.length ? (
@@ -272,11 +274,11 @@ export default function AgendaPage() {
                         router.push(`/app/leads/${t.lead_id}`);
                         router.refresh();
                       }}
-                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/60 px-3 py-2 text-left hover:bg-background/80"
+                      className="flex w-full items-start justify-between gap-3 rounded-xl border border-mg-border bg-mg-surface/60 px-3 py-2 text-left hover:bg-mg-surface-2/70"
                     >
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium">{t.title}</div>
-                        <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                        <div className="mt-0.5 truncate text-xs text-mg-fg-muted">
                           {t.leads?.[0]?.name ?? "Lead"}
                         </div>
                       </div>
@@ -286,15 +288,15 @@ export default function AgendaPage() {
                     </button>
                   ))
                 ) : (
-                  <div className="text-sm text-muted-foreground">Nenhuma tarefa atrasada.</div>
+                  <div className="text-sm text-mg-fg-muted">Nenhuma tarefa atrasada.</div>
                 )}
               </div>
             </div>
 
-            <div className="rounded-xl border bg-background/40 p-4">
+            <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium">Próximas tarefas</div>
-                <div className="text-xs text-muted-foreground">{upcomingTasks.length}</div>
+                <div className="text-xs text-mg-fg-muted">{upcomingTasks.length}</div>
               </div>
               <div className="mt-3 space-y-2">
                 {upcomingTasks.length ? (
@@ -306,33 +308,35 @@ export default function AgendaPage() {
                         router.push(`/app/leads/${t.lead_id}`);
                         router.refresh();
                       }}
-                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/60 px-3 py-2 text-left hover:bg-background/80"
+                      className="flex w-full items-start justify-between gap-3 rounded-xl border border-mg-border bg-mg-surface/60 px-3 py-2 text-left hover:bg-mg-surface-2/70"
                     >
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium">{t.title}</div>
-                        <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                        <div className="mt-0.5 truncate text-xs text-mg-fg-muted">
                           {t.leads?.[0]?.name ?? "Lead"}
                         </div>
                       </div>
-                      <div className="shrink-0 text-xs font-medium text-muted-foreground">
+                      <div className="shrink-0 text-xs font-medium text-mg-fg-muted">
                         {formatDue(t.due_date)}
                       </div>
                     </button>
                   ))
                 ) : (
-                  <div className="text-sm text-muted-foreground">Sem tarefas pendentes com vencimento.</div>
+                  <div className="text-sm text-mg-fg-muted">Sem tarefas pendentes com vencimento.</div>
                 )}
               </div>
             </div>
           </div>
         )}
       </Card>
+      </PremiumSurface>
 
-      <Card className="bg-background/60 p-4">
+      <PremiumSurface>
+      <Card className="rounded-2xl border-0 bg-transparent p-5 shadow-none sm:p-6">
         {events.isLoading ? (
-          <div className="text-sm text-muted-foreground">Carregando...</div>
+          <div className="text-sm text-mg-fg-muted">Carregando...</div>
         ) : events.isError ? (
-          <div className="text-sm text-destructive">
+          <div className="text-sm text-red-300">
             Não foi possível carregar a agenda.
           </div>
         ) : events.data?.length ? (
@@ -340,14 +344,14 @@ export default function AgendaPage() {
             {events.data.map((e) => (
               <div
                 key={e.id}
-                className="flex flex-col gap-2 rounded-lg border bg-background/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 rounded-2xl border border-mg-border bg-mg-surface/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="size-4 text-muted-foreground" />
+                    <CalendarIcon className="size-4 text-mg-fg-muted" />
                     <div className="truncate font-medium">{e.title}</div>
                   </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
+                  <div className="mt-1 text-xs text-mg-fg-muted">
                     {new Date(e.start_at).toLocaleString("pt-BR")}
                     {e.end_at ? ` → ${new Date(e.end_at).toLocaleString("pt-BR")}` : ""}
                     {e.location ? ` · ${e.location}` : ""}
@@ -374,7 +378,7 @@ export default function AgendaPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-mg-fg-muted">
               Sem eventos por enquanto.
             </div>
             <Button variant="outline" onClick={() => setOpen(true)}>
@@ -383,6 +387,7 @@ export default function AgendaPage() {
           </div>
         )}
       </Card>
+      </PremiumSurface>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

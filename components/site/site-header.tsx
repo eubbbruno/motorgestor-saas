@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { MenuIcon } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/site/container";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
   { href: "/recursos", label: "Recursos" },
@@ -14,7 +16,7 @@ const nav = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-mg-border bg-background/75 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
           <Link
@@ -39,6 +41,43 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Abrir menu">
+                  <MenuIcon className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="border-mg-border bg-background p-0">
+                <SheetHeader className="border-b border-mg-border p-5">
+                  <SheetTitle className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
+                    <span className="tracking-tight">MotorGestor</span>
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="space-y-1 p-4">
+                  {nav.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block rounded-xl px-3.5 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  <div className="mt-4 grid gap-2">
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/login">Entrar</Link>
+                    </Button>
+                    <Button asChild className="w-full">
+                      <Link href="/cadastro">Começar agora</Link>
+                    </Button>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
+
           <ThemeToggle />
           <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/login">Entrar</Link>

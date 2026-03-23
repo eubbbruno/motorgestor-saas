@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PageHeader } from "@/components/app/page-header";
+import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 const Schema = z.object({
   full_name: z.string().min(2, "Informe seu nome.").optional(),
@@ -80,23 +82,25 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
-        <p className="text-sm text-muted-foreground">
-          Ajustes de conta, empresa e preferências.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Conta"
+        title="Configurações"
+        description="Ajustes de perfil, empresa e preferências."
+      />
 
       {profile.isError ? (
-        <Card className="bg-background/60 p-6">
-          <div className="text-base font-medium">Não foi possível carregar</div>
-          <p className="mt-2 text-sm text-destructive">
+        <PremiumSurface>
+          <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
+          <div className="text-base font-medium text-foreground">Não foi possível carregar</div>
+          <p className="mt-2 text-sm text-red-300">
             Verifique se você está logado e se o Supabase está configurado.
           </p>
-        </Card>
+          </Card>
+        </PremiumSurface>
       ) : (
         <div className="grid gap-6 lg:grid-cols-12">
-          <Card className="bg-background/60 p-6 lg:col-span-6">
+          <PremiumSurface className="lg:col-span-6">
+          <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Avatar size="lg">
@@ -160,8 +164,10 @@ export default function ConfiguracoesPage() {
               </form>
             </div>
           </Card>
+          </PremiumSurface>
 
-          <Card className="bg-background/60 p-6 lg:col-span-6">
+          <PremiumSurface className="lg:col-span-6">
+          <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
@@ -212,8 +218,10 @@ export default function ConfiguracoesPage() {
               </div>
             </div>
           </Card>
+          </PremiumSurface>
 
-          <Card className="bg-background/60 p-6 lg:col-span-12">
+          <PremiumSurface className="lg:col-span-12">
+          <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-base font-medium">Preferências</div>
@@ -259,6 +267,7 @@ export default function ConfiguracoesPage() {
               </div>
             </div>
           </Card>
+          </PremiumSurface>
         </div>
       )}
     </div>

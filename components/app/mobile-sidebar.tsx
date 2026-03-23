@@ -15,8 +15,8 @@ export function MobileSidebar() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="left" className="w-80 border-white/10 bg-black/85 p-0 text-white backdrop-blur-xl">
-        <SheetHeader className="border-b border-white/10 p-5">
+      <SheetContent side="left" className="w-80 border-mg-border bg-mg-bg/90 p-0 text-foreground backdrop-blur-xl">
+        <SheetHeader className="border-b border-mg-border p-5">
           <SheetTitle className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
             <span className="tracking-tight">MotorGestor</span>
@@ -36,8 +36,8 @@ export function MobileSidebar() {
                 className={cn(
                   "group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-white/10 text-white shadow-[0_1px_0_rgba(255,255,255,0.06)_inset]"
-                    : "text-white/70 hover:bg-white/6 hover:text-white",
+                    ? "bg-mg-surface-2 text-foreground shadow-[0_1px_0_rgba(255,255,255,0.06)_inset]"
+                    : "text-mg-fg-muted hover:bg-mg-surface hover:text-foreground",
                 )}
               >
                 <Icon

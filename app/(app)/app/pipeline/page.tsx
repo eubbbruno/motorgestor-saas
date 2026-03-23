@@ -11,6 +11,7 @@ import type { LeadRow } from "@/types/models";
 import { buildLeadWhatsAppText, buildWhatsAppLink } from "@/lib/whatsapp";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/app/page-header";
 
 const columns = [
   { key: "novo", title: "Novo" },
@@ -114,17 +115,16 @@ export default function PipelinePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Pipeline</h1>
-          <p className="text-sm text-muted-foreground">
-            Arraste os leads entre as etapas para atualizar o funil.
-          </p>
-        </div>
-        <Button asChild variant="outline">
-          <Link href="/app/leads/novo">Novo lead</Link>
-        </Button>
-      </div>
+      <PageHeader
+        kicker="Vendas"
+        title="Pipeline"
+        description="Arraste leads entre etapas para atualizar o funil."
+        right={
+          <Button asChild variant="outline" className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
+            <Link href="/app/leads/novo">Novo lead</Link>
+          </Button>
+        }
+      />
 
       {leads.isLoading ? (
         <div className="text-sm text-muted-foreground">Carregando pipeline...</div>
@@ -143,13 +143,13 @@ export default function PipelinePage() {
                   className="w-[18rem] shrink-0"
                 >
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="text-sm font-semibold">{col.title}</div>
-                    <div className="text-xs text-muted-foreground">{list.length}</div>
+                    <div className="text-sm font-semibold text-foreground">{col.title}</div>
+                    <div className="text-xs text-mg-fg-muted">{list.length}</div>
                   </div>
 
-                  <div className="space-y-3 rounded-xl border bg-background/50 p-3">
+                  <div className="space-y-3 rounded-2xl border border-mg-border bg-mg-surface/60 p-3 backdrop-blur">
                     {list.length === 0 ? (
-                      <div className="rounded-md border border-dashed bg-background/40 p-4 text-xs text-muted-foreground">
+                      <div className="rounded-xl border border-dashed border-mg-border bg-mg-surface/40 p-4 text-xs text-mg-fg-muted">
                         Arraste um lead para cá.
                       </div>
                     ) : null}
@@ -170,20 +170,23 @@ export default function PipelinePage() {
                           onDragStart={(e) => onDragStart(e, l.id)}
                           onDragEnd={onDragEnd}
                           className={[
-                            "bg-background/70 p-3 shadow-sm transition",
-                            isDragging ? "opacity-70 ring-2 ring-primary/30" : "",
-                            isMoving ? "opacity-60" : "hover:shadow-md",
+                            "rounded-2xl border-mg-border bg-mg-surface-2/70 p-3 shadow-sm backdrop-blur transition",
+                            isDragging ? "opacity-70 ring-2 ring-emerald-400/25" : "",
+                            isMoving ? "opacity-60" : "hover:bg-mg-surface-2/85 hover:shadow-md",
                           ].join(" ")}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-medium">{l.name}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="truncate text-sm font-medium text-foreground">{l.name}</div>
+                              <div className="mt-1 text-xs text-mg-fg-muted">
                                 {v?.title ? v.title : "Sem veículo"}
                               </div>
                               {v?.fipe_value != null ? (
-                                <div className="mt-1 text-xs text-muted-foreground">
-                                  FIPE: <span className="font-medium">{formatBRL(Number(v.fipe_value))}</span>
+                                <div className="mt-1 text-xs text-mg-fg-muted">
+                                  FIPE:{" "}
+                                  <span className="font-medium text-foreground">
+                                    {formatBRL(Number(v.fipe_value))}
+                                  </span>
                                 </div>
                               ) : null}
                             </div>
@@ -195,7 +198,7 @@ export default function PipelinePage() {
                                     href={link}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-emerald-600 hover:text-emerald-700"
+                                    className="text-emerald-400 hover:text-emerald-300"
                                   >
                                     <MessageCircleIcon className="size-4" />
                                   </a>
@@ -207,7 +210,7 @@ export default function PipelinePage() {
                               )}
 
                               {isMoving ? (
-                                <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+                                <Loader2Icon className="size-4 animate-spin text-mg-fg-muted" />
                               ) : null}
                             </div>
                           </div>

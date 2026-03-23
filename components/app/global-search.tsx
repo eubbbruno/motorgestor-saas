@@ -88,18 +88,18 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className="hidden w-[380px] justify-start gap-2 bg-background/60 text-muted-foreground md:inline-flex"
+        className="hidden w-[380px] justify-start gap-2 border-mg-border bg-mg-surface text-mg-fg-muted hover:bg-mg-surface-2 hover:text-foreground md:inline-flex"
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="size-4" />
         <span>Buscar leads e veículos...</span>
-        <span className="ml-auto text-xs text-muted-foreground/80">⌘K</span>
+        <span className="ml-auto text-xs text-mg-fg-muted/80">⌘K</span>
       </Button>
 
       <Button
         variant="outline"
         size="icon"
-        className="md:hidden"
+        className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2 md:hidden"
         onClick={() => setOpen(true)}
         aria-label="Buscar"
       >

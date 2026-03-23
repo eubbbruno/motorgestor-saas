@@ -22,7 +22,7 @@ export default async function AppLayout({
     profile?.role === "admin" ? "Admin" : profile?.role === "vendedor" ? "Vendedor" : "";
 
   return (
-    <div className="dark min-h-screen bg-[#05060a] text-white">
+    <div className="dark min-h-screen bg-mg-bg text-foreground">
       <AppSidebar />
       <MobileSidebar />
 
@@ -35,7 +35,9 @@ export default async function AppLayout({
           />
         </div>
         <GuidedOnboardingModal />
-        <main className="px-4 py-6 lg:px-10 lg:py-10">{children}</main>
+        <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-10 lg:py-10">
+          <div className="mx-auto w-full max-w-[1400px]">{children}</div>
+        </main>
       </div>
     </div>
   );
