@@ -108,61 +108,81 @@ export default function HomePage() {
   return (
     <>
       {/* SECTION 1 — white */}
-      <section className="bg-background py-18 sm:py-24">
+      <section className="relative overflow-hidden bg-[#05060a] py-18 text-white sm:py-24">
+        {/* Video background (estrutura pronta). Se o arquivo não existir, o hero continua perfeito. */}
+        <video
+          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-25"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          poster="/hero-nova.png"
+        >
+          <source src="/hero-bg.mp4" type="video/mp4" />
+        </video>
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.65),rgba(5,6,10,0.92))]" />
         <Container className="max-w-7xl">
           <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
             <div className="space-y-6 pt-2">
-              <Badge variant="secondary" className="border bg-background">
+              <Badge variant="secondary" className="border-white/10 bg-white/5 text-white">
                 SaaS B2B para revendas e vendedores autônomos
               </Badge>
 
-              <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.1]">
+              <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.06]">
                 Organize seus leads e vendas de veículos em um único sistema.
               </h1>
 
-              <p className="text-pretty text-base text-muted-foreground sm:text-lg">
-                CRM automotivo com pipeline, FIPE automática, WhatsApp integrado e gestão completa
-                de anúncios.
+              <p className="text-pretty text-base text-white/70 sm:text-lg">
+                CRM automotivo com pipeline, FIPE automática, WhatsApp com histórico e operação diária com rotina.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   asChild
                   size="lg"
-                  className="shadow-sm ring-1 ring-foreground/10 transition hover:-translate-y-0.5"
+                  className="bg-white text-black shadow-sm ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:bg-white/90"
                 >
                   <Link href="/cadastro">
                     Começar grátis <ArrowRightIcon className="ml-2 size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                >
                   <Link href="#screens">Ver demonstração</Link>
                 </Button>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="flex flex-wrap gap-2 text-xs text-white/65">
                 {[
-                  ["Importe sua base", "CSV com mapeamento."],
-                  ["WhatsApp com histórico", "Fica tudo registrado."],
-                  ["Anúncios prontos", "OLX e Webmotors."],
-                ].map(([title, desc]) => (
-                  <div key={title} className="rounded-xl border bg-background p-4 shadow-sm">
-                    <div className="text-sm font-medium">{title}</div>
-                    <div className="mt-1 text-sm text-muted-foreground">{desc}</div>
-                  </div>
+                  "Importação CSV com mapeamento",
+                  "WhatsApp + histórico na timeline",
+                  "Pipeline com drag & drop",
+                  "FIPE integrada no cadastro",
+                ].map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur"
+                  >
+                    {t}
+                  </span>
                 ))}
               </div>
             </div>
 
             <div id="screens" className="scroll-mt-24">
               <div className="relative">
-                <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(800px_circle_at_0%_0%,rgba(16,185,129,.10),transparent_60%),radial-gradient(800px_circle_at_100%_20%,rgba(59,130,246,.10),transparent_60%)]" />
+                <div className="pointer-events-none absolute -inset-8 -z-10 rounded-[2.25rem] bg-[radial-gradient(900px_circle_at_0%_0%,rgba(16,185,129,.22),transparent_60%),radial-gradient(900px_circle_at_100%_20%,rgba(59,130,246,.20),transparent_60%)]" />
                 <DashboardMockup />
               </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/55">
                 {["Dashboard real do produto", "Pipeline", "Timeline + WhatsApp", "Agenda de tarefas"].map(
                   (t) => (
-                    <span key={t} className="rounded-full border bg-background px-3 py-1">
+                    <span key={t} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur">
                       {t}
                     </span>
                   ),

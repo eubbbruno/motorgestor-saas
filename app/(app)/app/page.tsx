@@ -20,6 +20,9 @@ import {
   NextAgendaWidget,
   PendingTasksWidget,
   PipelineSummaryWidget,
+  RecentActivityWidget,
+  LeadsTodayWidget,
+  PerformanceWidget,
   RecentLeadsWidget,
   RecentVehiclesWidget,
   usePendingTasks,
@@ -38,8 +41,6 @@ export default function AppDashboardPage() {
       currency: "BRL",
       maximumFractionDigits: 0,
     }).format(value);
-
-  const pct = (value: number) => `${Math.round(value * 100)}%`;
 
   const container = {
     hidden: { opacity: 0 },
@@ -143,6 +144,26 @@ export default function AppDashboardPage() {
 
           <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
+              <div className="text-base font-semibold tracking-tight text-white">Operação de hoje</div>
+              <p className="text-sm text-white/60">
+                Execução e contexto para não deixar lead esfriar.
+              </p>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-8">
+                <RecentActivityWidget />
+              </div>
+              <div className="lg:col-span-4">
+                <div className="grid gap-6">
+                  <LeadsTodayWidget />
+                  <PerformanceWidget />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={item} className="space-y-4">
+            <div className="space-y-1">
               <div className="text-base font-semibold tracking-tight text-white">Widgets</div>
               <p className="text-sm text-white/60">
                 Blocos organizados em linhas, com largura e hierarquia consistentes.
@@ -156,14 +177,15 @@ export default function AppDashboardPage() {
 
             <div className="mt-6 grid gap-6 lg:grid-cols-3">
               <MiniStatWidget
-                title="Conversões"
-                subtitle="Fechados / total"
+                title="Pipeline"
+                subtitle="Em negociação / fechados"
                 icon={<BarChart3Icon className="size-4" />}
-                value={metrics.isLoading ? "—" : pct(metrics.data?.taxa_conversao ?? 0)}
+                value={metrics.isLoading ? "—" : metrics.data?.leads_em_negociacao ?? 0}
                 lines={[
                   `Fechados: ${metrics.isLoading ? "—" : metrics.data?.leads_fechados ?? 0}`,
                   `Total: ${metrics.isLoading ? "—" : metrics.data?.total_leads ?? 0}`,
                 ]}
+                href="/app/pipeline"
               />
               <MiniStatWidget
                 title="Follow-ups"

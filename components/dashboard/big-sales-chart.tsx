@@ -139,8 +139,18 @@ export function BigSalesChart({
             <ComposedChart data={data} margin={{ left: 8, right: 12, top: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id="bigLeadsFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={NEON_LEADS} stopOpacity={0.26} />
-                  <stop offset="100%" stopColor={NEON_LEADS} stopOpacity={0.02} />
+                  <stop offset="0%" stopColor={NEON_LEADS} stopOpacity={0.22} />
+                  <stop offset="100%" stopColor={NEON_LEADS} stopOpacity={0.01} />
+                </linearGradient>
+                <linearGradient id="bigLeadsStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="rgba(34,211,238,0.95)" />
+                  <stop offset="55%" stopColor="rgba(56,189,248,0.95)" />
+                  <stop offset="100%" stopColor="rgba(168,85,247,0.90)" />
+                </linearGradient>
+                <linearGradient id="bigValueStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="rgba(168,85,247,0.90)" />
+                  <stop offset="60%" stopColor="rgba(236,72,153,0.85)" />
+                  <stop offset="100%" stopColor="rgba(59,130,246,0.85)" />
                 </linearGradient>
                 <linearGradient id="bigCursor" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
@@ -179,6 +189,8 @@ export function BigSalesChart({
                 dataKey="leads"
                 stroke={NEON_LEADS_GLOW}
                 strokeWidth={6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 fill="transparent"
                 dot={false}
                 activeDot={false}
@@ -189,13 +201,15 @@ export function BigSalesChart({
                 type="monotone"
                 name="Leads"
                 dataKey="leads"
-                stroke={NEON_LEADS}
+                  stroke="url(#bigLeadsStroke)"
                 strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 fill="url(#bigLeadsFill)"
                 dot={false}
                 activeDot={{ r: 5, fill: NEON_LEADS, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
                 isAnimationActive={!reduceMotion}
-                animationDuration={950}
+                  animationDuration={1050}
               />
               {/* Glow strokes (behind) */}
               <Line
@@ -205,6 +219,8 @@ export function BigSalesChart({
                 dataKey="closedValue"
                 stroke={NEON_VALUE_GLOW}
                 strokeWidth={6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 dot={false}
                 isAnimationActive={false}
               />
@@ -213,12 +229,14 @@ export function BigSalesChart({
                 type="monotone"
                 name="Valor fechado"
                 dataKey="closedValue"
-                stroke={NEON_VALUE}
+                  stroke="url(#bigValueStroke)"
                 strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 dot={false}
                 activeDot={{ r: 4, fill: NEON_VALUE, stroke: "rgba(255,255,255,0.35)", strokeWidth: 2 }}
                 isAnimationActive={!reduceMotion}
-                animationDuration={1050}
+                  animationDuration={1150}
               />
             </ComposedChart>
           </ResponsiveContainer>

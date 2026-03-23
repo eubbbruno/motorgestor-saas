@@ -37,16 +37,19 @@ export function AppSidebar() {
                 href={item.href}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition",
+                  "motion-safe:transition-[transform,background-color,box-shadow] motion-safe:duration-200",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15",
                   active
-                    ? "bg-white/10 text-white shadow-[0_1px_0_rgba(255,255,255,0.06)_inset] before:absolute before:left-0 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-emerald-400 before:shadow-[0_0_0_6px_rgba(52,211,153,.12),0_0_30px_rgba(52,211,153,.35)]"
-                    : "text-white/70 hover:bg-white/8 hover:text-white hover:before:absolute hover:before:left-0 hover:before:top-1/2 hover:before:h-6 hover:before:w-1 hover:before:-translate-y-1/2 hover:before:rounded-full hover:before:bg-white/20",
+                    ? "bg-white/10 text-white shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_20px_60px_rgba(0,0,0,0.35)] before:absolute before:left-0 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-emerald-400 before:shadow-[0_0_0_6px_rgba(52,211,153,.12),0_0_30px_rgba(52,211,153,.35)] motion-safe:translate-x-[2px]"
+                    : "text-white/70 hover:bg-white/8 hover:text-white hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)] motion-safe:hover:translate-x-[2px] hover:before:absolute hover:before:left-0 hover:before:top-1/2 hover:before:h-6 hover:before:w-1 hover:before:-translate-y-1/2 hover:before:rounded-full hover:before:bg-emerald-400/30 hover:before:shadow-[0_0_22px_rgba(52,211,153,0.22)]",
                 )}
               >
                 <Icon
                   className={cn(
-                    "size-4 transition-opacity",
-                    active ? "opacity-100" : "opacity-70 group-hover:opacity-95",
+                    "size-[18px] transition-opacity",
+                    active
+                      ? "opacity-100 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]"
+                      : "opacity-75 group-hover:opacity-95",
                   )}
                 />
                 <span>{item.label}</span>

@@ -42,8 +42,10 @@ export function MobileSidebar() {
               >
                 <Icon
                   className={cn(
-                    "size-4 transition-opacity",
-                    active ? "opacity-100" : "opacity-70 group-hover:opacity-95",
+                    "size-[18px] transition-opacity",
+                    active
+                      ? "opacity-100 drop-shadow-[0_0_18px_rgba(52,211,153,0.22)]"
+                      : "opacity-75 group-hover:opacity-95",
                   )}
                 />
                 <span>{item.label}</span>
