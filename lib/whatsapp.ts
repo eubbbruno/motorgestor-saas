@@ -42,7 +42,13 @@ function firstName(name: string) {
   return n.split(/\s+/)[0] ?? n;
 }
 
-export type WhatsAppLeadTemplateKey = "initial" | "follow_up" | "proposal";
+export type WhatsAppLeadTemplateKey =
+  | "initial"
+  | "follow_up"
+  | "proposal"
+  | "schedule"
+  | "hot"
+  | "objection_price";
 
 export function buildLeadWhatsAppTemplateText(args: {
   template: WhatsAppLeadTemplateKey;
@@ -53,20 +59,40 @@ export function buildLeadWhatsAppTemplateText(args: {
   const name = firstName(full) || "tudo bem";
   const vehicle = (args.vehicleTitle ?? "").trim();
 
+  if (args.template === "schedule") {
+    return vehicle
+      ? `Oi ${name}! Podemos agendar uma visita/test drive do ${vehicle}? Prefere hoje ou amanhã — manhã ou tarde?`
+      : `Oi ${name}! Podemos agendar uma visita/test drive? Prefere hoje ou amanhã — manhã ou tarde?`;
+  }
+
+  if (args.template === "hot") {
+    return vehicle
+      ? `Oi ${name}! O ${vehicle} ainda está disponível. Quer que eu te mande fotos/condições e já deixo separado pra você ver hoje?`
+      : `Oi ${name}! Ainda consigo te ajudar hoje. Quer que eu te mande fotos/condições e já deixo separado pra você ver?`;
+  }
+
+  if (args.template === "objection_price") {
+    return vehicle
+      ? `Entendi, ${name}. Se o preço for o ponto principal no ${vehicle}, me diz: você busca mais “menor parcela” ou “menor entrada”? Eu te mando duas opções pra comparar.`
+      : `Entendi, ${name}. Se o preço for o ponto principal, você busca mais “menor parcela” ou “menor entrada”? Eu te mando duas opções pra comparar.`;
+  }
+
   if (args.template === "follow_up") {
     return vehicle
-      ? `Oi ${name}! Passando pra confirmar se você ainda tem interesse no ${vehicle}. Posso te ajudar com mais detalhes ou agendar uma visita?`
-      : `Oi ${name}! Passando pra confirmar se você ainda tem interesse. Posso te ajudar com mais detalhes ou agendar uma visita?`;
+      ? `Oi ${name}! Só passando pra não deixar sua pesquisa esfriar. Você ainda tem interesse no ${vehicle}? Se quiser, eu te mando 2 opções e já agendamos uma visita.`
+      : `Oi ${name}! Só passando pra não deixar sua pesquisa esfriar. Você ainda tem interesse? Se quiser, eu te mando 2 opções e já agendamos uma visita.`;
   }
 
   if (args.template === "proposal") {
     return vehicle
-      ? `Olá ${name}! Posso te enviar uma proposta do ${vehicle} (PDF) e já alinhamos as condições?`
-      : `Olá ${name}! Posso te enviar uma proposta (PDF) e já alinhamos as condições?`;
+      ? `Perfeito, ${name}. Posso te enviar uma proposta do ${vehicle} (PDF) com condições e próximos passos?`
+      : `Perfeito, ${name}. Posso te enviar uma proposta (PDF) com condições e próximos passos?`;
   }
 
   // initial
-  return buildLeadWhatsAppText({ leadName: full || name, vehicleTitle: vehicle || null });
+  return vehicle
+    ? `Oi ${name}! Vi seu interesse no ${vehicle}. Posso te mandar fotos, condições e já te dizer o que precisa pra fechar?`
+    : `Oi ${name}! Vi seu interesse. Posso te mandar fotos, condições e já te dizer o que precisa pra fechar?`;
 }
 
 export async function copyTextToClipboard(text: string) {

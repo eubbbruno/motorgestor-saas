@@ -23,6 +23,9 @@ import {
   RecentActivityWidget,
   LeadsTodayWidget,
   PerformanceWidget,
+  TasksTodayWidget,
+  HotOpportunitiesWidget,
+  DoNowWidget,
   RecentLeadsWidget,
   RecentVehiclesWidget,
   usePendingTasks,
@@ -144,9 +147,9 @@ export default function AppDashboardPage() {
 
           <motion.div variants={item} className="space-y-4">
             <div className="space-y-1">
-              <div className="text-base font-semibold tracking-tight text-white">Operação de hoje</div>
+              <div className="text-base font-semibold tracking-tight text-white">Hoje</div>
               <p className="text-sm text-white/60">
-                Execução e contexto para não deixar lead esfriar.
+                O que você precisa ver para vender mais rápido.
               </p>
             </div>
             <div className="grid gap-6 lg:grid-cols-12">
@@ -155,7 +158,27 @@ export default function AppDashboardPage() {
               </div>
               <div className="lg:col-span-4">
                 <div className="grid gap-6">
+                  <TasksTodayWidget />
                   <LeadsTodayWidget />
+                  <HotOpportunitiesWidget />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={item} className="space-y-4">
+            <div className="space-y-1">
+              <div className="text-base font-semibold tracking-tight text-white">A fazer agora</div>
+              <p className="text-sm text-white/60">
+                3 ações objetivas para mover o funil hoje.
+              </p>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-8">
+                <DoNowWidget />
+              </div>
+              <div className="lg:col-span-4">
+                <div className="grid gap-6">
                   <PerformanceWidget />
                 </div>
               </div>

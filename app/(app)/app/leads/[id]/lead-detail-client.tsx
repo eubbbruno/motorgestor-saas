@@ -94,6 +94,8 @@ export function LeadDetailClient({ id }: { id: string }) {
   const [waOpen, setWaOpen] = React.useState(false);
   const [waTemplate, setWaTemplate] = React.useState<WhatsAppLeadTemplateKey>("initial");
   const [copied, setCopied] = React.useState(false);
+  const [waAutoFollowup, setWaAutoFollowup] = React.useState(false);
+  const [waTaskCreated, setWaTaskCreated] = React.useState(false);
 
   const vehicleTitle = React.useMemo(() => {
     const vid = lead.data?.vehicle_id ?? null;
@@ -114,6 +116,49 @@ export function LeadDetailClient({ id }: { id: string }) {
   const whatsappLink = React.useMemo(() => {
     return buildWhatsAppLink({ phone: lead.data?.phone ?? null, text: waText });
   }, [lead.data?.phone, waText]);
+
+  function addDaysIso(days: number) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function templateLabel(t: WhatsAppLeadTemplateKey) {
+    switch (t) {
+      case "initial":
+        return "Mensagem inicial";
+      case "follow_up":
+        return "Follow-up";
+      case "proposal":
+        return "Proposta";
+      case "schedule":
+        return "Agendar visita/test drive";
+      case "hot":
+        return "Oportunidade quente";
+      case "objection_price":
+        return "Preço / objeção";
+      default:
+        return "WhatsApp";
+    }
+  }
+
+  async function maybeCreateFollowupTask() {
+    if (!waAutoFollowup || waTaskCreated) return;
+    if (!lead.data) return;
+    try {
+      await createTask.mutateAsync({
+        leadId: id,
+        title: `Follow-up WhatsApp • ${templateLabel(waTemplate)}`,
+        due_date: addDaysIso(1),
+      });
+      setWaTaskCreated(true);
+      toast.success("Follow-up agendado para amanhã.");
+    } catch {
+      // não bloqueia uso do WhatsApp
+      toast.error("Não foi possível agendar o follow-up.");
+    }
+  }
 
   async function logWhatsAppInteraction(template: WhatsAppLeadTemplateKey) {
     if (!lead.data) return;
@@ -266,6 +311,8 @@ export function LeadDetailClient({ id }: { id: string }) {
                   onClick={() => {
                     setWaTemplate("initial");
                     setCopied(false);
+                    setWaAutoFollowup(false);
+                    setWaTaskCreated(false);
                     void logWhatsAppInteraction("initial");
                     setWaOpen(true);
                   }}
@@ -276,6 +323,8 @@ export function LeadDetailClient({ id }: { id: string }) {
                   onClick={() => {
                     setWaTemplate("follow_up");
                     setCopied(false);
+                    setWaAutoFollowup(true);
+                    setWaTaskCreated(false);
                     void logWhatsAppInteraction("follow_up");
                     setWaOpen(true);
                   }}
@@ -284,8 +333,46 @@ export function LeadDetailClient({ id }: { id: string }) {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
+                    setWaTemplate("schedule");
+                    setCopied(false);
+                    setWaAutoFollowup(true);
+                    setWaTaskCreated(false);
+                    void logWhatsAppInteraction("schedule");
+                    setWaOpen(true);
+                  }}
+                >
+                  Agendar visita/test drive
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setWaTemplate("hot");
+                    setCopied(false);
+                    setWaAutoFollowup(true);
+                    setWaTaskCreated(false);
+                    void logWhatsAppInteraction("hot");
+                    setWaOpen(true);
+                  }}
+                >
+                  Oportunidade quente
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setWaTemplate("objection_price");
+                    setCopied(false);
+                    setWaAutoFollowup(true);
+                    setWaTaskCreated(false);
+                    void logWhatsAppInteraction("objection_price");
+                    setWaOpen(true);
+                  }}
+                >
+                  Preço / objeção
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
                     setWaTemplate("proposal");
                     setCopied(false);
+                    setWaAutoFollowup(true);
+                    setWaTaskCreated(false);
                     void logWhatsAppInteraction("proposal");
                     setWaOpen(true);
                   }}
@@ -646,20 +733,37 @@ export function LeadDetailClient({ id }: { id: string }) {
         open={waOpen}
         onOpenChange={(open) => {
           setWaOpen(open);
-          if (!open) setCopied(false);
+          if (!open) {
+            setCopied(false);
+            setWaTaskCreated(false);
+          }
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Mensagem para WhatsApp</DialogTitle>
+            <DialogTitle>Mensagem pronta para vender</DialogTitle>
             <DialogDescription>
-              Escolha o texto, copie com um clique ou abra direto no WhatsApp.
+              Copie com 1 clique, abra no WhatsApp e (se quiser) já deixe um follow-up agendado.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
             <div className="rounded-lg border bg-background/60 p-3 text-sm whitespace-pre-wrap">
               {waText || "—"}
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border bg-background/60 p-3">
+              <div className="min-w-0">
+                <div className="text-sm font-medium">Follow-up automático</div>
+                <div className="text-xs text-muted-foreground">
+                  Cria uma tarefa pendente para amanhã e você não perde o timing.
+                </div>
+              </div>
+              <Checkbox
+                checked={waAutoFollowup}
+                onCheckedChange={(v) => setWaAutoFollowup(Boolean(v))}
+                aria-label="Agendar follow-up automático"
+              />
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
@@ -681,7 +785,14 @@ export function LeadDetailClient({ id }: { id: string }) {
                 {copied ? "Copiado" : "Copiar mensagem"}
               </Button>
 
-              <Button asChild type="button" disabled={!whatsappLink}>
+              <Button
+                asChild
+                type="button"
+                disabled={!whatsappLink}
+                onClick={() => {
+                  void maybeCreateFollowupTask();
+                }}
+              >
                 <a href={whatsappLink ?? "#"} target="_blank" rel="noreferrer">
                   <MessageCircleIcon className="mr-2 size-4" />
                   Abrir no WhatsApp

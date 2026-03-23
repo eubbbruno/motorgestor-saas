@@ -116,7 +116,7 @@ export function GuidedOnboardingModal() {
     {
       key: "company",
       title: "Empresa criada",
-      description: "Configure a empresa para habilitar multi-tenant e permissões.",
+      description: "Deixa seus dados organizados e prontos para operar com segurança.",
       ok: companyCreated,
       href: "/app/onboarding",
       icon: Building2Icon,
@@ -124,7 +124,7 @@ export function GuidedOnboardingModal() {
     {
       key: "vehicle",
       title: "Primeiro veículo",
-      description: "Cadastre um veículo do estoque e já puxe FIPE automaticamente.",
+      description: "Com 1 veículo no estoque, você já consegue responder leads com contexto.",
       ok: hasVehicle,
       href: "/app/veiculos/novo",
       icon: CarIcon,
@@ -132,7 +132,7 @@ export function GuidedOnboardingModal() {
     {
       key: "lead",
       title: "Primeiro lead",
-      description: "Registre um lead e comece a acompanhar no pipeline.",
+      description: "Centralize o atendimento e pare de perder lead no histórico do WhatsApp.",
       ok: hasLead,
       href: "/app/leads/novo",
       icon: UsersIcon,
@@ -140,7 +140,7 @@ export function GuidedOnboardingModal() {
     {
       key: "pipeline",
       title: "Ver pipeline",
-      description: "Arraste leads por etapas e registre o andamento das negociações.",
+      description: "Você enxerga o funil e sabe exatamente o próximo passo.",
       ok: pipelineSeen,
       href: "/app/pipeline",
       icon: LayoutGridIcon,
@@ -170,7 +170,7 @@ export function GuidedOnboardingModal() {
             <DialogHeader>
               <DialogTitle>Bem-vindo ao MotorGestor</DialogTitle>
               <DialogDescription>
-                Complete os primeiros passos para começar a operar com mais organização.
+                Configure o básico em minutos e comece a vender com rotina (sem improviso).
               </DialogDescription>
             </DialogHeader>
 
@@ -206,6 +206,11 @@ export function GuidedOnboardingModal() {
                           ) : null}
                         </div>
                         <div className="text-sm text-muted-foreground">{s.description}</div>
+                        {s.ok ? (
+                          <div className="mt-1 text-xs text-emerald-500/90">
+                            Conquista: pronto.
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   );
@@ -222,12 +227,12 @@ export function GuidedOnboardingModal() {
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {nextStep
-                    ? "Clique para concluir o próximo passo."
-                    : "Seu ambiente está configurado. Bora vender."}
+                    ? `Você está a ${steps.filter((s) => !s.ok).length} passo(s) de operar redondo.`
+                    : "Seu ambiente está configurado. Agora é execução: responder, mover funil e fazer follow-up."}
                 </div>
               </div>
               <Button variant="outline" onClick={dismiss}>
-                Depois eu faço
+                Agora não
               </Button>
             </div>
 
@@ -238,6 +243,31 @@ export function GuidedOnboardingModal() {
                     <div className="space-y-1">
                       <div className="text-base font-semibold tracking-tight">{nextStep.title}</div>
                       <div className="text-sm text-muted-foreground">{nextStep.description}</div>
+                      <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                        <div className="font-medium text-foreground/90">O que você ganha agora</div>
+                        {nextStep.key === "vehicle" ? (
+                          <>
+                            <div>• Responder leads com contexto (modelo/ano/valor).</div>
+                            <div>• Padronizar cadastro e evitar retrabalho.</div>
+                          </>
+                        ) : nextStep.key === "lead" ? (
+                          <>
+                            <div>• Histórico do atendimento (sem perder conversa).</div>
+                            <div>• Próximo passo claro com follow-ups.</div>
+                          </>
+                        ) : nextStep.key === "pipeline" ? (
+                          <>
+                            <div>• Você enxerga “quem está quente” e quem precisa de ação.</div>
+                            <div>• Conversão melhora quando o funil anda todo dia.</div>
+                          </>
+                        ) : (
+                          <>
+                            <div>• Base pronta para trabalhar com organização.</div>
+                            <div>• Permissões e dados separados por empresa.</div>
+                          </>
+                        )}
+                        <div className="pt-2">Tempo estimado: 2–4 min.</div>
+                      </div>
                     </div>
                     <Button
                       onClick={() => {

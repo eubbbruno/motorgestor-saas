@@ -130,11 +130,11 @@ export default function HomePage() {
               </Badge>
 
               <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.06]">
-                Organize seus leads e vendas de veículos em um único sistema.
+                Responda leads mais rápido e feche mais carros — sem planilhas.
               </h1>
 
               <p className="text-pretty text-base text-white/70 sm:text-lg">
-                CRM automotivo com pipeline, FIPE automática, WhatsApp com histórico e operação diária com rotina.
+                MotorGestor organiza seu atendimento em um funil claro, com WhatsApp + histórico e follow-ups para você não perder timing.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -144,7 +144,7 @@ export default function HomePage() {
                   className="bg-white text-black shadow-sm ring-1 ring-white/10 transition hover:-translate-y-0.5 hover:bg-white/90"
                 >
                   <Link href="/cadastro">
-                    Começar grátis <ArrowRightIcon className="ml-2 size-4" />
+                    Começar grátis agora <ArrowRightIcon className="ml-2 size-4" />
                   </Link>
                 </Button>
                 <Button
@@ -153,16 +153,16 @@ export default function HomePage() {
                   variant="outline"
                   className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                 >
-                  <Link href="#screens">Ver demonstração</Link>
+                  <Link href="#screens">Ver o produto</Link>
                 </Button>
               </div>
 
               <div className="flex flex-wrap gap-2 text-xs text-white/65">
                 {[
-                  "Importação CSV com mapeamento",
-                  "WhatsApp + histórico na timeline",
-                  "Pipeline com drag & drop",
-                  "FIPE integrada no cadastro",
+                  "Mais respostas no dia",
+                  "Menos lead perdido",
+                  "Funil claro (pipeline)",
+                  "Follow-ups com rotina",
                 ].map((t) => (
                   <span
                     key={t}
@@ -188,6 +188,122 @@ export default function HomePage() {
                   ),
                 )}
               </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 2 — how it works */}
+      <section className="bg-background py-18 sm:py-24">
+        <Container className="max-w-7xl">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
+            <div className="space-y-4 lg:col-span-5">
+              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Como funciona
+              </div>
+              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                Uma rotina simples para vender todos os dias.
+              </h2>
+              <p className="text-muted-foreground">
+                Você não precisa “virar refém do WhatsApp”. Precisa de um processo leve que te diga o que fazer agora.
+              </p>
+            </div>
+
+            <div className="grid gap-4 lg:col-span-7 sm:grid-cols-3">
+              {[
+                {
+                  icon: MessageCircleIcon,
+                  title: "1) Registrar",
+                  desc: "Cadastre lead e mantenha histórico do atendimento.",
+                },
+                {
+                  icon: BarChart3Icon,
+                  title: "2) Priorizar",
+                  desc: "Pipeline + “A fazer agora” mostram o próximo passo.",
+                },
+                {
+                  icon: CheckIcon,
+                  title: "3) Fechar",
+                  desc: "Proposta PDF + follow-up para não perder timing.",
+                },
+              ].map((s) => (
+                <Card key={s.title} className="rounded-xl bg-background p-6 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-xl border bg-background p-2">
+                      <s.icon className="size-4 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-medium">{s.title}</div>
+                      <p className="text-sm text-muted-foreground">{s.desc}</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 2.5 — for who */}
+      <section className="border-y bg-muted/30 py-18 sm:py-24">
+        <Container className="max-w-7xl">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
+            <div className="space-y-4 lg:col-span-5">
+              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Para quem é
+              </div>
+              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                Feito para quem vende carro com volume e precisa de previsibilidade.
+              </h2>
+              <p className="text-muted-foreground">
+                Revendas pequenas, vendedores autônomos e times enxutos que querem vender mais com menos bagunça.
+              </p>
+            </div>
+
+            <div className="grid gap-4 lg:col-span-7 sm:grid-cols-2">
+              {[
+                ["Revendas pequenas", "2–10 pessoas, estoque em rotação e atendimento intenso."],
+                ["Vendedor autônomo", "Precisa de rotina e histórico sem “virar secretário do WhatsApp”."],
+                ["Operação com anúncios", "Texto/fotos prontos e proposta rápida para ganhar velocidade."],
+                ["Quem quer padrão", "Funil + follow-ups: cada lead com próximo passo definido."],
+              ].map(([title, desc]) => (
+                <Card key={title} className="rounded-xl bg-background p-6 shadow-sm">
+                  <div className="font-medium">{title}</div>
+                  <div className="mt-2 text-sm text-muted-foreground">{desc}</div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 2.75 — expected results */}
+      <section className="bg-background py-18 sm:py-24">
+        <Container className="max-w-7xl">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
+            <div className="space-y-4 lg:col-span-5">
+              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Resultados esperados
+              </div>
+              <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                Quando você cria rotina, a conversão sobe.
+              </h2>
+              <p className="text-muted-foreground">
+                Não é “mágica”: é processo. Com funil + follow-ups, você responde mais rápido e perde menos oportunidade.
+              </p>
+            </div>
+
+            <div className="grid gap-4 lg:col-span-7 sm:grid-cols-3">
+              {[
+                ["Mais respostas no dia", "Lead quente não espera. Ação rápida aumenta chance de visita."],
+                ["Menos lead perdido", "Histórico e tarefas impedem que conversas sumam."],
+                ["Funil andando", "Você sabe quem está em negociação e o que falta para fechar."],
+              ].map(([title, desc]) => (
+                <Card key={title} className="rounded-xl bg-background p-6 shadow-sm">
+                  <div className="text-sm font-medium">{title}</div>
+                  <div className="mt-2 text-sm text-muted-foreground">{desc}</div>
+                </Card>
+              ))}
             </div>
           </div>
         </Container>

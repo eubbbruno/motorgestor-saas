@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardCharts, useDashboardMetrics } from "@/features/dashboard/hooks";
 import { useEvents } from "@/features/events/hooks";
 import type { LeadRow, VehicleRow } from "@/types/models";
+import { buildLeadWhatsAppTemplateText, buildWhatsAppLink } from "@/lib/whatsapp";
 
 type PendingTaskRow = {
   id: string;
@@ -31,6 +32,14 @@ type PendingTaskRow = {
   due_date: string | null;
   lead_id: string;
   leads?: Array<{ name: string }> | null;
+};
+
+type TodayTaskRow = {
+  id: string;
+  title: string;
+  due_date: string | null;
+  lead_id: string;
+  leads?: Array<{ id?: string; name?: string; phone?: string }> | null;
 };
 
 type LeadEventRow = {
@@ -425,6 +434,294 @@ export function PerformanceWidget() {
                 Execução sugerida: mova 3 leads para “Contato” e envie mensagem inicial.
               </div>
             </div>
+          )}
+        </div>
+      </motion.div>
+    </PremiumSurface>
+  );
+}
+
+export function TasksTodayWidget() {
+  const reduceMotion = useReducedMotion();
+
+  const q = useQuery({
+    queryKey: ["dashboard", "tasks-today"],
+    queryFn: async () => {
+      const supabase = createSupabaseBrowserClient();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayIso = today.toISOString().slice(0, 10);
+
+      const { data, error } = await supabase
+        .from("lead_tasks")
+        .select("id, title, due_date, lead_id, leads(id, name, phone)")
+        .eq("status", "pending")
+        .not("due_date", "is", null)
+        .lte("due_date", todayIso)
+        .order("due_date", { ascending: true, nullsFirst: false })
+        .limit(6);
+      if (error) throw error;
+      return { todayIso, rows: (data ?? []) as TodayTaskRow[] };
+    },
+    staleTime: 10_000,
+  });
+
+  return (
+    <PremiumSurface>
+      <motion.div
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="p-6"
+      >
+        <WidgetHeader
+          title="Tarefas de hoje"
+          description="Não deixe lead esfriar"
+          icon={<ListTodoIcon className="size-4" />}
+          href="/app/agenda"
+        />
+
+        <div className="mt-4">
+          {q.isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="py-2">
+                  <Skeleton className="h-4 w-2/3 bg-white/10" />
+                  <Skeleton className="mt-2 h-3 w-1/2 bg-white/10" />
+                </div>
+              ))}
+            </div>
+          ) : q.isError ? (
+            <div className="text-sm text-red-300">Não foi possível carregar tarefas de hoje.</div>
+          ) : (q.data?.rows.length ?? 0) === 0 ? (
+            <div className="text-sm text-white/55">Sem tarefas vencendo hoje. Bom sinal.</div>
+          ) : (
+            <div className="divide-y divide-white/10">
+              {q.data!.rows.map((t) => {
+                const due = String(t.due_date ?? "");
+                const overdue = Boolean(due) && due < q.data!.todayIso;
+                const leadId = t.leads?.[0]?.id ?? t.lead_id;
+                const leadName = t.leads?.[0]?.name ?? "Lead";
+                return (
+                  <Link
+                    key={t.id}
+                    href={leadId ? `/app/leads/${leadId}` : "/app/agenda"}
+                    className="block -mx-2 rounded-lg px-2 py-2 transition hover:bg-white/5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-white">{t.title}</div>
+                        <div className="text-xs text-white/55">
+                          {leadName}
+                          {overdue ? " · atrasada" : " · hoje"}
+                        </div>
+                      </div>
+                      <ChevronRightIcon className="mt-1 size-4 text-white/35" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </PremiumSurface>
+  );
+}
+
+export function HotOpportunitiesWidget() {
+  const reduceMotion = useReducedMotion();
+
+  const q = useQuery({
+    queryKey: ["dashboard", "hot-opportunities"],
+    queryFn: async () => {
+      const supabase = createSupabaseBrowserClient();
+      const { data, error } = await supabase
+        .from("leads")
+        .select("id, name, status, phone, created_at")
+        .in("status", ["proposta", "negociacao"])
+        .order("created_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return (data ?? []) as Array<Pick<LeadRow, "id" | "name" | "status" | "phone" | "created_at">>;
+    },
+    staleTime: 10_000,
+  });
+
+  return (
+    <PremiumSurface>
+      <motion.div
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="p-6"
+      >
+        <WidgetHeader
+          title="Oportunidades quentes"
+          description="Negociação e proposta"
+          icon={<BadgeCheckIcon className="size-4" />}
+          href="/app/pipeline"
+        />
+
+        <div className="mt-4">
+          {q.isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 py-2">
+                  <Skeleton className="h-4 w-2/3 bg-white/10" />
+                  <Skeleton className="h-8 w-16 rounded-xl bg-white/10" />
+                </div>
+              ))}
+            </div>
+          ) : q.isError ? (
+            <div className="text-sm text-red-300">Não foi possível carregar oportunidades.</div>
+          ) : (q.data?.length ?? 0) === 0 ? (
+            <div className="text-sm text-white/55">Sem leads em negociação por enquanto.</div>
+          ) : (
+            <div className="divide-y divide-white/10">
+              {q.data!.slice(0, 5).map((l) => {
+                const text = buildLeadWhatsAppTemplateText({
+                  template: "hot",
+                  leadName: l.name,
+                  vehicleTitle: null,
+                });
+                const wa = buildWhatsAppLink({ phone: l.phone ?? null, text });
+                return (
+                  <div key={l.id} className="flex items-center justify-between gap-3 py-2">
+                    <Link
+                      href={`/app/leads/${l.id}`}
+                      className="min-w-0 flex-1 -mx-2 rounded-lg px-2 py-1 transition hover:bg-white/5"
+                    >
+                      <div className="truncate text-sm font-medium text-white">{l.name}</div>
+                      <div className="text-xs text-white/55">{String(l.status)}</div>
+                    </Link>
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+                      disabled={!wa}
+                    >
+                      <a href={wa ?? "#"} target="_blank" rel="noreferrer">
+                        WhatsApp
+                      </a>
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </PremiumSurface>
+  );
+}
+
+export function DoNowWidget() {
+  const reduceMotion = useReducedMotion();
+
+  const q = useQuery({
+    queryKey: ["dashboard", "do-now"],
+    queryFn: async () => {
+      const supabase = createSupabaseBrowserClient();
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const startIso = start.toISOString();
+      const todayIso = startIso.slice(0, 10);
+
+      const [leadsToday, overdueTasks, hotLeads] = await Promise.all([
+        supabase
+          .from("leads")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", startIso),
+        supabase
+          .from("lead_tasks")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending")
+          .not("due_date", "is", null)
+          .lt("due_date", todayIso),
+        supabase
+          .from("leads")
+          .select("id", { count: "exact", head: true })
+          .in("status", ["proposta", "negociacao"]),
+      ]);
+
+      if (leadsToday.error) throw leadsToday.error;
+      if (overdueTasks.error) throw overdueTasks.error;
+      if (hotLeads.error) throw hotLeads.error;
+
+      return {
+        leadsToday: Number(leadsToday.count ?? 0),
+        overdueTasks: Number(overdueTasks.count ?? 0),
+        hotLeads: Number(hotLeads.count ?? 0),
+      };
+    },
+    staleTime: 10_000,
+  });
+
+  const rows = [
+    {
+      label: "Responder leads do dia",
+      value: q.isLoading ? "—" : q.data?.leadsToday ?? 0,
+      href: "/app/leads",
+    },
+    {
+      label: "Resolver tarefas atrasadas",
+      value: q.isLoading ? "—" : q.data?.overdueTasks ?? 0,
+      href: "/app/agenda",
+    },
+    {
+      label: "Priorizar oportunidades quentes",
+      value: q.isLoading ? "—" : q.data?.hotLeads ?? 0,
+      href: "/app/pipeline",
+    },
+  ] as const;
+
+  return (
+    <PremiumSurface>
+      <motion.div
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+        className="p-6"
+      >
+        <WidgetHeader
+          title="A fazer agora"
+          description="3 ações que movem o caixa"
+          icon={<RefreshCcwIcon className="size-4" />}
+        />
+
+        <div className="mt-4 divide-y divide-white/10">
+          {q.isLoading ? (
+            <div className="space-y-2 py-2">
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 py-2">
+                  <Skeleton className="h-4 w-2/3 bg-white/10" />
+                  <Skeleton className="h-8 w-16 rounded-xl bg-white/10" />
+                </div>
+              ))}
+            </div>
+          ) : q.isError ? (
+            <div className="py-2 text-sm text-red-300">Não foi possível carregar “A fazer agora”.</div>
+          ) : (
+            rows.map((r) => (
+              <div key={r.href} className="flex items-center justify-between gap-3 py-2">
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-white">{r.label}</div>
+                  <div className="text-xs text-white/55">
+                    <span className="tabular-nums">{r.value}</span> pendências
+                  </div>
+                </div>
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+                >
+                  <Link href={r.href}>Abrir</Link>
+                </Button>
+              </div>
+            ))
           )}
         </div>
       </motion.div>
