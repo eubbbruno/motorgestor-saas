@@ -101,7 +101,7 @@ export default function CadastroPage() {
     <div className="relative min-h-screen bg-background">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_30%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_70%_30%,rgba(16,185,129,.10),transparent_55%)]" />
 
-      <div className="mx-auto flex min-h-screen w-full max-w-[420px] items-center px-4 py-14">
+      <div className="mx-auto flex min-h-screen w-full max-w-[420px] items-center px-4 py-10 sm:py-14">
         <div className="w-full space-y-6">
           <div className="space-y-2 text-center">
             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -113,7 +113,7 @@ export default function CadastroPage() {
             </p>
           </div>
 
-          <Card className="rounded-xl border bg-background/70 p-7 shadow-sm backdrop-blur">
+          <Card className="rounded-xl border bg-background/70 p-5 shadow-sm backdrop-blur sm:p-7">
             <div className="space-y-4">
               <Button
                 type="button"

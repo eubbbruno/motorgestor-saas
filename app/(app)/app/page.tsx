@@ -82,25 +82,29 @@ export default function AppDashboardPage() {
     <div className="dark">
       <div className="relative">
         <EpicDashboardBackground className="rounded-none" />
-        <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-10">
+        <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-8 sm:space-y-10">
           <motion.div variants={item} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur">
                 <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.10)]" />
                 Operação em tempo real
               </div>
-              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl">
                 Dashboard
               </h1>
               <p className="text-sm text-white/60">
                 Painel executivo com visão do funil e próximos passos.
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button asChild variant="outline" className="border-white/10 bg-white/5 text-white hover:bg-white/10">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 sm:w-auto"
+              >
                 <Link href="/app/leads/novo">Novo lead</Link>
               </Button>
-              <Button asChild className="bg-white text-black hover:bg-white/90">
+              <Button asChild className="w-full bg-white text-black hover:bg-white/90 sm:w-auto">
                 <Link href="/app/veiculos/novo">
                   Novo veículo <ArrowRightIcon className="ml-2 size-4" />
                 </Link>
@@ -109,7 +113,7 @@ export default function AppDashboardPage() {
           </motion.div>
 
           <motion.div variants={item} className="space-y-4">
-            <div className="grid gap-6 lg:grid-cols-12">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <div className="relative">
                   <div className="flex items-start justify-between gap-4">
@@ -130,16 +134,23 @@ export default function AppDashboardPage() {
                     <DashboardKpiStrip />
                     <BigSalesChart
                       showHeader={false}
-                      heightClassName="h-[300px] sm:h-[320px] lg:h-[340px]"
+                      heightClassName="h-[220px] sm:h-[300px] lg:h-[340px]"
                     />
                   </div>
                 </div>
               </div>
               <div className="lg:col-span-4">
-                <div className="grid gap-6 auto-rows-fr">
-                  <FipeQuickWidget compact />
-                  <PipelineSummaryWidget compact />
-                  <NextAgendaWidget compact />
+                {/* Mobile: carrossel horizontal / Desktop: stack */}
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:grid sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:auto-rows-fr">
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <FipeQuickWidget compact />
+                  </div>
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <PipelineSummaryWidget compact />
+                  </div>
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <NextAgendaWidget compact />
+                  </div>
                 </div>
               </div>
             </div>
@@ -152,15 +163,22 @@ export default function AppDashboardPage() {
                 O que você precisa ver para vender mais rápido.
               </p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-12">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <RecentActivityWidget />
               </div>
               <div className="lg:col-span-4">
-                <div className="grid gap-6">
-                  <TasksTodayWidget />
-                  <LeadsTodayWidget />
-                  <HotOpportunitiesWidget />
+                {/* Mobile: carrossel horizontal para reduzir altura */}
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:grid sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <TasksTodayWidget />
+                  </div>
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <LeadsTodayWidget />
+                  </div>
+                  <div className="min-w-[292px] sm:min-w-0">
+                    <HotOpportunitiesWidget />
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,7 +191,7 @@ export default function AppDashboardPage() {
                 3 ações objetivas para mover o funil hoje.
               </p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-12">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <DoNowWidget />
               </div>
@@ -192,13 +210,13 @@ export default function AppDashboardPage() {
                 Blocos organizados em linhas, com largura e hierarquia consistentes.
               </p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
               <RecentLeadsWidget />
               <RecentVehiclesWidget />
               <PendingTasksWidget />
             </div>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-3">
+            <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6 lg:grid-cols-3">
               <MiniStatWidget
                 title="Pipeline"
                 subtitle="Em negociação / fechados"
@@ -239,7 +257,7 @@ export default function AppDashboardPage() {
               <div className="text-base font-semibold tracking-tight text-white">Hub</div>
               <p className="text-sm text-white/60">Ações e atalhos principais (sem cara de cards repetidos).</p>
             </div>
-            <div className="grid gap-6 lg:grid-cols-12">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
               <div className="lg:col-span-8">
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {modules.map((m) => {
@@ -269,7 +287,7 @@ export default function AppDashboardPage() {
               </div>
               <div className="lg:col-span-4">
                 <PremiumSurface>
-                  <div className="p-6">
+                  <div className="p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div className="space-y-1">
                         <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">

@@ -155,7 +155,7 @@ export function RecentActivityWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Atividade recente"
@@ -293,7 +293,7 @@ export function LeadsTodayWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Leads do dia"
@@ -384,7 +384,7 @@ export function PerformanceWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Performance"
@@ -472,7 +472,7 @@ export function TasksTodayWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Tarefas de hoje"
@@ -554,7 +554,7 @@ export function HotOpportunitiesWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Oportunidades quentes"
@@ -683,7 +683,7 @@ export function DoNowWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="A fazer agora"
@@ -741,7 +741,7 @@ export function PipelineSummaryWidget({ compact = false }: { compact?: boolean }
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className={compact ? "p-5" : "p-6"}
+        className={compact ? "p-4 sm:p-5" : "p-5 sm:p-6"}
       >
         <WidgetHeader
           title="Pipeline"
@@ -806,7 +806,7 @@ export function NextAgendaWidget({ compact = false }: { compact?: boolean }) {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className={compact ? "p-5" : "p-6"}
+        className={compact ? "p-4 sm:p-5" : "p-5 sm:p-6"}
       >
         <WidgetHeader
           title="Agenda"
@@ -868,7 +868,7 @@ export function RecentLeadsWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Leads recentes"
@@ -944,7 +944,7 @@ export function RecentVehiclesWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Veículos"
@@ -1007,7 +1007,7 @@ export function PendingTasksWidget() {
         initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
+        className="p-5 sm:p-6"
       >
         <WidgetHeader
           title="Tarefas"

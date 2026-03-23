@@ -162,11 +162,11 @@ export function GuidedOnboardingModal() {
       }}
     >
       <DialogContent
-        className="max-w-3xl rounded-2xl border-white/10 bg-black/70 p-0 shadow-[0_50px_140px_rgba(0,0,0,0.80)] backdrop-blur"
+        className="w-[calc(100vw-1.5rem)] max-w-3xl max-h-[85vh] overflow-hidden rounded-xl border-white/10 bg-black/70 p-0 shadow-[0_50px_140px_rgba(0,0,0,0.80)] backdrop-blur sm:rounded-2xl"
         showCloseButton
       >
-        <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
-          <div className="border-b p-6 lg:border-b-0 lg:border-r">
+        <div className="grid h-full max-h-[85vh] gap-0 md:grid-cols-[1fr_1.1fr]">
+          <div className="overflow-y-auto border-b p-4 md:border-b-0 md:border-r sm:p-6">
             <DialogHeader>
               <DialogTitle>Bem-vindo ao MotorGestor</DialogTitle>
               <DialogDescription>
@@ -184,7 +184,7 @@ export function GuidedOnboardingModal() {
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <div className="mt-4 space-y-2 text-sm">
+              <div className="mt-4 space-y-2 text-xs sm:text-sm">
                 {steps.map((s) => {
                   const Icon = s.icon;
                   return (
@@ -205,7 +205,7 @@ export function GuidedOnboardingModal() {
                             <CheckCircle2Icon className="size-4 text-emerald-500" />
                           ) : null}
                         </div>
-                        <div className="text-sm text-muted-foreground">{s.description}</div>
+                        <div className="text-xs text-muted-foreground sm:text-sm">{s.description}</div>
                         {s.ok ? (
                           <div className="mt-1 text-xs text-emerald-500/90">
                             Conquista: pronto.
@@ -219,7 +219,7 @@ export function GuidedOnboardingModal() {
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="overflow-y-auto p-4 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="text-sm font-medium">
@@ -275,6 +275,7 @@ export function GuidedOnboardingModal() {
                         goto(nextStep.href);
                       }}
                       disabled={loading}
+                      className="shrink-0"
                     >
                       Ir agora <ArrowRightIcon className="ml-2 size-4" />
                     </Button>

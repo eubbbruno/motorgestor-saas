@@ -63,7 +63,7 @@ export function DashboardMockup({ className }: { className?: string }) {
           <div className="h-2 w-16 rounded-full bg-foreground/10" />
         </div>
 
-        <div className="grid min-h-[360px] grid-cols-12">
+        <div className="grid min-h-[280px] grid-cols-12 sm:min-h-[360px]">
           <div className="col-span-4 border-r bg-background/50 p-4 sm:col-span-3">
             <div className="flex items-center gap-2">
               <div className="size-2 rounded-full bg-emerald-400/80" />

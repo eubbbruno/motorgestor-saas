@@ -108,7 +108,7 @@ export default function HomePage() {
   return (
     <>
       {/* SECTION 1 — white */}
-      <section className="relative overflow-hidden bg-[#05060a] py-18 text-white sm:py-24">
+      <section className="relative overflow-hidden bg-[#05060a] py-14 text-white sm:py-24">
         {/* Video background (estrutura pronta). Se o arquivo não existir, o hero continua perfeito. */}
         <video
           className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-25"
@@ -123,13 +123,13 @@ export default function HomePage() {
         </video>
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.65),rgba(5,6,10,0.92))]" />
         <Container className="max-w-7xl">
-          <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
             <div className="space-y-6 pt-2">
               <Badge variant="secondary" className="border-white/10 bg-white/5 text-white">
                 SaaS B2B para revendas e vendedores autônomos
               </Badge>
 
-              <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.06]">
+              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.06]">
                 Responda leads mais rápido e feche mais carros — sem planilhas.
               </h1>
 
@@ -177,7 +177,7 @@ export default function HomePage() {
             <div id="screens" className="scroll-mt-24">
               <div className="relative">
                 <div className="pointer-events-none absolute -inset-8 -z-10 rounded-[2.25rem] bg-[radial-gradient(900px_circle_at_0%_0%,rgba(16,185,129,.22),transparent_60%),radial-gradient(900px_circle_at_100%_20%,rgba(59,130,246,.20),transparent_60%)]" />
-                <DashboardMockup />
+                <DashboardMockup className="mx-auto max-w-[560px] sm:max-w-none" />
               </div>
               <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/55">
                 {["Dashboard real do produto", "Pipeline", "Timeline + WhatsApp", "Agenda de tarefas"].map(
@@ -194,7 +194,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2 — how it works */}
-      <section className="bg-background py-18 sm:py-24">
+      <section className="bg-background py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
@@ -245,7 +245,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2.5 — for who */}
-      <section className="border-y bg-muted/30 py-18 sm:py-24">
+      <section className="border-y bg-muted/30 py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
@@ -278,7 +278,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2.75 — expected results */}
-      <section className="bg-background py-18 sm:py-24">
+      <section className="bg-background py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
@@ -310,7 +310,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 2 — subtle background */}
-      <section className="border-y bg-muted/30 py-18 sm:py-24">
+      <section className="border-y bg-muted/30 py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
@@ -382,7 +382,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 3 — white */}
-      <section className="bg-background py-18 sm:py-24">
+      <section className="bg-background py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-5">
@@ -434,7 +434,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4 — Screenshots */}
-      <section className="border-y bg-muted/30 py-18 sm:py-24">
+      <section className="border-y bg-muted/30 py-14 sm:py-24">
         <Container className="max-w-7xl">
           <div className="grid gap-10">
             <div className="grid gap-4 lg:grid-cols-12 lg:items-end">
@@ -515,7 +515,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION 4 — subtle gradient */}
-      <section className="relative overflow-hidden py-18 sm:py-24">
+      <section className="relative overflow-hidden py-14 sm:py-24">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_0%,rgba(59,130,246,.10),transparent_55%),radial-gradient(900px_circle_at_0%_40%,rgba(16,185,129,.10),transparent_55%)]" />
         <Container className="max-w-7xl">
           <div className="grid gap-14">
