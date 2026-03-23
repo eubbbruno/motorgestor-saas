@@ -109,19 +109,22 @@ export default function HomePage() {
     <>
       {/* SECTION 1 — white */}
       <section className="relative overflow-hidden bg-[#05060a] py-14 text-white sm:py-24">
-        {/* Video background (estrutura pronta). Se o arquivo não existir, o hero continua perfeito. */}
+        {/* Video background (cinematográfico). Sem áudio; com fallback e overlay para legibilidade. */}
         <video
-          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-25"
+          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-30 motion-reduce:hidden"
           autoPlay
           muted
           loop
           playsInline
-          preload="none"
+          preload="metadata"
           poster="/hero-nova.png"
+          aria-hidden="true"
+          disablePictureInPicture
         >
-          <source src="/hero-bg.mp4" type="video/mp4" />
+          <source src="/hero-bg-motorgestor.mp4" type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.65),rgba(5,6,10,0.92))]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_20%_0%,rgba(16,185,129,.18),transparent_55%),radial-gradient(900px_circle_at_80%_10%,rgba(59,130,246,.18),transparent_55%),linear-gradient(to_bottom,rgba(5,6,10,0.55),rgba(5,6,10,0.94))]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_80%,rgba(0,0,0,0.65),transparent_55%)]" />
         <Container className="max-w-7xl">
           <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
             <div className="space-y-6 pt-2">
