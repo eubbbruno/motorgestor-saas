@@ -347,6 +347,7 @@ export default function HomePage() {
             src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80"
             alt=""
             fill
+            sizes="100vw"
             className="object-cover opacity-10"
             loading="lazy"
             placeholder="blur"
@@ -494,6 +495,7 @@ export default function HomePage() {
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
                     alt="Vendedor com tablet"
                     fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover object-top"
                     loading="lazy"
                     placeholder="blur"
@@ -577,6 +579,7 @@ export default function HomePage() {
                 src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&q=80"
                 alt="Equipe de vendas"
                 fill
+                sizes="(max-width: 768px) 100vw, 90vw"
                 className="object-cover"
                 loading="lazy"
                 placeholder="blur"
@@ -870,6 +873,7 @@ export default function HomePage() {
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80"
                     alt={testimonials[0].name}
                     fill
+                    sizes="56px"
                     className="object-cover"
                     loading="lazy"
                     placeholder="blur"
