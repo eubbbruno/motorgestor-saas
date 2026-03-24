@@ -2,30 +2,50 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  BarChart3Icon,
+  CalendarIcon,
+  CarIcon,
+  HelpCircleIcon,
+  LayoutDashboardIcon,
+  LayoutGridIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react";
 
-import { appNav } from "@/components/app/app-nav";
 import { cn } from "@/lib/utils";
+
+const primaryNav = [
+  { href: "/app", label: "Dashboard", icon: LayoutDashboardIcon },
+  { href: "/app/veiculos", label: "Veículos", icon: CarIcon },
+  { href: "/app/leads", label: "Leads", icon: UsersIcon },
+  { href: "/app/pipeline", label: "Pipeline", icon: LayoutGridIcon },
+  { href: "/app/agenda", label: "Agenda", icon: CalendarIcon },
+  { href: "/app/relatorios", label: "Relatórios", icon: BarChart3Icon },
+  { href: "/app/configuracoes", label: "Configurações", icon: SettingsIcon },
+  { href: "/app/ajuda", label: "Ajuda", icon: HelpCircleIcon },
+];
 
 export function AppSidebar() {
   const pathname = usePathname();
+
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex lg:w-80 lg:flex-col">
-      <div className="relative h-full border-r border-mg-border bg-mg-bg/55 backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 -left-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle_at_30%_30%,color-mix(in_oklab,var(--mg-glow-emerald)_100%,transparent),transparent_60%)] blur-3xl" />
-          <div className="absolute -bottom-52 -right-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_30%_30%,color-mix(in_oklab,var(--mg-glow-blue)_100%,transparent),transparent_60%)] blur-3xl" />
-        </div>
-
-        <div className="relative flex h-16 items-center gap-3 border-b border-mg-border px-6">
-          <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
-          <div className="leading-tight">
-            <div className="font-semibold tracking-tight text-foreground">MotorGestor</div>
-            <div className="text-[11px] text-mg-fg-muted">Operação e funil em um só lugar</div>
+      <div className="flex h-full flex-col bg-[#0A1A0C] border-r border-[rgba(74,229,74,0.1)]">
+        {/* Logo */}
+        <div className="flex h-16 items-center gap-3 px-5 border-b border-[rgba(74,229,74,0.08)]">
+          <div className="size-8 rounded-xl bg-[#4AE54A] flex items-center justify-center shrink-0">
+            <CarIcon className="size-4 text-[#0A1A0C]" />
+          </div>
+          <div>
+            <div className="font-bold tracking-tight text-white text-sm">MotorGestor</div>
+            <div className="text-[10px] text-[#6B9E6B]">Operação e funil em um só lugar</div>
           </div>
         </div>
 
-        <nav className="relative flex-1 space-y-1.5 p-4">
-          {appNav.map((item) => {
+        {/* Nav */}
+        <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
+          {primaryNav.map((item) => {
             const active =
               pathname === item.href ||
               (item.href !== "/app" && pathname.startsWith(item.href));
@@ -36,20 +56,16 @@ export function AppSidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition",
-                  "motion-safe:transition-[transform,background-color,box-shadow] motion-safe:duration-200",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15",
+                  "flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-mg-surface-2 text-foreground shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_18px_50px_rgba(0,0,0,0.35)] before:absolute before:left-0 before:top-1/2 before:h-6 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-emerald-400 before:shadow-[0_0_0_6px_rgba(52,211,153,.12),0_0_30px_rgba(52,211,153,.30)] motion-safe:translate-x-[2px]"
-                    : "text-mg-fg-muted hover:bg-mg-surface hover:text-foreground hover:shadow-[0_14px_36px_rgba(0,0,0,0.20)] motion-safe:hover:translate-x-[2px] hover:before:absolute hover:before:left-0 hover:before:top-1/2 hover:before:h-6 hover:before:w-1 hover:before:-translate-y-1/2 hover:before:rounded-full hover:before:bg-emerald-400/25 hover:before:shadow-[0_0_22px_rgba(52,211,153,0.18)]",
+                    ? "bg-[#4AE54A] text-[#0A1A0C] font-semibold"
+                    : "text-[#6B9E6B] hover:bg-[rgba(74,229,74,0.08)] hover:text-white",
                 )}
               >
                 <Icon
                   className={cn(
-                    "size-[18px] transition-opacity",
-                    active
-                      ? "opacity-100 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]"
-                      : "opacity-75 group-hover:opacity-95",
+                    "size-[18px] shrink-0",
+                    active ? "text-[#0A1A0C]" : "text-[#6B9E6B]",
                   )}
                 />
                 <span>{item.label}</span>
@@ -58,14 +74,23 @@ export function AppSidebar() {
           })}
         </nav>
 
-        <div className="relative border-t border-mg-border px-6 py-5 text-xs text-mg-fg-muted">
-          <div className="font-medium text-foreground/85">Dica rápida</div>
-          <div className="mt-1">
-            Cadastre seus veículos primeiro e depois conecte os leads a eles.
+        {/* Footer */}
+        <div className="border-t border-[rgba(74,229,74,0.08)] px-5 py-4">
+          <div className="text-[11px] text-[#6B9E6B] mb-3">
+            Cadastre veículos primeiro, depois conecte os leads.
+          </div>
+          <div className="flex gap-2">
+            {["in", "tw", "ig"].map((s) => (
+              <div
+                key={s}
+                className="size-7 rounded-lg bg-[rgba(74,229,74,0.08)] border border-[rgba(74,229,74,0.12)] flex items-center justify-center text-[9px] font-bold text-[#4AE54A]"
+              >
+                {s}
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </aside>
   );
 }
-

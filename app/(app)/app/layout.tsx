@@ -22,7 +22,7 @@ export default async function AppLayout({
     profile?.role === "admin" ? "Admin" : profile?.role === "vendedor" ? "Vendedor" : "";
 
   return (
-    <div className="dark min-h-screen bg-mg-bg text-foreground">
+    <div className="dark min-h-screen bg-[#0D1A0F] text-foreground">
       <AppSidebar />
       <MobileSidebar />
 

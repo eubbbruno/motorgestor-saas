@@ -3,382 +3,354 @@
 import Link from "next/link";
 import {
   ArrowRightIcon,
-  LayoutGridIcon,
-  UsersIcon,
-  CarIcon,
   BarChart3Icon,
+  CalendarIcon,
+  CarIcon,
+  LayoutGridIcon,
+  MapPinIcon,
+  PlusIcon,
+  UsersIcon,
   WalletIcon,
 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { useDashboardMetrics } from "@/features/dashboard/hooks";
-import { EpicDashboardBackground } from "@/components/dashboard/epic-dashboard-background";
 import { BigSalesChart } from "@/components/dashboard/big-sales-chart";
 import { FipeQuickWidget } from "@/components/dashboard/fipe-quick-widget";
 import {
   NextAgendaWidget,
-  PendingTasksWidget,
-  PipelineSummaryWidget,
-  RecentActivityWidget,
-  LeadsTodayWidget,
-  PerformanceWidget,
-  TasksTodayWidget,
-  HotOpportunitiesWidget,
-  DoNowWidget,
   RecentLeadsWidget,
-  RecentVehiclesWidget,
-  usePendingTasks,
+  PipelineSummaryWidget,
 } from "@/components/dashboard/dashboard-widgets";
 import { DashboardKpiStrip } from "@/components/dashboard/dashboard-kpi-strip";
-import { PremiumSurface } from "@/components/dashboard/premium-surface";
-import { DashboardSectionHeading } from "@/components/dashboard/dashboard-section-heading";
 
-export default function AppDashboardPage() {
-  const metrics = useDashboardMetrics();
-  const pendingTasks = usePendingTasks();
-  const followupsCount = pendingTasks.data?.total ?? 0;
+// ─── Animation variants ────────────────────────────────────────────────────
 
-  const formatBRL = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      maximumFractionDigits: 0,
-    }).format(value);
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07, delayChildren: 0.05 },
+  },
+} as const;
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.06, delayChildren: 0.05 },
-    },
-  } as const;
-  const item = {
-    hidden: { opacity: 0, y: 14, filter: "blur(6px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
-  } as const;
+const card = {
+  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+  },
+} as const;
 
-  const modules = [
-    {
-      title: "Veículos",
-      description: "Estoque, fotos, FIPE e anúncio pronto para publicar.",
-      href: "/app/veiculos",
-      icon: CarIcon,
-    },
-    {
-      title: "Leads",
-      description: "CRM com timeline, tarefas, WhatsApp e histórico.",
-      href: "/app/leads",
-      icon: UsersIcon,
-    },
-    {
-      title: "Pipeline",
-      description: "Kanban do funil com drag and drop por etapas.",
-      href: "/app/pipeline",
-      icon: LayoutGridIcon,
-    },
-  ] as const;
+// ─── Card shell ────────────────────────────────────────────────────────────
 
+function DashCard({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="dark">
-      <div className="relative">
-        <EpicDashboardBackground className="rounded-none" />
-        <motion.div variants={container} initial="hidden" animate="show" className="relative space-y-8 sm:space-y-10">
-          <motion.div variants={item} className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 backdrop-blur">
-                <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.10)]" />
-                Operação em tempo real
-              </div>
-              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-                Dashboard
-              </h1>
-              <p className="text-sm text-white/60">
-                Painel executivo com visão do funil e próximos passos.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button
-                asChild
-                variant="outline"
-                className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 sm:w-auto"
-              >
-                <Link href="/app/leads/novo">Novo lead</Link>
-              </Button>
-              <Button asChild className="w-full bg-white text-black hover:bg-white/90 sm:w-auto">
-                <Link href="/app/veiculos/novo">
-                  Novo veículo <ArrowRightIcon className="ml-2 size-4" />
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="space-y-4">
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-8">
-                <div className="relative">
-                  <DashboardSectionHeading
-                    kicker="Visão geral"
-                    title="Performance do funil"
-                    description="Leads/mês e valor fechado (FIPE) — últimos 6 meses."
-                    right={
-                      <div className="flex size-10 items-center justify-center rounded-2xl bg-white/5 text-white/70 ring-1 ring-white/10">
-                        <BarChart3Icon className="size-4" />
-                      </div>
-                    }
-                  />
-
-                  <div className="mt-4 space-y-4">
-                    <DashboardKpiStrip />
-                    <BigSalesChart
-                      showHeader={false}
-                      heightClassName="h-[220px] sm:h-[300px] lg:h-[340px]"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="lg:col-span-4">
-                {/* Mobile: carrossel horizontal / Desktop: stack */}
-                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:grid sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:auto-rows-fr">
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <FipeQuickWidget compact />
-                  </div>
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <PipelineSummaryWidget compact />
-                  </div>
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <NextAgendaWidget compact />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="space-y-4">
-            <DashboardSectionHeading
-              title="Hoje"
-              description="O que você precisa ver para vender mais rápido."
-            />
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-8">
-                <RecentActivityWidget />
-              </div>
-              <div className="lg:col-span-4">
-                {/* Mobile: carrossel horizontal para reduzir altura */}
-                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:grid sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <TasksTodayWidget />
-                  </div>
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <LeadsTodayWidget />
-                  </div>
-                  <div className="min-w-[292px] sm:min-w-0">
-                    <HotOpportunitiesWidget />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="space-y-4">
-            <DashboardSectionHeading
-              title="A fazer agora"
-              description="3 ações objetivas para mover o funil hoje."
-            />
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-8">
-                <DoNowWidget />
-              </div>
-              <div className="lg:col-span-4">
-                <div className="grid gap-6">
-                  <PerformanceWidget />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="space-y-4">
-            <DashboardSectionHeading
-              title="Widgets"
-              description="Blocos organizados em linhas, com largura e hierarquia consistentes."
-            />
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-              <RecentLeadsWidget />
-              <RecentVehiclesWidget />
-              <PendingTasksWidget />
-            </div>
-
-            <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6 lg:grid-cols-3">
-              <MiniStatWidget
-                title="Pipeline"
-                subtitle="Em negociação / fechados"
-                icon={<BarChart3Icon className="size-4" />}
-                value={metrics.isLoading ? "—" : metrics.data?.leads_em_negociacao ?? 0}
-                lines={[
-                  `Fechados: ${metrics.isLoading ? "—" : metrics.data?.leads_fechados ?? 0}`,
-                  `Total: ${metrics.isLoading ? "—" : metrics.data?.total_leads ?? 0}`,
-                ]}
-                href="/app/pipeline"
-              />
-              <MiniStatWidget
-                title="Follow-ups"
-                subtitle="Tarefas pendentes"
-                icon={<LayoutGridIcon className="size-4" />}
-                value={pendingTasks.isLoading ? "—" : followupsCount}
-                lines={[
-                  pendingTasks.isError ? "Não foi possível carregar." : "Abra a agenda para executar.",
-                  "Padronize: próximo passo por lead.",
-                ]}
-                href="/app/agenda"
-              />
-              <MiniStatWidget
-                title="Métricas"
-                subtitle="Valores (FIPE)"
-                icon={<WalletIcon className="size-4" />}
-                value={metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_fechado ?? 0)}
-                lines={[
-                  `Negociação: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_em_negociacao ?? 0)}`,
-                  `Ticket: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.ticket_medio ?? 0)}`,
-                ]}
-              />
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="space-y-4">
-            <DashboardSectionHeading
-              title="Hub"
-              description="Ações e atalhos principais (sem cara de cards repetidos)."
-            />
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-8">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {modules.map((m) => {
-                const Icon = m.icon;
-                return (
-                  <Link
-                    key={m.href}
-                    href={m.href}
-                    className="group relative rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:bg-white/10 hover:shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
-                  >
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/16 to-white/0" />
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-white">{m.title}</div>
-                        <div className="text-sm text-white/60">{m.description}</div>
-                      </div>
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10 transition group-hover:bg-white/10 group-hover:text-white">
-                        <Icon className="size-4" />
-                      </div>
-                    </div>
-                    <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-white/80">
-                      Abrir <ArrowRightIcon className="size-4 opacity-80" />
-                    </div>
-                  </Link>
-                );
-              })}
-                </div>
-              </div>
-              <div className="lg:col-span-4">
-                <PremiumSurface>
-                  <div className="p-5 sm:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-                          Ações rápidas
-                        </div>
-                        <div className="text-sm text-white/60">
-                          Crie, registre e avance o pipeline.
-                        </div>
-                      </div>
-                      <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-                        <LayoutGridIcon className="size-4" />
-                      </div>
-                    </div>
-                    <div className="mt-4 grid gap-3">
-                      <Button asChild className="w-full bg-white text-black hover:bg-white/90">
-                        <Link href="/app/leads/novo">Novo lead</Link>
-                      </Button>
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10"
-                      >
-                        <Link href="/app/veiculos/novo">Novo veículo</Link>
-                      </Button>
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10"
-                      >
-                        <Link href="/app/pipeline">Ver pipeline</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </PremiumSurface>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
+    <div
+      className={[
+        "relative overflow-hidden rounded-2xl bg-[#0F2014]",
+        "border border-[rgba(74,229,74,0.12)]",
+        "shadow-[0_0_20px_rgba(74,229,74,0.06)]",
+        className,
+      ].join(" ")}
+    >
+      {/* Top glow line */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.25)] to-transparent" />
+      {children}
     </div>
   );
 }
 
-function MiniStatWidget({
+// ─── Card header ───────────────────────────────────────────────────────────
+
+function CardHeader({
+  icon: Icon,
   title,
-  subtitle,
-  icon,
-  value,
-  lines,
-  href,
+  action,
 }: {
+  icon: React.ElementType;
   title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  value: React.ReactNode;
-  lines: string[];
-  href?: string;
+  action?: React.ReactNode;
 }) {
-  const reduceMotionLocal = useReducedMotion();
   return (
-    <PremiumSurface>
-      <motion.div
-        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: reduceMotionLocal ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="p-6"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="text-xs font-medium uppercase tracking-[0.18em] text-white/60">
-              {title}
-            </div>
-            <div className="text-sm text-white/60">{subtitle}</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/70 ring-1 ring-white/10">
-              {icon}
-            </div>
-            {href ? (
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="border-white/10 bg-white/5 text-white hover:bg-white/10"
-              >
-                <Link href={href}>Abrir</Link>
-              </Button>
-            ) : null}
-          </div>
+    <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(74,229,74,0.08)]">
+      <div className="flex items-center gap-2.5">
+        <div className="size-7 rounded-lg bg-[rgba(74,229,74,0.1)] flex items-center justify-center">
+          <Icon className="size-4 text-[#4AE54A]" />
         </div>
-        <div className="mt-3 text-3xl font-semibold tracking-tight text-white">{value}</div>
-        <div className="mt-3 space-y-1 text-xs text-white/55">
-          {lines.map((l, idx) => (
-            <div key={idx}>{l}</div>
-          ))}
-        </div>
-      </motion.div>
-    </PremiumSurface>
+        <span className="text-sm font-semibold text-white">{title}</span>
+      </div>
+      {action && <div>{action}</div>}
+    </div>
   );
 }
 
+// ─── Regions / Performance Widget ─────────────────────────────────────────
+
+function PerformanceCard() {
+  const metrics = useDashboardMetrics();
+
+  const formatBRL = (v: number) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 0,
+    }).format(v);
+
+  const regions = [
+    {
+      name: "Em Negociação",
+      value: metrics.isLoading
+        ? "—"
+        : formatBRL(metrics.data?.valor_em_negociacao ?? 0),
+      count: metrics.data?.leads_em_negociacao ?? 0,
+      active: true,
+    },
+    {
+      name: "Ticket Médio",
+      value: metrics.isLoading ? "—" : formatBRL(metrics.data?.ticket_medio ?? 0),
+      count: null,
+      active: false,
+    },
+    {
+      name: "Leads Fechados",
+      value: metrics.isLoading ? "—" : String(metrics.data?.leads_fechados ?? 0),
+      count: null,
+      active: false,
+    },
+    {
+      name: "Total de Leads",
+      value: metrics.isLoading ? "—" : String(metrics.data?.total_leads ?? 0),
+      count: null,
+      active: false,
+    },
+  ];
+
+  return (
+    <DashCard className="h-full">
+      <CardHeader
+        icon={MapPinIcon}
+        title="Performance Geral"
+        action={
+          <Link
+            href="/app/relatorios"
+            className="text-xs text-[#6B9E6B] hover:text-[#4AE54A] flex items-center gap-1 transition-colors"
+          >
+            Ver mais <ArrowRightIcon className="size-3" />
+          </Link>
+        }
+      />
+      <div className="p-5 space-y-3">
+        {regions.map((r) => (
+          <div
+            key={r.name}
+            className={[
+              "flex items-center justify-between rounded-xl px-4 py-3 transition-colors",
+              r.active
+                ? "bg-[rgba(74,229,74,0.1)] border border-[rgba(74,229,74,0.2)]"
+                : "bg-[rgba(74,229,74,0.04)] border border-[rgba(74,229,74,0.07)]",
+            ].join(" ")}
+          >
+            <div>
+              <div className="text-xs text-[#6B9E6B] mb-0.5">{r.name}</div>
+              <div className="text-base font-bold text-white">{r.value}</div>
+            </div>
+            {r.active && (
+              <div className="rounded-full bg-[#4AE54A] px-2.5 py-0.5 text-[10px] font-bold text-[#0A1A0C]">
+                {r.count} leads
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Pipeline mini */}
+        <div className="pt-2">
+          <PipelineSummaryWidget compact />
+        </div>
+      </div>
+    </DashCard>
+  );
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────
+
+export default function AppDashboardPage() {
+  const metrics = useDashboardMetrics();
+
+  return (
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-5"
+    >
+      {/* ── Page header ── */}
+      <motion.div
+        variants={card}
+        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="size-1.5 rounded-full bg-[#4AE54A] animate-pulse" />
+            <span className="text-xs text-[#6B9E6B] font-medium">Operação em tempo real</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[#6B9E6B] mt-0.5">
+            Painel executivo com visão do funil e próximos passos.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="border-[rgba(74,229,74,0.2)] bg-[rgba(74,229,74,0.06)] text-white hover:bg-[rgba(74,229,74,0.12)]"
+          >
+            <Link href="/app/leads/novo">
+              <PlusIcon className="size-3.5 mr-1.5" /> Novo lead
+            </Link>
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            className="bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd13d] font-bold shadow-[0_0_14px_rgba(74,229,74,0.35)]"
+          >
+            <Link href="/app/veiculos/novo">
+              <CarIcon className="size-3.5 mr-1.5" /> Novo veículo
+            </Link>
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* ── KPI Strip ── */}
+      <motion.div variants={card}>
+        <DashboardKpiStrip />
+      </motion.div>
+
+      {/* ── Row 1: Chart (2/3) + FIPE Widget (1/3) ── */}
+      <motion.div variants={card} className="grid gap-5 lg:grid-cols-3">
+        {/* Card 1 — Sales Chart */}
+        <DashCard className="lg:col-span-2">
+          <CardHeader
+            icon={BarChart3Icon}
+            title="Desempenho de Vendas"
+            action={
+              <Link
+                href="/app/relatorios"
+                className="text-xs text-[#6B9E6B] hover:text-[#4AE54A] flex items-center gap-1 transition-colors"
+              >
+                Relatórios <ArrowRightIcon className="size-3" />
+              </Link>
+            }
+          />
+          <div className="p-5">
+            <BigSalesChart showHeader={true} heightClassName="h-[240px] sm:h-[280px]" />
+          </div>
+        </DashCard>
+
+        {/* Card 2 — FIPE Quick Widget */}
+        <DashCard className="lg:col-span-1">
+          <CardHeader icon={WalletIcon} title="Consulta FIPE" />
+          <div className="p-5">
+            <FipeQuickWidget compact />
+          </div>
+        </DashCard>
+      </motion.div>
+
+      {/* ── Row 2: Events (1/3) + Leads (1/3) + Performance (1/3) ── */}
+      <motion.div variants={card} className="grid gap-5 lg:grid-cols-3">
+        {/* Card 3 — Próximos Eventos */}
+        <DashCard className="h-full">
+          <CardHeader
+            icon={CalendarIcon}
+            title="Próximos Eventos"
+            action={
+              <Link
+                href="/app/agenda"
+                className="text-xs text-[#6B9E6B] hover:text-[#4AE54A] flex items-center gap-1 transition-colors"
+              >
+                Ver agenda <ArrowRightIcon className="size-3" />
+              </Link>
+            }
+          />
+          <div className="p-5">
+            <NextAgendaWidget compact />
+          </div>
+        </DashCard>
+
+        {/* Card 4 — Leads Recentes */}
+        <DashCard className="h-full">
+          <CardHeader
+            icon={UsersIcon}
+            title="Leads Recentes"
+            action={
+              <Link
+                href="/app/leads"
+                className="text-xs text-[#6B9E6B] hover:text-[#4AE54A] flex items-center gap-1 transition-colors"
+              >
+                Ver todos <ArrowRightIcon className="size-3" />
+              </Link>
+            }
+          />
+          <div className="p-5">
+            <RecentLeadsWidget />
+          </div>
+        </DashCard>
+
+        {/* Card 5 — Performance Geral */}
+        <PerformanceCard />
+      </motion.div>
+
+      {/* ── Quick action modules ── */}
+      <motion.div variants={card} className="grid gap-3 sm:grid-cols-3">
+        {[
+          {
+            href: "/app/veiculos",
+            icon: CarIcon,
+            title: "Veículos",
+            desc: "Estoque, fotos, FIPE e anúncio.",
+          },
+          {
+            href: "/app/leads",
+            icon: UsersIcon,
+            title: "Leads",
+            desc: "CRM, timeline e WhatsApp.",
+          },
+          {
+            href: "/app/pipeline",
+            icon: LayoutGridIcon,
+            title: "Pipeline",
+            desc: "Kanban com drag and drop.",
+          },
+        ].map((m) => (
+          <Link
+            key={m.href}
+            href={m.href}
+            className="group flex items-center gap-4 rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0F2014] px-5 py-4 transition hover:border-[rgba(74,229,74,0.25)] hover:shadow-[0_0_20px_rgba(74,229,74,0.1)]"
+          >
+            <div className="size-10 rounded-xl bg-[rgba(74,229,74,0.1)] flex items-center justify-center shrink-0 group-hover:bg-[rgba(74,229,74,0.18)] transition-colors">
+              <m.icon className="size-5 text-[#4AE54A]" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-white">{m.title}</div>
+              <div className="text-xs text-[#6B9E6B] truncate">{m.desc}</div>
+            </div>
+            <ArrowRightIcon className="size-4 text-[#6B9E6B] group-hover:text-[#4AE54A] transition-colors shrink-0" />
+          </Link>
+        ))}
+      </motion.div>
+    </motion.div>
+  );
+}

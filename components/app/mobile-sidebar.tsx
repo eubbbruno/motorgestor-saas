@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CarIcon } from "lucide-react";
 
 import { appNav } from "@/components/app/app-nav";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -15,14 +16,19 @@ export function MobileSidebar() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="left" className="w-80 border-mg-border bg-mg-bg/90 p-0 text-foreground backdrop-blur-xl">
-        <SheetHeader className="border-b border-mg-border p-5">
-          <SheetTitle className="flex items-center gap-2">
-            <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
-            <span className="tracking-tight">MotorGestor</span>
+      <SheetContent
+        side="left"
+        className="w-72 border-r border-[rgba(74,229,74,0.1)] bg-[#0A1A0C] p-0 text-white"
+      >
+        <SheetHeader className="border-b border-[rgba(74,229,74,0.08)] p-4">
+          <SheetTitle className="flex items-center gap-2.5">
+            <div className="size-7 rounded-xl bg-[#4AE54A] flex items-center justify-center">
+              <CarIcon className="size-4 text-[#0A1A0C]" />
+            </div>
+            <span className="font-bold tracking-tight text-white">MotorGestor</span>
           </SheetTitle>
         </SheetHeader>
-        <nav className="space-y-1.5 p-4">
+        <nav className="space-y-1 p-4">
           {appNav.map((item) => {
             const active =
               pathname === item.href ||
@@ -34,18 +40,16 @@ export function MobileSidebar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-mg-surface-2 text-foreground shadow-[0_1px_0_rgba(255,255,255,0.06)_inset]"
-                    : "text-mg-fg-muted hover:bg-mg-surface hover:text-foreground",
+                    ? "bg-[#4AE54A] text-[#0A1A0C] font-semibold"
+                    : "text-[#6B9E6B] hover:bg-[rgba(74,229,74,0.08)] hover:text-white",
                 )}
               >
                 <Icon
                   className={cn(
-                    "size-[18px] transition-opacity",
-                    active
-                      ? "opacity-100 drop-shadow-[0_0_18px_rgba(52,211,153,0.22)]"
-                      : "opacity-75 group-hover:opacity-95",
+                    "size-[18px] shrink-0",
+                    active ? "text-[#0A1A0C]" : "text-[#6B9E6B]",
                   )}
                 />
                 <span>{item.label}</span>
@@ -57,4 +61,3 @@ export function MobileSidebar() {
     </Sheet>
   );
 }
-

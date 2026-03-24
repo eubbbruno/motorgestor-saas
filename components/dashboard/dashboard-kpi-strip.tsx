@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BarChart3Icon, UsersIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, TrendingUpIcon, UsersIcon, WalletIcon } from "lucide-react";
 
 import { useDashboardMetrics } from "@/features/dashboard/hooks";
 
@@ -20,49 +20,55 @@ export function DashboardKpiStrip() {
     {
       label: "Total Leads",
       value: metrics.isLoading ? "—" : String(metrics.data?.total_leads ?? 0),
-      icon: <UsersIcon className="size-4" />,
-      accent: "from-cyan-400/25 via-cyan-400/0 to-transparent",
+      icon: UsersIcon,
+      sub: `${metrics.data?.leads_em_negociacao ?? 0} em negociação`,
     },
     {
       label: "Conversão",
-      value:
-        metrics.isLoading ? "—" : `${Math.round((metrics.data?.taxa_conversao ?? 0) * 100)}%`,
-      icon: <BarChart3Icon className="size-4" />,
-      accent: "from-violet-400/22 via-violet-400/0 to-transparent",
+      value: metrics.isLoading
+        ? "—"
+        : `${Math.round((metrics.data?.taxa_conversao ?? 0) * 100)}%`,
+      icon: TrendingUpIcon,
+      sub: `${metrics.data?.leads_fechados ?? 0} fechados`,
     },
     {
-      label: "Valor fechado",
+      label: "Valor Fechado",
       value: metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_fechado ?? 0),
-      icon: <WalletIcon className="size-4" />,
-      accent: "from-emerald-300/18 via-emerald-300/0 to-transparent",
+      icon: WalletIcon,
+      sub: `Ticket: ${metrics.isLoading ? "—" : formatBRL(metrics.data?.ticket_medio ?? 0)}`,
+    },
+    {
+      label: "Em Negociação",
+      value: metrics.isLoading ? "—" : formatBRL(metrics.data?.valor_em_negociacao ?? 0),
+      icon: BarChart3Icon,
+      sub: `${metrics.data?.leads_em_negociacao ?? 0} leads`,
     },
   ] as const;
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {items.map((it) => (
-        <div
-          key={it.label}
-          className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-sm backdrop-blur transition hover:bg-white/8 hover:shadow-[0_24px_80px_-60px_rgba(0,0,0,0.75)]"
-        >
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-white/0 via-white/15 to-white/0" />
-          <div className={["pointer-events-none absolute inset-0 bg-linear-to-br", it.accent].join(" ")} />
-          <div className="relative flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map((it) => {
+        const Icon = it.icon;
+        return (
+          <div
+            key={it.label}
+            className="relative overflow-hidden rounded-xl bg-[#0F2014] border border-[rgba(74,229,74,0.12)] px-4 py-3 transition hover:border-[rgba(74,229,74,0.25)] hover:shadow-[0_0_20px_rgba(74,229,74,0.1)]"
+          >
+            {/* Subtle top glow line */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.3)] to-transparent" />
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-[#6B9E6B]">
                 {it.label}
               </div>
-              <div className="mt-1 truncate text-lg font-semibold tracking-tight text-white sm:text-xl">
-                {it.value}
+              <div className="size-6 rounded-lg bg-[rgba(74,229,74,0.1)] flex items-center justify-center">
+                <Icon className="size-3.5 text-[#4AE54A]" />
               </div>
             </div>
-            <div className="flex size-9 items-center justify-center rounded-xl bg-white/5 text-white/75 ring-1 ring-white/10 transition group-hover:bg-white/10">
-              {it.icon}
-            </div>
+            <div className="text-xl font-bold tracking-tight text-white truncate">{it.value}</div>
+            <div className="mt-0.5 text-[10px] text-[#6B9E6B] truncate">{it.sub}</div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
-
