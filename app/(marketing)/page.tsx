@@ -22,6 +22,8 @@ import { FaqSection } from "@/components/site/faq-section";
 import Image from "next/image";
 import { HeroBackground } from "@/components/site/hero-background";
 import { AnimatedStats } from "@/components/site/animated-stats";
+import { StaggerSection, StaggerItem } from "@/components/site/stagger-section";
+import { HeroTextMotion } from "@/components/site/hero-parallax-text";
 
 const BLUR_PLACEHOLDER =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
@@ -356,6 +358,7 @@ export default function HomePage() {
         </div>
 
         <Container className="relative z-30 max-w-5xl">
+          <HeroTextMotion>
           {/* Badge */}
           <FadeUp className="flex justify-center mb-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.35)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm text-[#4AE54A] font-semibold">
@@ -435,6 +438,7 @@ export default function HomePage() {
               </div>
             </div>
           </FadeUp>
+          </HeroTextMotion>
         </Container>
       </section>
 
@@ -594,10 +598,10 @@ export default function HomePage() {
             </div>
           </FadeUp>
 
-          <div className="grid sm:grid-cols-2 gap-5">
-            {features4.map((f, i) => (
-              <FadeUp key={f.title} delay={i * 0.1}>
-                <div className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-xl hover:border-[rgba(74,229,74,0.2)] hover:-translate-y-1 transition-all duration-300 group">
+          <StaggerSection className="grid sm:grid-cols-2 gap-5">
+            {features4.map((f) => (
+              <StaggerItem key={f.title}>
+                <div className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-xl hover:border-[rgba(74,229,74,0.2)] hover:-translate-y-1 transition-all duration-300 group h-full">
                   <div
                     className="size-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: f.iconBg }}
@@ -611,9 +615,9 @@ export default function HomePage() {
                     {f.description}
                   </p>
                 </div>
-              </FadeUp>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerSection>
         </Container>
       </section>
 
@@ -906,10 +910,10 @@ export default function HomePage() {
           </FadeUp>
 
           {/* Secondary cards */}
-          <div className="grid sm:grid-cols-2 gap-5">
-            {testimonials.slice(1).map((t, i) => (
-              <FadeUp key={t.name} delay={i * 0.1 + 0.2}>
-                <div className="bg-[#1A2E23] border border-[rgba(74,229,74,0.1)] rounded-2xl p-6">
+          <StaggerSection className="grid sm:grid-cols-2 gap-5">
+            {testimonials.slice(1).map((t) => (
+              <StaggerItem key={t.name}>
+                <div className="bg-[#1A2E23] border border-[rgba(74,229,74,0.1)] rounded-2xl p-6 hover:border-[rgba(74,229,74,0.2)] transition-colors h-full">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="size-10 rounded-xl bg-[#0D1F1A] border border-[rgba(74,229,74,0.15)] flex items-center justify-center shrink-0">
                       <span className="text-sm font-bold text-[#4AE54A]">
@@ -937,9 +941,9 @@ export default function HomePage() {
                     &ldquo;{t.quote}&rdquo;
                   </p>
                 </div>
-              </FadeUp>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerSection>
         </Container>
       </section>
 

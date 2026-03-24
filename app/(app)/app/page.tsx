@@ -316,41 +316,33 @@ export default function AppDashboardPage() {
       </motion.div>
 
       {/* ── Quick action modules ── */}
-      <motion.div variants={card} className="grid gap-3 sm:grid-cols-3">
+      <motion.div
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } } }}
+        className="grid gap-3 sm:grid-cols-3"
+      >
         {[
-          {
-            href: "/app/veiculos",
-            icon: CarIcon,
-            title: "Veículos",
-            desc: "Estoque, fotos, FIPE e anúncio.",
-          },
-          {
-            href: "/app/leads",
-            icon: UsersIcon,
-            title: "Leads",
-            desc: "CRM, timeline e WhatsApp.",
-          },
-          {
-            href: "/app/pipeline",
-            icon: LayoutGridIcon,
-            title: "Pipeline",
-            desc: "Kanban com drag and drop.",
-          },
+          { href: "/app/veiculos", icon: CarIcon, title: "Veículos", desc: "Estoque, fotos, FIPE e anúncio." },
+          { href: "/app/leads", icon: UsersIcon, title: "Leads", desc: "CRM, timeline e WhatsApp." },
+          { href: "/app/pipeline", icon: LayoutGridIcon, title: "Pipeline", desc: "Kanban com drag and drop." },
         ].map((m) => (
-          <Link
+          <motion.div
             key={m.href}
-            href={m.href}
-            className="group flex items-center gap-4 rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0F2014] px-5 py-4 transition hover:border-[rgba(74,229,74,0.25)] hover:shadow-[0_0_20px_rgba(74,229,74,0.1)]"
+            variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } } }}
           >
-            <div className="size-10 rounded-xl bg-[rgba(74,229,74,0.1)] flex items-center justify-center shrink-0 group-hover:bg-[rgba(74,229,74,0.18)] transition-colors">
-              <m.icon className="size-5 text-[#4AE54A]" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-white">{m.title}</div>
-              <div className="text-xs text-[#6B9E6B] truncate">{m.desc}</div>
-            </div>
-            <ArrowRightIcon className="size-4 text-[#6B9E6B] group-hover:text-[#4AE54A] transition-colors shrink-0" />
-          </Link>
+            <Link
+              href={m.href}
+              className="group flex items-center gap-4 rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0F2014] px-5 py-4 transition hover:border-[rgba(74,229,74,0.25)] hover:shadow-[0_0_20px_rgba(74,229,74,0.1)] hover:-translate-y-0.5"
+            >
+              <div className="size-10 rounded-xl bg-[rgba(74,229,74,0.1)] flex items-center justify-center shrink-0 group-hover:bg-[rgba(74,229,74,0.18)] transition-colors">
+                <m.icon className="size-5 text-[#4AE54A]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-white">{m.title}</div>
+                <div className="text-xs text-[#6B9E6B] truncate">{m.desc}</div>
+              </div>
+              <ArrowRightIcon className="size-4 text-[#6B9E6B] group-hover:text-[#4AE54A] group-hover:translate-x-0.5 transition-all shrink-0" />
+            </Link>
+          </motion.div>
         ))}
       </motion.div>
     </motion.div>

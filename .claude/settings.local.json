@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas/app/\\(marketing\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.json\")",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(ls -la \"/c/Users/Bruno/motorgestor-saas/app/\\(app\\)/\")",
+      "Bash(find \"/c/Users/Bruno/motorgestor-saas/app/\\(app\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(find \"/c/Users/Bruno/motorgestor-saas/app/\\(app\\)\" -maxdepth 1 -type f)",
+      "Bash(ls -la \"/c/Users/Bruno/motorgestor-saas/app/\\(app\\)/layout.tsx\")",
+      "Bash(find /c/Users/Bruno/motorgestor-saas/components/app -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(find \"C:/Users/Bruno/motorgestor-saas/app/\\(auth\\)\" -type f)",
+      "Bash(ls \"C:/Users/Bruno/motorgestor-saas/app/\\(auth\\)/\")",
+      "Bash(git restore:*)",
+      "Bash(vercel:*)"
+    ]
+  }
+}

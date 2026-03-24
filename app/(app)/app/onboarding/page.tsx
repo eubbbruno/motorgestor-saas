@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import Image from "next/image";
+
 import { getHumanErrorMessage } from "@/lib/errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
@@ -255,8 +257,27 @@ export default function OnboardingPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="-mx-4 -my-5 sm:-mx-6 sm:-my-6 lg:-mx-10 lg:-my-10 min-h-[calc(100vh-64px)] bg-[#0D1A0F] flex items-center justify-center p-4 sm:p-8">
-      <div className="w-full max-w-2xl">
+    <div className="-mx-4 -my-5 sm:-mx-6 sm:-my-6 lg:-mx-10 lg:-my-10 min-h-[calc(100vh-64px)] bg-[#0D1F1A] flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="pointer-events-none absolute -top-40 -right-40 w-96 h-96 bg-[#4AE54A]/[0.06] rounded-full blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 -left-40 w-96 h-96 bg-[#4AE54A]/[0.04] rounded-full blur-[120px]" />
+      {/* Dot pattern */}
+      <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(rgba(74,229,74,0.08) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+
+      <div className="w-full max-w-2xl relative z-10">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/images/logo-motorgestor-branco-e-verde.svg"
+            alt="MotorGestor"
+            width={180}
+            height={36}
+            className="h-9 w-auto"
+            unoptimized
+            priority
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
@@ -591,7 +612,7 @@ function StepCard({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-[#0F2014] border border-[rgba(74,229,74,0.12)] shadow-[0_0_30px_rgba(74,229,74,0.06)] p-6 sm:p-8">
+    <div className="relative overflow-hidden rounded-2xl bg-[#0F2014] border border-[rgba(74,229,74,0.12)] shadow-[0_0_40px_rgba(74,229,74,0.08)] p-7 sm:p-10">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.35)] to-transparent" />
       <div className="flex items-center gap-3 mb-2">
         <div className="size-8 rounded-xl bg-[rgba(74,229,74,0.12)] flex items-center justify-center">
