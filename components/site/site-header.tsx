@@ -1,93 +1,114 @@
-import Link from "next/link";
-import { MenuIcon } from "lucide-react";
+"use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
+import { useState } from "react";
+import { CarIcon, MenuIcon, XIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/site/container";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
-  { href: "/recursos", label: "Recursos" },
-  { href: "/planos", label: "Planos" },
-  { href: "/integracoes", label: "Integrações" },
+  { href: "/", label: "Home" },
+  { href: "/recursos", label: "Features" },
+  { href: "/planos", label: "Preços" },
   { href: "/blog", label: "Blog" },
-  { href: "/sobre", label: "Sobre" },
 ];
 
 export function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-mg-border bg-background/75 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-semibold tracking-tight"
-          >
-            <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,.15)]" />
-            <span className="text-base">MotorGestor</span>
-          </Link>
+  const [open, setOpen] = useState(false);
 
-          <nav className="hidden items-center gap-5 text-sm text-muted-foreground md:flex">
+  return (
+    <header className="sticky top-0 z-50 bg-[#0D1F1A]/95 backdrop-blur-md border-b border-[rgba(74,229,74,0.1)]">
+      <Container className="flex h-16 items-center justify-between relative">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-bold text-white text-base tracking-tight shrink-0"
+        >
+          <div className="size-7 rounded-lg bg-[#4AE54A] flex items-center justify-center">
+            <CarIcon className="size-4 text-[#0D1F1A]" />
+          </div>
+          MotorGestor
+        </Link>
+
+        {/* Desktop nav — centered absolutely */}
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
+          {nav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-[#9CA3AF] hover:text-white transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Desktop CTAs */}
+        <div className="hidden md:flex items-center gap-2 shrink-0">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-[#9CA3AF] hover:text-white hover:bg-white/5"
+          >
+            <Link href="/login">Entrar</Link>
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            className="bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-semibold shadow-[0_0_14px_rgba(74,229,74,0.35)]"
+          >
+            <Link href="/cadastro">Começar agora</Link>
+          </Button>
+        </div>
+
+        {/* Mobile toggle */}
+        <button
+          className="md:hidden text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          onClick={() => setOpen(!open)}
+          aria-label="Menu"
+        >
+          {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
+        </button>
+      </Container>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="md:hidden bg-[#0D1F1A] border-t border-[rgba(74,229,74,0.1)] px-4 pb-5">
+          <nav className="space-y-1 pt-3">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="transition-colors hover:text-foreground"
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 text-sm text-[#9CA3AF] hover:text-white hover:bg-white/5 rounded-xl transition-colors"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Abrir menu">
-                  <MenuIcon className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="border-mg-border bg-background p-0">
-                <SheetHeader className="border-b border-mg-border p-5">
-                  <SheetTitle className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,.14)]" />
-                    <span className="tracking-tight">MotorGestor</span>
-                  </SheetTitle>
-                </SheetHeader>
-                <nav className="space-y-1 p-4">
-                  {nav.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block rounded-xl px-3.5 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                  <div className="mt-4 grid gap-2">
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href="/login">Entrar</Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link href="/cadastro">Começar agora</Link>
-                    </Button>
-                  </div>
-                </nav>
-              </SheetContent>
-            </Sheet>
+          <div className="mt-4 grid gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-white/10 text-white bg-white/5 hover:bg-white/10"
+            >
+              <Link href="/login" onClick={() => setOpen(false)}>
+                Entrar
+              </Link>
+            </Button>
+            <Button
+              asChild
+              className="w-full bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-semibold"
+            >
+              <Link href="/cadastro" onClick={() => setOpen(false)}>
+                Começar agora
+              </Link>
+            </Button>
           </div>
-
-          <ThemeToggle />
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
-            <Link href="/login">Entrar</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/cadastro">Começar agora</Link>
-          </Button>
         </div>
-      </Container>
+      )}
     </header>
   );
 }
-
