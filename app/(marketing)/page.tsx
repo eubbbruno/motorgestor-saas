@@ -19,6 +19,28 @@ import { Container } from "@/components/site/container";
 import { DashboardMockup } from "@/components/site/dashboard-mockup";
 import { FadeUp } from "@/components/site/fade-up";
 import { FaqSection } from "@/components/site/faq-section";
+import { HeroBackground } from "@/components/site/hero-background";
+import { AnimatedStats } from "@/components/site/animated-stats";
+
+// ─── Decorative helpers ───────────────────────────────────────────────────────
+
+function DotPattern() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-[0.18]"
+      style={{
+        backgroundImage: "radial-gradient(circle, rgba(74,229,74,0.5) 1px, transparent 1px)",
+        backgroundSize: "28px 28px",
+      }}
+    />
+  );
+}
+
+function SectionDivider() {
+  return (
+    <div className="h-px w-full bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.25)] to-transparent" />
+  );
+}
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -291,27 +313,21 @@ export default function HomePage() {
     <>
       {/* ══ 1. HERO ══════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-[#0D1F1A] pt-20 pb-28 sm:pt-28 sm:pb-36">
-        {/* Video background */}
-        <video
-          className="absolute inset-0 z-0 h-full w-full object-cover opacity-40"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          disablePictureInPicture
-        >
-          <source src="/hero-bg-motorgestor.mp4" type="video/mp4" />
-        </video>
+        {/* Parallax video background (client) */}
+        <div className="absolute inset-0 z-0">
+          <HeroBackground />
+        </div>
 
         {/* Dark overlay for readability */}
         <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-[#0D1F1A]/90 via-[#0D1F1A]/75 to-[#0D1F1A]/90" />
 
         {/* Radial glow */}
         <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(74,229,74,0.18),transparent)]" />
-        {/* Subtle grid */}
-        <div className="pointer-events-none absolute inset-0 z-20 opacity-[0.15] bg-[linear-gradient(to_right,rgba(74,229,74,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(74,229,74,0.08)_1px,transparent_1px)] bg-[size:52px_52px]" />
+        {/* Dot pattern */}
+        <div className="z-20 absolute inset-0"><DotPattern /></div>
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -top-32 -left-32 z-20 size-96 rounded-full bg-[rgba(74,229,74,0.07)] blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -right-16 z-20 size-64 rounded-full bg-[rgba(74,229,74,0.05)] blur-3xl" />
 
         <Container className="relative z-30 max-w-5xl">
           {/* Badge */}
@@ -396,6 +412,8 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <SectionDivider />
+
       {/* ══ 2. PARCEIROS / LOGOS ══════════════════════════════════════════════ */}
       <section className="bg-white border-y border-gray-100 py-10">
         <Container>
@@ -418,6 +436,17 @@ export default function HomePage() {
           </FadeUp>
         </Container>
       </section>
+
+      {/* ══ 2b. STATS ════════════════════════════════════════════════════════ */}
+      <section className="bg-[#0D1F1A] py-14">
+        <Container className="max-w-4xl">
+          <FadeUp>
+            <AnimatedStats />
+          </FadeUp>
+        </Container>
+      </section>
+
+      <SectionDivider />
 
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}
       <section
@@ -503,8 +532,8 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 gap-5">
             {features4.map((f, i) => (
-              <FadeUp key={f.title} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-md hover:border-gray-200 transition-all">
+              <FadeUp key={f.title} delay={i * 0.1}>
+                <div className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-xl hover:border-[rgba(74,229,74,0.2)] hover:-translate-y-1 transition-all duration-300 group">
                   <div
                     className="size-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: f.iconBg }}
@@ -749,8 +778,12 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <SectionDivider />
+
       {/* ══ 8. TESTIMONIALS (dark) ════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-20 sm:py-28">
+      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
+        <div className="pointer-events-none absolute top-0 right-0 size-96 rounded-full bg-[rgba(74,229,74,0.05)] blur-3xl" />
         <Container className="max-w-5xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
@@ -855,8 +888,11 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <SectionDivider />
+
       {/* ══ 10. CTA FINAL (dark) ═════════════════════════════════════════════ */}
       <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_50%,rgba(74,229,74,0.10),transparent)]" />
         <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">

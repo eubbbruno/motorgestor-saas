@@ -1,114 +1,183 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { CarIcon, MenuIcon, XIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CarIcon, XIcon, MenuIcon, ArrowRightIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/site/container";
 
 const nav = [
-  { href: "/", label: "Home" },
+  { href: "/#como-funciona", label: "Como funciona" },
   { href: "/recursos", label: "Features" },
   { href: "/planos", label: "Preços" },
   { href: "/blog", label: "Blog" },
 ];
 
+// ─── Animated nav link ────────────────────────────────────────────────────────
+
+function NavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} className="relative group text-[#9CA3AF] hover:text-white transition-colors duration-200 text-sm font-medium py-0.5">
+      {label}
+      <span className="absolute left-0 -bottom-0.5 h-px w-0 bg-[#4AE54A] transition-all duration-300 group-hover:w-full rounded-full" />
+    </Link>
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 20);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-[#0D1F1A]/95 backdrop-blur-md border-b border-[rgba(74,229,74,0.1)]">
+    <header
+      className={[
+        "sticky top-0 z-50 transition-all duration-300",
+        scrolled
+          ? "bg-[#0D1F1A]/98 backdrop-blur-md border-b border-[rgba(74,229,74,0.12)] shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+          : "bg-[#0D1F1A]/80 backdrop-blur-sm border-b border-transparent",
+      ].join(" ")}
+    >
       <Container className="flex h-16 items-center justify-between relative">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-bold text-white text-base tracking-tight shrink-0"
-        >
-          <div className="size-7 rounded-lg bg-[#4AE54A] flex items-center justify-center">
-            <CarIcon className="size-4 text-[#0D1F1A]" />
+        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="size-8 rounded-xl bg-[#4AE54A] flex items-center justify-center shadow-[0_0_12px_rgba(74,229,74,0.35)] group-hover:shadow-[0_0_20px_rgba(74,229,74,0.5)] transition-shadow">
+            <CarIcon className="size-4 text-[#0D1F1A]" strokeWidth={2.5} />
           </div>
-          MotorGestor
+          <span className="font-extrabold text-white text-base tracking-tight">
+            Motor<span className="text-[#4AE54A]">Gestor</span>
+          </span>
         </Link>
 
-        {/* Desktop nav — centered absolutely */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 text-sm">
+        {/* Desktop nav — centered */}
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
           {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-[#9CA3AF] hover:text-white transition-colors"
-            >
-              {item.label}
-            </Link>
+            <NavLink key={item.href} href={item.href} label={item.label} />
           ))}
         </nav>
 
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="text-[#9CA3AF] hover:text-white hover:bg-white/5"
+          <Link
+            href="/login"
+            className="px-4 py-1.5 text-sm font-semibold rounded-lg border border-[rgba(74,229,74,0.25)] text-[#4AE54A] hover:bg-[rgba(74,229,74,0.08)] transition-all duration-200"
           >
-            <Link href="/login">Entrar</Link>
-          </Button>
-          <Button
-            asChild
-            size="sm"
-            className="bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-semibold shadow-[0_0_14px_rgba(74,229,74,0.35)]"
+            Entrar
+          </Link>
+          <Link
+            href="/cadastro"
+            className="group flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold rounded-lg bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] shadow-[0_0_16px_rgba(74,229,74,0.35)] hover:shadow-[0_0_24px_rgba(74,229,74,0.5)] transition-all duration-200"
           >
-            <Link href="/cadastro">Começar agora</Link>
-          </Button>
+            Começar Grátis
+            <ArrowRightIcon className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
         </div>
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          className="md:hidden relative z-50 p-2 rounded-lg text-white hover:bg-white/5 transition-colors"
           onClick={() => setOpen(!open)}
-          aria-label="Menu"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
         >
-          {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
+          <AnimatePresence mode="wait" initial={false}>
+            {open ? (
+              <motion.span
+                key="x"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                <XIcon className="size-5" />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="menu"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                <MenuIcon className="size-5" />
+              </motion.span>
+            )}
+          </AnimatePresence>
         </button>
       </Container>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden bg-[#0D1F1A] border-t border-[rgba(74,229,74,0.1)] px-4 pb-5">
-          <nav className="space-y-1 pt-3">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2.5 text-sm text-[#9CA3AF] hover:text-white hover:bg-white/5 rounded-xl transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="mt-4 grid gap-2">
-            <Button
-              asChild
-              variant="outline"
-              className="w-full border-white/10 text-white bg-white/5 hover:bg-white/10"
+      {/* Mobile menu — slide-in drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 top-16 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              onClick={() => setOpen(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed top-16 right-0 bottom-0 z-50 w-72 bg-[#0D1F1A] border-l border-[rgba(74,229,74,0.12)] shadow-2xl md:hidden flex flex-col"
             >
-              <Link href="/login" onClick={() => setOpen(false)}>
-                Entrar
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="w-full bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-semibold"
-            >
-              <Link href="/cadastro" onClick={() => setOpen(false)}>
-                Começar agora
-              </Link>
-            </Button>
-          </div>
-        </div>
-      )}
+              <nav className="flex-1 p-5 space-y-1">
+                {nav.map((item, i) => (
+                  <motion.div
+                    key={item.href}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 + 0.1 }}
+                  >
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="block px-4 py-3 text-sm font-medium text-[#9CA3AF] hover:text-white hover:bg-[rgba(74,229,74,0.06)] rounded-xl transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </nav>
+
+              <div className="p-5 space-y-2 border-t border-[rgba(74,229,74,0.08)]">
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center w-full py-2.5 text-sm font-semibold rounded-xl border border-[rgba(74,229,74,0.25)] text-[#4AE54A] hover:bg-[rgba(74,229,74,0.08)] transition-colors"
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/cadastro"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-bold rounded-xl bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] transition-colors shadow-[0_0_16px_rgba(74,229,74,0.35)]"
+                >
+                  Começar Grátis <ArrowRightIcon className="size-3.5" />
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
