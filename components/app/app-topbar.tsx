@@ -138,12 +138,7 @@ export function AppTopbar({
 
       {/* Right: search + notifications + CTA */}
       <div className="flex items-center gap-2">
-        <div className="hidden sm:block">
-          <GlobalSearch />
-        </div>
-        <div className="sm:hidden">
-          <GlobalSearch />
-        </div>
+        <GlobalSearch />
 
         {/* Notifications bell */}
         <button className="relative p-2 text-[#6B9E6B] hover:text-white hover:bg-[rgba(74,229,74,0.08)] rounded-lg transition-colors">

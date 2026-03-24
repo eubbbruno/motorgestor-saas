@@ -291,12 +291,29 @@ export default function HomePage() {
     <>
       {/* ══ 1. HERO ══════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-[#0D1F1A] pt-20 pb-28 sm:pt-28 sm:pb-36">
-        {/* Radial glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(74,229,74,0.18),transparent)]" />
-        {/* Subtle grid */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.18] bg-[linear-gradient(to_right,rgba(74,229,74,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(74,229,74,0.08)_1px,transparent_1px)] bg-[size:52px_52px]" />
+        {/* Video background */}
+        <video
+          className="absolute inset-0 z-0 h-full w-full object-cover opacity-40"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          disablePictureInPicture
+        >
+          <source src="/hero-bg-motorgestor.mp4" type="video/mp4" />
+        </video>
 
-        <Container className="relative max-w-5xl">
+        {/* Dark overlay for readability */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-[#0D1F1A]/90 via-[#0D1F1A]/75 to-[#0D1F1A]/90" />
+
+        {/* Radial glow */}
+        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(74,229,74,0.18),transparent)]" />
+        {/* Subtle grid */}
+        <div className="pointer-events-none absolute inset-0 z-20 opacity-[0.15] bg-[linear-gradient(to_right,rgba(74,229,74,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(74,229,74,0.08)_1px,transparent_1px)] bg-[size:52px_52px]" />
+
+        <Container className="relative z-30 max-w-5xl">
           {/* Badge */}
           <FadeUp className="flex justify-center mb-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.35)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm text-[#4AE54A] font-semibold">
@@ -323,7 +340,7 @@ export default function HomePage() {
           </FadeUp>
 
           {/* CTAs */}
-          <FadeUp delay={0.2} className="flex flex-col sm:flex-row gap-3 justify-center mb-18 sm:mb-20">
+          <FadeUp delay={0.2} className="flex flex-col sm:flex-row gap-3 justify-center mb-14 sm:mb-20">
             <Button
               asChild
               size="lg"
@@ -345,7 +362,7 @@ export default function HomePage() {
 
           {/* Phone + floating cards */}
           <FadeUp delay={0.26}>
-            <div className="relative flex justify-center items-center min-h-[360px] sm:min-h-[420px]">
+            <div className="relative flex justify-center items-center min-h-[280px] sm:min-h-[400px]">
               {/* Left floating cards */}
               <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-3 -translate-x-6">
                 <FloatCard

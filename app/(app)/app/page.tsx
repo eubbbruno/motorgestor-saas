@@ -240,9 +240,9 @@ export default function AppDashboardPage() {
       </motion.div>
 
       {/* ── Row 1: Chart (2/3) + FIPE Widget (1/3) ── */}
-      <motion.div variants={card} className="grid gap-5 lg:grid-cols-3">
+      <motion.div variants={card} className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Card 1 — Sales Chart */}
-        <DashCard className="lg:col-span-2">
+        <DashCard className="md:col-span-2 lg:col-span-2">
           <CardHeader
             icon={BarChart3Icon}
             title="Desempenho de Vendas"
@@ -270,7 +270,7 @@ export default function AppDashboardPage() {
       </motion.div>
 
       {/* ── Row 2: Events (1/3) + Leads (1/3) + Performance (1/3) ── */}
-      <motion.div variants={card} className="grid gap-5 lg:grid-cols-3">
+      <motion.div variants={card} className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Card 3 — Próximos Eventos */}
         <DashCard className="h-full">
           <CardHeader
@@ -310,7 +310,9 @@ export default function AppDashboardPage() {
         </DashCard>
 
         {/* Card 5 — Performance Geral */}
-        <PerformanceCard />
+        <div className="md:col-span-2 lg:col-span-1">
+          <PerformanceCard />
+        </div>
       </motion.div>
 
       {/* ── Quick action modules ── */}
