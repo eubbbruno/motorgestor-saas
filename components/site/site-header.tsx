@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CarIcon, XIcon, MenuIcon, ArrowRightIcon } from "lucide-react";
+import { XIcon, MenuIcon, ArrowRightIcon } from "lucide-react";
 
 import { Container } from "@/components/site/container";
 
@@ -50,13 +51,15 @@ export function SiteHeader() {
     >
       <Container className="flex h-16 items-center justify-between relative">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="size-8 rounded-xl bg-[#4AE54A] flex items-center justify-center shadow-[0_0_12px_rgba(74,229,74,0.35)] group-hover:shadow-[0_0_20px_rgba(74,229,74,0.5)] transition-shadow">
-            <CarIcon className="size-4 text-[#0D1F1A]" strokeWidth={2.5} />
-          </div>
-          <span className="font-extrabold text-white text-base tracking-tight">
-            Motor<span className="text-[#4AE54A]">Gestor</span>
-          </span>
+        <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
+          <Image
+            src="/images/logo-motorgestor-branco-e-verde.svg"
+            alt="MotorGestor"
+            width={800}
+            height={400}
+            className="h-9 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop nav — centered */}

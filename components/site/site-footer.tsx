@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { CarIcon } from "lucide-react";
 
 import { Container } from "@/components/site/container";
 
@@ -51,8 +51,6 @@ function InstagramIcon() {
   );
 }
 
-const techBadges = ["Next.js", "Supabase", "Vercel"];
-
 export function SiteFooter() {
   return (
     <footer className="relative bg-[#080F0A] overflow-hidden">
@@ -68,30 +66,19 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 mb-12">
           {/* Brand col */}
           <div className="space-y-5 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="size-8 rounded-xl bg-[#4AE54A] flex items-center justify-center group-hover:shadow-[0_0_16px_rgba(74,229,74,0.5)] transition-shadow">
-                <CarIcon className="size-4 text-[#0D1F1A]" strokeWidth={2.5} />
-              </div>
-              <span className="font-extrabold text-white text-base tracking-tight">
-                Motor<span className="text-[#4AE54A]">Gestor</span>
-              </span>
+            <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+              <Image
+                src="/images/logo-motorgestor-branco-e-verde.svg"
+                alt="MotorGestor"
+                width={800}
+                height={400}
+                className="h-8 w-auto"
+              />
             </Link>
 
             <p className="text-sm text-[#9CA3AF] leading-relaxed">
               Operação de revenda sem planilha — funil, agenda, estoque e métricas em um só lugar.
             </p>
-
-            {/* Tech badges */}
-            <div className="flex flex-wrap gap-2">
-              {techBadges.map((b) => (
-                <span
-                  key={b}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-[#6B9E6B] border border-[rgba(74,229,74,0.12)] bg-[rgba(74,229,74,0.04)]"
-                >
-                  {b}
-                </span>
-              ))}
-            </div>
 
             {/* Social icons */}
             <div className="flex gap-2">
@@ -161,10 +148,7 @@ export function SiteFooter() {
 
         {/* Bottom bar */}
         <div className="pt-6 border-t border-[rgba(74,229,74,0.06)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B9E6B]/70">
-          <span>
-            © {new Date().getFullYear()} MotorGestor — Feito com{" "}
-            <span className="text-[#4AE54A]">♥</span> no Brasil
-          </span>
+          <span>© {new Date().getFullYear()} MotorGestor. Todos os direitos reservados.</span>
           <div className="flex gap-4">
             <Link href="/politica-de-privacidade" className="hover:text-white transition-colors">Privacidade</Link>
             <Link href="/termos-de-uso" className="hover:text-white transition-colors">Termos</Link>

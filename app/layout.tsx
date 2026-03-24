@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${jakarta.variable} ${geistMono.variable} min-h-screen antialiased`}
+        className={`${jakarta.variable} ${geistMono.variable} font-sans min-h-screen antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

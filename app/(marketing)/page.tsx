@@ -19,26 +19,38 @@ import { Container } from "@/components/site/container";
 import { DashboardMockup } from "@/components/site/dashboard-mockup";
 import { FadeUp } from "@/components/site/fade-up";
 import { FaqSection } from "@/components/site/faq-section";
+import Image from "next/image";
 import { HeroBackground } from "@/components/site/hero-background";
 import { AnimatedStats } from "@/components/site/animated-stats";
+
+const BLUR_PLACEHOLDER =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
 // ─── Decorative helpers ───────────────────────────────────────────────────────
 
 function DotPattern() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 opacity-[0.18]"
+      className="pointer-events-none absolute inset-0"
       style={{
-        backgroundImage: "radial-gradient(circle, rgba(74,229,74,0.5) 1px, transparent 1px)",
-        backgroundSize: "28px 28px",
+        backgroundImage: "radial-gradient(circle, rgba(74,229,74,0.15) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
       }}
+    />
+  );
+}
+
+function GreenBlob({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`absolute w-96 h-96 bg-[#4AE54A]/[0.08] rounded-full blur-[120px] pointer-events-none ${className}`}
     />
   );
 }
 
 function SectionDivider() {
   return (
-    <div className="h-px w-full bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.25)] to-transparent" />
+    <div className="h-px w-full bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.30)] to-transparent" />
   );
 }
 
@@ -325,9 +337,22 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(74,229,74,0.18),transparent)]" />
         {/* Dot pattern */}
         <div className="z-20 absolute inset-0"><DotPattern /></div>
-        {/* Decorative circles */}
-        <div className="pointer-events-none absolute -top-32 -left-32 z-20 size-96 rounded-full bg-[rgba(74,229,74,0.07)] blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -right-16 z-20 size-64 rounded-full bg-[rgba(74,229,74,0.05)] blur-3xl" />
+        {/* Decorative blobs */}
+        <GreenBlob className="top-0 right-0 z-20" />
+        <GreenBlob className="-bottom-16 -left-16 z-20 opacity-60" />
+
+        {/* Fallback/secondary bg image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80"
+            alt=""
+            fill
+            className="object-cover opacity-10"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
+          />
+        </div>
 
         <Container className="relative z-30 max-w-5xl">
           {/* Badge */}
@@ -438,8 +463,10 @@ export default function HomePage() {
       </section>
 
       {/* ══ 2b. STATS ════════════════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-14">
-        <Container className="max-w-4xl">
+      <section className="bg-[#0D1F1A] py-14 relative overflow-hidden">
+        <DotPattern />
+        <GreenBlob className="top-0 right-0" />
+        <Container className="relative max-w-4xl">
           <FadeUp>
             <AnimatedStats />
           </FadeUp>
@@ -455,11 +482,25 @@ export default function HomePage() {
       >
         <Container className="max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left: dark app window */}
+            {/* Left: app window + person photo */}
             <FadeUp>
-              <div className="relative rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/20">
-                <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-[#4AE54A]/10 to-transparent blur-xl pointer-events-none" />
-                <DashboardMockup />
+              <div className="space-y-4">
+                <div className="relative rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/20">
+                  <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-[#4AE54A]/10 to-transparent blur-xl pointer-events-none" />
+                  <DashboardMockup />
+                </div>
+                <div className="relative h-40 rounded-2xl overflow-hidden shadow-lg">
+                  <Image
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+                    alt="Vendedor com tablet"
+                    fill
+                    className="object-cover object-top"
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={BLUR_PLACEHOLDER}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D1F1A]/40 to-transparent" />
+                </div>
               </div>
             </FadeUp>
 
@@ -528,6 +569,26 @@ export default function HomePage() {
               Uma stack completa de vendas, do estoque ao fechamento, em um só
               lugar.
             </p>
+          </FadeUp>
+
+          <FadeUp className="mb-8">
+            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden shadow-md">
+              <Image
+                src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&q=80"
+                alt="Equipe de vendas"
+                fill
+                className="object-cover"
+                loading="lazy"
+                placeholder="blur"
+                blurDataURL={BLUR_PLACEHOLDER}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1F1A]/50 to-transparent" />
+              <div className="absolute inset-0 flex items-center px-8">
+                <p className="text-white font-bold text-xl sm:text-2xl max-w-xs leading-snug">
+                  Uma equipe mais rápida, uma revenda mais lucrativa.
+                </p>
+              </div>
+            </div>
           </FadeUp>
 
           <div className="grid sm:grid-cols-2 gap-5">
@@ -783,7 +844,8 @@ export default function HomePage() {
       {/* ══ 8. TESTIMONIALS (dark) ════════════════════════════════════════════ */}
       <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
         <DotPattern />
-        <div className="pointer-events-none absolute top-0 right-0 size-96 rounded-full bg-[rgba(74,229,74,0.05)] blur-3xl" />
+        <GreenBlob className="top-0 right-0" />
+        <GreenBlob className="bottom-0 left-0 opacity-50" />
         <Container className="max-w-5xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
@@ -803,10 +865,16 @@ export default function HomePage() {
             <div className="bg-[#1A2E23] border border-[rgba(74,229,74,0.15)] rounded-2xl p-8 mb-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 size-64 rounded-full bg-[#4AE54A]/5 blur-3xl pointer-events-none" />
               <div className="relative flex flex-col sm:flex-row gap-6 items-start">
-                <div className="size-14 rounded-2xl bg-[#0D1F1A] border border-[rgba(74,229,74,0.2)] flex items-center justify-center shrink-0">
-                  <span className="text-xl font-bold text-[#4AE54A]">
-                    {testimonials[0].name[0]}
-                  </span>
+                <div className="size-14 rounded-2xl overflow-hidden border border-[rgba(74,229,74,0.2)] shrink-0 relative">
+                  <Image
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80"
+                    alt={testimonials[0].name}
+                    fill
+                    className="object-cover"
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={BLUR_PLACEHOLDER}
+                  />
                 </div>
                 <div>
                   <div className="flex gap-0.5 mb-3">
