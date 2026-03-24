@@ -55,8 +55,8 @@ export function SiteHeader() {
           <Image
             src="/images/logo-motorgestor-branco-e-verde.svg"
             alt="MotorGestor"
-            width={800}
-            height={400}
+            width={180}
+            height={36}
             className="h-9 w-auto"
             priority
           />
