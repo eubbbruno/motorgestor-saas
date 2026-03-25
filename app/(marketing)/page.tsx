@@ -486,6 +486,9 @@ export default function HomePage() {
         className="bg-[#0D1F1A] py-20 sm:py-28 scroll-mt-16 relative overflow-hidden"
       >
         <DotPattern />
+        {/* Decorative circles */}
+        <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full border border-[#4AE54A]/10 pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full border border-[#4AE54A]/15 pointer-events-none" />
         <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: app window + person photo */}
@@ -497,18 +500,13 @@ export default function HomePage() {
                     <DashboardMockup />
                   </div>
                 </div>
-                <div className="relative h-40 rounded-2xl overflow-hidden shadow-lg">
-                  <Image
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
-                    alt="Vendedor com tablet"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-top"
-                    loading="lazy"
-                    placeholder="blur"
-                    blurDataURL={BLUR_PLACEHOLDER}
+                <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80"
+                    alt="Concessionária moderna"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D1F1A]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D1F1A]/80 via-[#4AE54A]/10 to-transparent" />
                 </div>
               </div>
             </FadeUp>
@@ -564,6 +562,8 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-[#4AE54A]/30 to-transparent" />
+
       {/* ══ 4. FEATURES GRID (2×2) ════════════════════════════════════════════ */}
       <section className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden">
         <DotPattern />
@@ -582,12 +582,16 @@ export default function HomePage() {
           </FadeUp>
 
           <FadeUp className="mb-8">
-            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden border border-[#4AE54A]/20 bg-gradient-to-r from-[#0D1F1A] via-[#122E1A] to-[#0D1F1A]">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_20%_50%,rgba(74,229,74,0.12),transparent)]" />
-              <div className="absolute inset-0 flex items-center px-8">
-                <p className="text-white font-bold text-xl sm:text-2xl max-w-xs leading-snug">
-                  Uma equipe mais rápida,{" "}
-                  <span className="text-[#4AE54A]">uma revenda mais lucrativa.</span>
+            <div className="relative w-full h-64 rounded-2xl overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=80"
+                alt="Veículos concessionária"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1F1A]/90 to-[#0D1F1A]/40" />
+              <div className="absolute inset-0 flex items-center px-10">
+                <p className="text-white font-goldman text-2xl font-bold max-w-xs">
+                  Uma equipe mais rápida, uma revenda mais lucrativa.
                 </p>
               </div>
             </div>
@@ -596,9 +600,9 @@ export default function HomePage() {
           <StaggerSection className="grid sm:grid-cols-2 gap-5">
             {features4.map((f) => (
               <StaggerItem key={f.title}>
-                <div className="bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-6 hover:border-[#4AE54A]/30 hover:-translate-y-1 transition-all duration-300 h-full">
+                <div className="group bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-6 hover:border-[#4AE54A]/40 hover:shadow-[0_0_30px_rgba(74,229,74,0.08)] hover:-translate-y-1 transition-all duration-300 h-full">
                   <div
-                    className="size-12 rounded-xl flex items-center justify-center mb-5"
+                    className="size-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: f.iconBg }}
                   >
                     <f.icon className="size-6" style={{ color: f.iconColor }} />
@@ -615,6 +619,8 @@ export default function HomePage() {
           </StaggerSection>
         </Container>
       </section>
+
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-[#4AE54A]/30 to-transparent" />
 
       {/* ══ 5. APP EM DESTAQUE ════════════════════════════════════════════════ */}
       <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
@@ -647,9 +653,9 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-4">
               {highlights.map((h, i) => (
                 <FadeUp key={h.title} delay={i * 0.08}>
-                  <div className="bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-5">
+                  <div className="group bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-5 hover:border-[#4AE54A]/40 hover:shadow-[0_0_30px_rgba(74,229,74,0.08)] hover:-translate-y-1 transition-all duration-300">
                     <div
-                      className="size-10 rounded-xl flex items-center justify-center mb-4"
+                      className="size-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
                       style={{ backgroundColor: "rgba(74,229,74,0.12)" }}
                     >
                       <h.icon className="size-5 text-[#4AE54A]" />
@@ -968,9 +974,14 @@ export default function HomePage() {
       <SectionDivider />
 
       {/* ══ 10. CTA FINAL (dark) ═════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
+      <section
+        className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden"
+        style={{ backgroundImage: "radial-gradient(rgba(74,229,74,0.12) 1px, transparent 1px)", backgroundSize: "32px 32px" }}
+      >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_50%,rgba(74,229,74,0.10),transparent)]" />
+        {/* Decorative circles */}
+        <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full border border-[#4AE54A]/10 pointer-events-none" />
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full border border-[#4AE54A]/15 pointer-events-none" />
         <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <FadeUp>

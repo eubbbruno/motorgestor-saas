@@ -20,7 +20,9 @@
       "Bash(dir:*)",
       "Bash(git -C /c/Users/Bruno/motorgestor-saas add public/images/logo-motorgestor.png)",
       "Bash(git -C /c/Users/Bruno/motorgestor-saas status)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm list:*)"
     ]
   }
 }
