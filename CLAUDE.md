@@ -1,5 +1,12 @@
 # CLAUDE.md
 
+## Skills ativas
+
+As skills em .claude/skills/ devem ser seguidas em todas as tarefas:
+- git-workflow.md — push obrigatório após toda alteração
+- design-system.md — padrões visuais e fontes do projeto
+- images.md — regras para imagens e assets
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands

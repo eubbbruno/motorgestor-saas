@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Goldman, Prompt, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/app/providers";
 
-const jakarta = Plus_Jakarta_Sans({
+const goldman = Goldman({
   subsets: ["latin"],
-  variable: "--font-jakarta",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "700"],
+  variable: "--font-goldman",
+  display: "swap",
+});
+
+const prompt = Prompt({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-prompt",
   display: "swap",
 });
 
@@ -32,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${jakarta.variable} ${geistMono.variable} font-sans min-h-screen antialiased`}
+        className={`${goldman.variable} ${prompt.variable} ${geistMono.variable} font-sans min-h-screen antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

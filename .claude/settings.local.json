@@ -16,7 +16,8 @@
       "Bash(find \"C:/Users/Bruno/motorgestor-saas/app/\\(auth\\)\" -type f)",
       "Bash(ls \"C:/Users/Bruno/motorgestor-saas/app/\\(auth\\)/\")",
       "Bash(git restore:*)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(dir:*)"
     ]
   }
 }
