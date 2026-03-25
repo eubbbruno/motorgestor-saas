@@ -68,7 +68,7 @@ export function SiteFooter() {
           <div className="space-y-5 lg:col-span-1">
             <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
               <Image
-                src="/images/logo-motorgestor-branco-e-verde.svg"
+                src="/images/logo-motorgestor-new.svg"
                 alt="MotorGestor"
                 width={360}
                 height={72}
