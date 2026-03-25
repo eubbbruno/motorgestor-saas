@@ -1,9 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 
 // ─── Steps ────────────────────────────────────────────────────────────────────
 
@@ -39,105 +37,109 @@ const STEPS = [
   },
 ] as const;
 
-const TOTAL = STEPS.length;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+async function finishTour() {
+  try {
+    await fetch("/api/onboarding/complete", { method: "POST" });
+  } catch {
+    // ignora — o redirect vai forçar reavaliação do middleware de qualquer forma
+  }
+  window.location.href = "/app/dashboard";
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const router = useRouter();
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const isLast = step === TOTAL - 1;
-  const progress = Math.round(((step + 1) / TOTAL) * 100);
+  const isLast = step === STEPS.length - 1;
+  const current = STEPS[step];
 
-  function next() {
+  async function handleNext() {
     if (isLast) {
-      router.replace("/app/dashboard");
+      setLoading(true);
+      await finishTour();
     } else {
       setStep((s) => s + 1);
     }
   }
 
-  const current = STEPS[step];
+  async function handleSkip() {
+    setLoading(true);
+    await finishTour();
+  }
 
   return (
-    <div className="fixed inset-0 bg-[#0D1F1A] flex flex-col overflow-hidden">
-      {/* Progress bar */}
-      <div className="absolute top-0 inset-x-0 h-[3px] bg-[rgba(74,229,74,0.1)] z-10">
-        <motion.div
-          className="h-full bg-[#4AE54A] shadow-[0_0_8px_rgba(74,229,74,0.7)]"
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        />
-      </div>
-
-      {/* Skip link */}
-      <div className="absolute top-5 right-6 z-10">
-        <Link
-          href="/app/dashboard"
-          className="text-sm text-[#6B9E6B] hover:text-[#9CA3AF] transition-colors"
+    /* Overlay */
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      {/* Modal */}
+      <div className="relative w-full max-w-md mx-4 rounded-2xl border border-[#4AE54A]/20 bg-[#0F2014] p-8 shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+        {/* Skip */}
+        <button
+          onClick={handleSkip}
+          disabled={loading}
+          className="absolute top-4 right-5 text-sm text-[#6B9E6B] hover:text-[#9CA3AF] transition-colors disabled:opacity-40"
         >
-          Pular tour
-        </Link>
-      </div>
+          Pular
+        </button>
 
-      {/* Centered content */}
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-lg">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center text-center gap-6"
+        {/* Step content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col items-center text-center gap-5"
+          >
+            {/* Icon */}
+            <span className="text-[48px] leading-none select-none" role="img" aria-label={current.title}>
+              {current.icon}
+            </span>
+
+            {/* Title */}
+            <h1
+              className="text-[22px] font-bold text-white leading-tight tracking-tight"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              {/* Icon */}
-              <div className="text-[64px] leading-none select-none" role="img" aria-label={current.title}>
-                {current.icon}
-              </div>
+              {current.title}
+            </h1>
 
-              {/* Title */}
-              <h1
-                className="text-[28px] font-bold text-white leading-tight tracking-tight"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-              >
-                {current.title}
-              </h1>
+            {/* Description */}
+            <p className="text-sm text-[#9CA3AF] leading-relaxed max-w-xs">
+              {current.description}
+            </p>
 
-              {/* Description */}
-              <p className="text-[#9CA3AF] text-base leading-relaxed max-w-sm">
-                {current.description}
-              </p>
+            {/* CTA */}
+            <button
+              onClick={handleNext}
+              disabled={loading}
+              className="w-full mt-1 py-3 rounded-xl bg-[#4AE54A] text-[#0D1F1A] text-sm font-bold shadow-[0_0_20px_rgba(74,229,74,0.3)] hover:bg-[#3dd13d] hover:shadow-[0_0_28px_rgba(74,229,74,0.45)] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
+              {loading ? "Carregando…" : isLast ? "Acessar Dashboard →" : "Próximo →"}
+            </button>
+          </motion.div>
+        </AnimatePresence>
 
-              {/* Button */}
-              <button
-                onClick={next}
-                className="mt-2 px-8 py-3 rounded-xl bg-[#4AE54A] text-[#0D1F1A] font-bold text-base shadow-[0_0_24px_rgba(74,229,74,0.35)] hover:bg-[#3dd13d] hover:shadow-[0_0_32px_rgba(74,229,74,0.5)] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {isLast ? "Acessar Dashboard →" : "Próximo →"}
-              </button>
-            </motion.div>
-          </AnimatePresence>
+        {/* Dots */}
+        <div className="flex items-center justify-center gap-2 mt-7">
+          {STEPS.map((_, i) => (
+            <div
+              key={i}
+              className={[
+                "rounded-full transition-all duration-300",
+                i === step
+                  ? "w-4 h-[7px] bg-[#4AE54A]"
+                  : i < step
+                  ? "w-[7px] h-[7px] bg-[#4AE54A]/40"
+                  : "w-[7px] h-[7px] bg-white/10",
+              ].join(" ")}
+            />
+          ))}
         </div>
-      </div>
-
-      {/* Step dots */}
-      <div className="flex items-center justify-center gap-2 pb-10">
-        {STEPS.map((_, i) => (
-          <div
-            key={i}
-            className={[
-              "rounded-full transition-all duration-300",
-              i === step
-                ? "w-5 h-2 bg-[#4AE54A]"
-                : i < step
-                ? "w-2 h-2 bg-[#4AE54A]/40"
-                : "w-2 h-2 bg-[rgba(74,229,74,0.15)]",
-            ].join(" ")}
-          />
-        ))}
       </div>
     </div>
   );
