@@ -52,8 +52,8 @@ export function SiteHeader() {
             src="/images/logo-motorgestor-new.svg"
             alt="MotorGestor"
             width={240}
-            height={48}
-            className="h-10 w-auto"
+            height={80}
+            className="h-14 w-auto"
             priority
             unoptimized
           />
@@ -105,7 +105,7 @@ export function SiteHeader() {
                 alt="MotorGestor"
                 width={180}
                 height={36}
-                className="h-9 w-auto"
+                className="h-12 w-auto"
                 unoptimized
               />
             </div>

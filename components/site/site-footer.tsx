@@ -70,9 +70,9 @@ export function SiteFooter() {
               <Image
                 src="/images/logo-motorgestor-new.svg"
                 alt="MotorGestor"
-                width={360}
-                height={72}
-                className="h-14 w-auto"
+                width={180}
+                height={60}
+                className="h-12 w-auto"
                 unoptimized
               />
             </Link>
