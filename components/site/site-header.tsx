@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRightIcon, MenuIcon } from "lucide-react";
 
-import { Container } from "@/components/site/container";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
@@ -14,8 +13,6 @@ const nav = [
   { href: "/planos", label: "Preços" },
   { href: "/blog", label: "Blog" },
 ];
-
-// ─── Animated nav link ────────────────────────────────────────────────────────
 
 function NavLink({ href, label }: { href: string; label: string }) {
   return (
@@ -29,15 +26,13 @@ function NavLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 10);
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -46,13 +41,11 @@ export function SiteHeader() {
   return (
     <header
       className={[
-        "sticky top-0 z-50 transition-all duration-300",
-        scrolled
-          ? "bg-[#0A1A0C]/95 backdrop-blur-md border-b border-[#4AE54A]/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
-          : "bg-transparent border-b border-transparent",
+        "fixed top-0 left-0 right-0 z-50 bg-[#0A1A0C] border-b border-[#4AE54A]/10 transition-all duration-300",
+        scrolled ? "bg-[#0A1A0C]/95 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : "",
       ].join(" ")}
     >
-      <Container className="flex h-16 items-center justify-between relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
           <Image
@@ -60,7 +53,7 @@ export function SiteHeader() {
             alt="MotorGestor"
             width={240}
             height={48}
-            className="h-12 w-auto"
+            className="h-10 w-auto"
             priority
             unoptimized
           />
@@ -150,7 +143,7 @@ export function SiteHeader() {
             </div>
           </SheetContent>
         </Sheet>
-      </Container>
+      </div>
     </header>
   );
 }
