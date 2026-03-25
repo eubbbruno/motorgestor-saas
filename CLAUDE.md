@@ -111,3 +111,12 @@ Foreign key constraints live in `rls.sql`, not `schema.sql`.
 ## Path Aliases
 
 `@/*` maps to the project root. Use `@/components`, `@/features`, `@/lib`, etc.
+
+## Regra obrigatória — Git
+
+Após QUALQUER alteração de arquivo, sempre executar obrigatoriamente:
+1. `git add .`
+2. `git commit -m "descrição do que foi feito"`
+3. `git push origin main`
+
+Nunca finalizar uma tarefa sem fazer o push. O Vercel está vinculado ao GitHub e só atualiza após o push. Isso inclui alterações de imagens, arquivos estáticos em /public, e qualquer outro arquivo.
