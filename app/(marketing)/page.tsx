@@ -69,24 +69,24 @@ const features4 = [
   },
   {
     icon: UsersIcon,
-    iconColor: "#60A5FA",
-    iconBg: "rgba(96,165,250,0.12)",
+    iconColor: "#4AE54A",
+    iconBg: "rgba(74,229,74,0.12)",
     title: "Controle de Leads",
     description:
       "Pipeline Kanban visual, histórico de atendimento, WhatsApp integrado e importação via CSV.",
   },
   {
     icon: BarChart3Icon,
-    iconColor: "#A78BFA",
-    iconBg: "rgba(167,139,250,0.12)",
+    iconColor: "#4AE54A",
+    iconBg: "rgba(74,229,74,0.12)",
     title: "Relatórios e Métricas",
     description:
       "Dashboard com KPIs em tempo real: leads, negociações, conversão e valor fechado.",
   },
   {
     icon: CalendarIcon,
-    iconColor: "#FB923C",
-    iconBg: "rgba(251,146,60,0.12)",
+    iconColor: "#4AE54A",
+    iconBg: "rgba(74,229,74,0.12)",
     title: "Agenda de Eventos",
     description:
       "Calendário de follow-ups, tarefas com prazos e notificações para não perder nenhum timing.",
@@ -123,19 +123,19 @@ const highlights = [
   },
   {
     icon: ShieldIcon,
-    color: "#60A5FA",
+    color: "#4AE54A",
     title: "Dados seguros",
     description: "Isolamento por empresa, RLS no banco e backup automático.",
   },
   {
     icon: TrendingUpIcon,
-    color: "#A78BFA",
+    color: "#4AE54A",
     title: "Escalável",
     description: "Do vendedor solo à equipe de 10 pessoas sem mudar de sistema.",
   },
   {
     icon: MessageCircleIcon,
-    color: "#FB923C",
+    color: "#4AE54A",
     title: "Suporte ativo",
     description:
       "Equipe brasileira, rápida e que conhece o mercado de revendas.",
@@ -483,16 +483,19 @@ export default function HomePage() {
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}
       <section
         id="como-funciona"
-        className="bg-white py-20 sm:py-28 scroll-mt-16"
+        className="bg-[#0D1F1A] py-20 sm:py-28 scroll-mt-16 relative overflow-hidden"
       >
-        <Container className="max-w-6xl">
+        <DotPattern />
+        <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: app window + person photo */}
             <FadeUp>
               <div className="space-y-4">
-                <div className="relative rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/20">
-                  <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-[#4AE54A]/10 to-transparent blur-xl pointer-events-none" />
-                  <DashboardMockup />
+                <div className="relative rounded-2xl overflow-hidden border border-[#4AE54A]/30 shadow-[0_0_40px_rgba(74,229,74,0.1)]">
+                  <div className="rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/20">
+                    <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-[#4AE54A]/10 to-transparent blur-xl pointer-events-none" />
+                    <DashboardMockup />
+                  </div>
                 </div>
                 <div className="relative h-40 rounded-2xl overflow-hidden shadow-lg">
                   <Image
@@ -516,10 +519,10 @@ export default function HomePage() {
                 <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-5">
                   Passo a Passo
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
                   Como o MotorGestor funciona
                 </h2>
-                <p className="text-gray-500 mb-10 text-lg">
+                <p className="text-[#6B9E6B] mb-10 text-lg">
                   Setup simples, rotina clara. Você organiza estoque e
                   atendimento no mesmo dia.
                 </p>
@@ -529,14 +532,14 @@ export default function HomePage() {
                 {steps.map((step, i) => (
                   <FadeUp key={step.number} delay={i * 0.1}>
                     <div className="flex gap-5">
-                      <div className="shrink-0 size-12 rounded-2xl bg-[#0D1F1A] text-[#4AE54A] flex items-center justify-center font-bold text-sm border border-[rgba(74,229,74,0.2)]">
+                      <div className="shrink-0 size-12 rounded-2xl bg-[#4AE54A] text-black flex items-center justify-center font-bold text-sm">
                         {step.number}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-1.5">
+                        <h3 className="font-semibold text-white mb-1.5">
                           {step.title}
                         </h3>
-                        <p className="text-gray-500 text-sm leading-relaxed">
+                        <p className="text-[#6B9E6B] text-sm leading-relaxed">
                           {step.description}
                         </p>
                       </div>
@@ -562,37 +565,29 @@ export default function HomePage() {
       </section>
 
       {/* ══ 4. FEATURES GRID (2×2) ════════════════════════════════════════════ */}
-      <section className="bg-gray-50 py-20 sm:py-28">
-        <Container className="max-w-6xl">
+      <section className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
+        <Container className="relative max-w-6xl">
           <FadeUp className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               Funcionalidades
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Tudo que sua revenda precisa
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            <p className="text-[#6B9E6B] max-w-xl mx-auto text-lg">
               Uma stack completa de vendas, do estoque ao fechamento, em um só
               lugar.
             </p>
           </FadeUp>
 
           <FadeUp className="mb-8">
-            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden shadow-md">
-              <Image
-                src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&q=80"
-                alt="Equipe de vendas"
-                fill
-                sizes="(max-width: 768px) 100vw, 90vw"
-                className="object-cover"
-                loading="lazy"
-                placeholder="blur"
-                blurDataURL={BLUR_PLACEHOLDER}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1F1A]/50 to-transparent" />
+            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden border border-[#4AE54A]/20 bg-gradient-to-r from-[#0D1F1A] via-[#122E1A] to-[#0D1F1A]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_20%_50%,rgba(74,229,74,0.12),transparent)]" />
               <div className="absolute inset-0 flex items-center px-8">
                 <p className="text-white font-bold text-xl sm:text-2xl max-w-xs leading-snug">
-                  Uma equipe mais rápida, uma revenda mais lucrativa.
+                  Uma equipe mais rápida,{" "}
+                  <span className="text-[#4AE54A]">uma revenda mais lucrativa.</span>
                 </p>
               </div>
             </div>
@@ -601,17 +596,17 @@ export default function HomePage() {
           <StaggerSection className="grid sm:grid-cols-2 gap-5">
             {features4.map((f) => (
               <StaggerItem key={f.title}>
-                <div className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-xl hover:border-[rgba(74,229,74,0.2)] hover:-translate-y-1 transition-all duration-300 group h-full">
+                <div className="bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-6 hover:border-[#4AE54A]/30 hover:-translate-y-1 transition-all duration-300 h-full">
                   <div
                     className="size-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: f.iconBg }}
                   >
                     <f.icon className="size-6" style={{ color: f.iconColor }} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     {f.title}
                   </h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">
+                  <p className="text-[#6B9E6B] text-sm leading-relaxed">
                     {f.description}
                   </p>
                 </div>
@@ -622,16 +617,18 @@ export default function HomePage() {
       </section>
 
       {/* ══ 5. APP EM DESTAQUE ════════════════════════════════════════════════ */}
-      <section className="bg-white py-20 sm:py-28">
-        <Container className="max-w-6xl">
+      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
+        <GreenBlob className="top-0 left-0" />
+        <Container className="relative max-w-6xl">
           <FadeUp className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               O Produto
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Dashboard completo para vender mais
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
+            <p className="text-[#6B9E6B] max-w-xl mx-auto">
               Métricas, pipeline e estoque num lugar só. Sem precisar de
               planilha.
             </p>
@@ -639,26 +636,28 @@ export default function HomePage() {
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <FadeUp>
-              <div className="rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 size-48 rounded-full bg-[#4AE54A]/6 blur-3xl pointer-events-none" />
-                <DashboardMockup />
+              <div className="relative rounded-2xl overflow-hidden border border-[#4AE54A]/30 shadow-[0_0_40px_rgba(74,229,74,0.1)]">
+                <div className="rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 size-48 rounded-full bg-[#4AE54A]/6 blur-3xl pointer-events-none" />
+                  <DashboardMockup />
+                </div>
               </div>
             </FadeUp>
 
             <div className="grid grid-cols-2 gap-4">
               {highlights.map((h, i) => (
                 <FadeUp key={h.title} delay={i * 0.08}>
-                  <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
+                  <div className="bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-5">
                     <div
                       className="size-10 rounded-xl flex items-center justify-center mb-4"
-                      style={{ backgroundColor: h.color + "1a" }}
+                      style={{ backgroundColor: "rgba(74,229,74,0.12)" }}
                     >
-                      <h.icon className="size-5" style={{ color: h.color }} />
+                      <h.icon className="size-5 text-[#4AE54A]" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm mb-1.5">
+                    <h3 className="font-semibold text-white text-sm mb-1.5">
                       {h.title}
                     </h3>
-                    <p className="text-gray-500 text-xs leading-relaxed">
+                    <p className="text-[#6B9E6B] text-xs leading-relaxed">
                       {h.description}
                     </p>
                   </div>
@@ -777,36 +776,37 @@ export default function HomePage() {
       </section>
 
       {/* ══ 7. COMPARATIVO ════════════════════════════════════════════════════ */}
-      <section className="bg-white py-20 sm:py-28">
-        <Container className="max-w-5xl">
+      <section className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
+        <Container className="relative max-w-5xl">
           <FadeUp className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               Por que escolher
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               MotorGestor vs. alternativas
             </h2>
-            <p className="text-gray-500 max-w-lg mx-auto">
+            <p className="text-[#6B9E6B] max-w-lg mx-auto">
               Feito especificamente para revendas brasileiras — não é um CRM
               genérico adaptado.
             </p>
           </FadeUp>
 
           <FadeUp>
-            <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
+            <div className="overflow-x-auto rounded-2xl border border-[#4AE54A]/20 bg-[#0F2014]">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left py-4 px-6 font-semibold text-gray-900">
+                  <tr className="bg-[#4AE54A] border-b border-[#4AE54A]/20">
+                    <th className="text-left py-4 px-6 font-semibold text-black">
                       Funcionalidade
                     </th>
-                    <th className="text-center py-4 px-5 font-semibold text-[#22C55E]">
+                    <th className="text-center py-4 px-5 font-semibold text-black">
                       MotorGestor
                     </th>
-                    <th className="text-center py-4 px-5 font-semibold text-gray-400">
+                    <th className="text-center py-4 px-5 font-semibold text-black/60">
                       Planilha
                     </th>
-                    <th className="text-center py-4 px-5 font-semibold text-gray-400">
+                    <th className="text-center py-4 px-5 font-semibold text-black/60">
                       Outros CRMs
                     </th>
                   </tr>
@@ -815,26 +815,26 @@ export default function HomePage() {
                   {benefits.map((row, i) => (
                     <tr
                       key={row.feature}
-                      className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}
+                      className={i % 2 === 0 ? "bg-[#0F2014]" : "bg-[#0D1F1A]"}
                     >
-                      <td className="py-3.5 px-6 text-gray-700">
+                      <td className="py-3.5 px-6 text-white">
                         {row.feature}
                       </td>
                       <td className="py-3.5 px-5 text-center">
-                        <CheckIcon className="size-5 text-[#22C55E] mx-auto" />
+                        <CheckIcon className="size-5 text-[#4AE54A] mx-auto" />
                       </td>
                       <td className="py-3.5 px-5 text-center">
                         {row.planilha ? (
-                          <CheckIcon className="size-5 text-gray-300 mx-auto" />
+                          <CheckIcon className="size-5 text-[#6B9E6B] mx-auto" />
                         ) : (
-                          <span className="text-gray-200 text-lg">—</span>
+                          <span className="text-red-400 text-lg font-bold">✗</span>
                         )}
                       </td>
                       <td className="py-3.5 px-5 text-center">
                         {row.outros ? (
-                          <CheckIcon className="size-5 text-gray-300 mx-auto" />
+                          <CheckIcon className="size-5 text-[#6B9E6B] mx-auto" />
                         ) : (
-                          <span className="text-gray-200 text-lg">—</span>
+                          <span className="text-red-400 text-lg font-bold">✗</span>
                         )}
                       </td>
                     </tr>
@@ -948,16 +948,17 @@ export default function HomePage() {
       </section>
 
       {/* ══ 9. FAQ ════════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-20 sm:py-28">
-        <Container className="max-w-3xl">
+      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
+        <DotPattern />
+        <Container className="relative max-w-3xl">
           <FadeUp className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               FAQ
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Perguntas frequentes
             </h2>
-            <p className="text-gray-500">Dúvidas comuns sobre o MotorGestor.</p>
+            <p className="text-[#6B9E6B]">Dúvidas comuns sobre o MotorGestor.</p>
           </FadeUp>
 
           <FaqSection faqs={faqs} />

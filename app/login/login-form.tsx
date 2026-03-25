@@ -127,14 +127,8 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
         <div className="pointer-events-none absolute bottom-0 right-0 size-96 bg-[radial-gradient(circle,rgba(74,229,74,0.06),transparent_70%)]" />
 
         {/* Logo */}
-        <div className="relative flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-[#4AE54A] flex items-center justify-center">
-            <CarIcon className="size-5 text-[#0D1F1A]" />
-          </div>
-          <div>
-            <div className="font-bold text-white text-lg tracking-tight">MotorGestor</div>
-            <div className="text-xs text-[#6B9E6B]">Gestão inteligente de revendas</div>
-          </div>
+        <div className="relative">
+          <img src="/images/logo-motorgestor.png" alt="MotorGestor" className="h-12 w-auto" />
         </div>
 
         {/* Center content */}
@@ -181,11 +175,8 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
       <div className="flex flex-1 items-center justify-center bg-[#111F16] px-6 py-12 lg:px-12">
         <div className="w-full max-w-[400px] space-y-6">
           {/* Mobile logo */}
-          <div className="flex lg:hidden items-center justify-center gap-2.5 mb-2">
-            <div className="size-8 rounded-xl bg-[#4AE54A] flex items-center justify-center">
-              <CarIcon className="size-4 text-[#0D1F1A]" />
-            </div>
-            <span className="font-bold text-white text-base">MotorGestor</span>
+          <div className="flex lg:hidden items-center justify-center mb-2">
+            <img src="/images/logo-motorgestor.png" alt="MotorGestor" className="h-12 w-auto" />
           </div>
 
           {/* Heading */}
