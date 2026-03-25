@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/site/container";
@@ -67,14 +66,7 @@ export function SiteFooter() {
           {/* Brand col */}
           <div className="space-y-5 lg:col-span-1">
             <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
-              <Image
-                src="/images/logo-motorgestor-new.svg"
-                alt="MotorGestor"
-                width={180}
-                height={60}
-                className="h-12 w-auto"
-                unoptimized
-              />
+              <img src="/images/logo-motorgestor.png" alt="MotorGestor" className="h-12 w-auto" />
             </Link>
 
             <p className="text-sm text-[#9CA3AF] leading-relaxed">

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRightIcon, MenuIcon } from "lucide-react";
@@ -48,15 +47,7 @@ export function SiteHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
-          <Image
-            src="/images/logo-motorgestor-new.svg"
-            alt="MotorGestor"
-            width={240}
-            height={80}
-            className="h-14 w-auto"
-            priority
-            unoptimized
-          />
+          <img src="/images/logo-motorgestor.png" alt="MotorGestor" className="h-14 w-auto" />
         </Link>
 
         {/* Desktop nav — centered */}
@@ -100,14 +91,7 @@ export function SiteHeader() {
           >
             {/* Logo */}
             <div className="p-5 border-b border-[rgba(74,229,74,0.08)]">
-              <Image
-                src="/images/logo-motorgestor-new.svg"
-                alt="MotorGestor"
-                width={180}
-                height={36}
-                className="h-12 w-auto"
-                unoptimized
-              />
+              <img src="/images/logo-motorgestor.png" alt="MotorGestor" className="h-12 w-auto" />
             </div>
 
             {/* Nav links */}
