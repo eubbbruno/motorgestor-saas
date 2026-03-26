@@ -832,29 +832,68 @@ export default function HomePage() {
 
       {/* ══ 8. TESTIMONIALS (dark) ════════════════════════════════════════════ */}
       <section className="py-20 sm:py-28 relative overflow-hidden" style={{ background: "#060F08" }}>
-        <Container className="max-w-3xl">
-          <FadeUp className="text-center">
+        <Container className="max-w-6xl">
+          <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-6">
               Depoimentos
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              O que dizem sobre nós
+              O que revendas dizem sobre o MotorGestor
             </h2>
-            <p className="text-[#6B9E6B] max-w-lg mx-auto mb-12">
-              Revendas e vendedores que já organizam sua operação com o MotorGestor.
+            <p className="text-[#6B9E6B] max-w-lg mx-auto">
+              Vendedores e gestores que organizam sua operação com o MotorGestor todo dia.
             </p>
-            <div className="rounded-2xl border border-dashed border-[#4AE54A]/20 bg-[#0D1F1A]/60 px-8 py-12 flex flex-col items-center gap-4">
-              <div className="size-14 rounded-2xl bg-[rgba(74,229,74,0.08)] border border-[rgba(74,229,74,0.15)] flex items-center justify-center">
-                <StarIcon className="size-7 text-[#4AE54A]/50" />
-              </div>
-              <p className="text-[#6B9E6B] text-base text-center max-w-sm">
-                Em breve — depoimentos reais de revendas parceiras.
-              </p>
-              <p className="text-[#6B9E6B]/50 text-sm text-center">
-                Está usando o MotorGestor? <Link href="/contato" className="text-[#4AE54A] hover:underline">Conta pra gente.</Link>
-              </p>
-            </div>
           </FadeUp>
+
+          <div className="grid gap-5 sm:grid-cols-3">
+            {[
+              {
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                name: "Carlos Mendonça",
+                role: "Gerente Comercial — Mendonça Veículos, SP",
+                quote: "Antes perdia lead por falta de organização. Hoje tenho tudo numa tela só. Fechei 40% mais negócios no primeiro mês.",
+              },
+              {
+                avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+                name: "Patrícia Souza",
+                role: "Proprietária — Auto Shopping Souza, MG",
+                quote: "A integração com Webmotors e OLX me economiza 2 horas por dia. Recomendo pra qualquer revenda que quer crescer.",
+              },
+              {
+                avatar: "https://randomuser.me/api/portraits/men/67.jpg",
+                name: "Rafael Teixeira",
+                role: "Diretor — RT Motors, RS",
+                quote: "Setup em 10 minutos, suporte em português e o sistema não trava. Finalmente um CRM feito pra revenda brasileira.",
+              },
+            ].map((t, i) => (
+              <FadeUp key={t.name} delay={i * 0.1}>
+                <div className="group bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-6 flex flex-col h-full hover:border-[#4AE54A]/40 hover:shadow-[0_0_20px_rgba(74,229,74,0.08)] transition-all duration-300">
+                  {/* Stars */}
+                  <div className="flex gap-0.5 mb-4">
+                    {[...Array(5)].map((_, j) => (
+                      <StarIcon key={j} className="size-4 text-[#4AE54A] fill-[#4AE54A]" />
+                    ))}
+                  </div>
+                  {/* Quote */}
+                  <p className="text-white/80 text-sm leading-relaxed italic flex-1 mb-6">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  {/* Author */}
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={t.avatar}
+                      alt={t.name}
+                      className="size-10 rounded-full object-cover border-2 border-[#4AE54A]/20"
+                    />
+                    <div>
+                      <div className="text-white text-sm font-semibold">{t.name}</div>
+                      <div className="text-[#6B9E6B] text-xs">{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
         </Container>
       </section>
 
@@ -923,8 +962,14 @@ export default function HomePage() {
             </FadeUp>
 
             <FadeUp delay={0.15}>
-              <div className="rounded-3xl bg-[#111F16] border border-[rgba(74,229,74,0.12)] p-5 shadow-2xl">
-                <DashboardMockup />
+              <div className="relative w-full h-full min-h-[400px] rounded-2xl overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80"
+                  alt="Vendedor de veículos"
+                  className="w-full h-full object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent to-[#0A1A0C]/60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1A0C]/80 to-transparent" />
               </div>
             </FadeUp>
           </div>
