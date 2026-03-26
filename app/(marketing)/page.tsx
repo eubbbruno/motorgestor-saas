@@ -23,7 +23,6 @@ import Image from "next/image";
 import { HeroBackground } from "@/components/site/hero-background";
 import { StaggerSection, StaggerItem } from "@/components/site/stagger-section";
 import { HeroTextMotion } from "@/components/site/hero-parallax-text";
-import { PartnerLogos } from "@/components/site/partner-logos";
 
 const BLUR_PLACEHOLDER =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
@@ -399,11 +398,30 @@ export default function HomePage() {
       <SectionDivider />
 
       {/* ══ 2. PARCEIROS / LOGOS ══════════════════════════════════════════════ */}
-      <section className="bg-[#0A1A0C] border-y border-[#4AE54A]/10 py-10">
-        <p className="text-center text-xs font-semibold tracking-widest text-[#6B9E6B] uppercase mb-8 px-6">
-          Integrado com as ferramentas que você já usa
-        </p>
-        <PartnerLogos />
+      <section className="bg-white py-16 border-y border-gray-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50" />
+        <div className="relative max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-10">
+            Integrado com as ferramentas que você já usa
+          </p>
+          <div className="relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+            <div className="flex animate-marquee gap-16 w-max items-center">
+              <img src="/images/logos/whatsapp.png" alt="WhatsApp" className="h-8 w-auto object-contain rounded-lg bg-white p-1" />
+              <img src="/images/logos/olx.png" alt="OLX" className="h-8 w-auto object-contain" />
+              <img src="/images/logos/webmotors.png" alt="Webmotors" className="h-7 w-auto object-contain" />
+              <img src="/images/logos/icarros.svg" alt="iCarros" className="h-7 w-auto object-contain" />
+              <img src="/images/logos/fipe.jpg" alt="FIPE" className="h-8 w-auto object-contain" />
+              {/* Duplicado para loop seamless */}
+              <img src="/images/logos/whatsapp.png" alt="WhatsApp" className="h-8 w-auto object-contain rounded-lg bg-white p-1" />
+              <img src="/images/logos/olx.png" alt="OLX" className="h-8 w-auto object-contain" />
+              <img src="/images/logos/webmotors.png" alt="Webmotors" className="h-7 w-auto object-contain" />
+              <img src="/images/logos/icarros.svg" alt="iCarros" className="h-7 w-auto object-contain" />
+              <img src="/images/logos/fipe.jpg" alt="FIPE" className="h-8 w-auto object-contain" />
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}

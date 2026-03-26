@@ -24,7 +24,12 @@
       "Bash(pnpm add:*)",
       "Bash(pnpm list:*)",
       "Bash(find \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\\\(app\\)\\\\app\" -maxdepth 1 -type d)",
-      "Bash(ls -la \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\\\(app\\)\\\\app\")"
+      "Bash(ls -la \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\\\(app\\)\\\\app\")",
+      "Bash(cp \"Digital_Inline_Green_RGB_2026.png\" whatsapp.png)",
+      "Bash(cp \"logo_oficial_2025.jpg\" fipe.jpg)",
+      "Bash(cp \"olx-logo-png_seeklogo-270798.png\" olx.png)",
+      "Bash(cp \"webmotors-logo-8.png\" webmotors.png)",
+      "Bash(cp \"novo-logo-icarros.svg\" icarros.svg)"
     ]
   }
 }
