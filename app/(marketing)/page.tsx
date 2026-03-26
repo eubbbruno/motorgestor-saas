@@ -399,17 +399,11 @@ export default function HomePage() {
       <SectionDivider />
 
       {/* ══ 2. PARCEIROS / LOGOS ══════════════════════════════════════════════ */}
-      <section className="bg-white border-y border-gray-100 py-12">
-        <div className="max-w-5xl mx-auto px-6">
-          <FadeUp>
-            <p className="text-center text-xs font-semibold tracking-widest text-gray-400 uppercase mb-8">
-              Integrado com as ferramentas que você já usa
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
-              <PartnerLogos />
-            </div>
-          </FadeUp>
-        </div>
+      <section className="bg-[#0A1A0C] border-y border-[#4AE54A]/10 py-10">
+        <p className="text-center text-xs font-semibold tracking-widest text-[#6B9E6B] uppercase mb-8 px-6">
+          Integrado com as ferramentas que você já usa
+        </p>
+        <PartnerLogos />
       </section>
 
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}

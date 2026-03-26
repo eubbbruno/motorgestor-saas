@@ -12,13 +12,13 @@ const partners = [
   {
     name: "OLX",
     src: "/images/logos/olx-logo-png_seeklogo-270798.png",
-    h: "h-7",
+    h: "h-6",
     fallbackColor: "text-[#E8392A]",
   },
   {
     name: "Webmotors",
     src: "/images/logos/webmotors-logo-8.png",
-    h: "h-7",
+    h: "h-6",
     fallbackColor: "text-[#E8392A]",
   },
   {
@@ -31,7 +31,7 @@ const partners = [
     name: "FIPE",
     src: "/images/logos/logo_oficial_2025.jpg",
     h: "h-7",
-    fallbackColor: "text-gray-500",
+    fallbackColor: "text-gray-400",
   },
 ];
 
@@ -50,28 +50,41 @@ function PartnerLogo({
 
   if (failed) {
     return (
-      <span className={`font-goldman text-xl select-none ${fallbackColor}`}>
+      <span
+        className={`font-goldman text-xl select-none opacity-50 hover:opacity-100 transition-opacity ${fallbackColor}`}
+      >
         {name}
       </span>
     );
   }
 
   return (
-    <img
-      src={src}
-      alt={name}
-      className={`${h} w-auto opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0`}
-      onError={() => setFailed(true)}
-    />
+    <div className="group relative flex items-center justify-center px-2">
+      {/* hover glow */}
+      <div className="absolute inset-0 rounded-lg bg-[#4AE54A]/0 group-hover:bg-[#4AE54A]/6 blur-md transition-all duration-300 pointer-events-none" />
+      <img
+        src={src}
+        alt={name}
+        className={`relative ${h} w-auto opacity-50 brightness-200 hover:opacity-100 transition-all duration-300`}
+        onError={() => setFailed(true)}
+      />
+    </div>
   );
 }
 
 export function PartnerLogos() {
   return (
-    <>
-      {partners.map((p) => (
-        <PartnerLogo key={p.name} {...p} />
-      ))}
-    </>
+    <div className="overflow-hidden w-full">
+      <div className="flex animate-marquee gap-16 w-max">
+        {/* First set */}
+        {partners.map((p) => (
+          <PartnerLogo key={`a-${p.name}`} {...p} />
+        ))}
+        {/* Duplicate for seamless loop */}
+        {partners.map((p) => (
+          <PartnerLogo key={`b-${p.name}`} {...p} />
+        ))}
+      </div>
+    </div>
   );
 }
