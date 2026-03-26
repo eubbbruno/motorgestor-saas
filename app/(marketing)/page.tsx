@@ -23,6 +23,7 @@ import Image from "next/image";
 import { HeroBackground } from "@/components/site/hero-background";
 import { StaggerSection, StaggerItem } from "@/components/site/stagger-section";
 import { HeroTextMotion } from "@/components/site/hero-parallax-text";
+import { PartnerLogos } from "@/components/site/partner-logos";
 
 const BLUR_PLACEHOLDER =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
@@ -398,26 +399,17 @@ export default function HomePage() {
       <SectionDivider />
 
       {/* ══ 2. PARCEIROS / LOGOS ══════════════════════════════════════════════ */}
-      <section className="bg-white border-y border-gray-100 py-10">
-        <Container>
+      <section className="bg-white border-y border-gray-100 py-12">
+        <div className="max-w-5xl mx-auto px-6">
           <FadeUp>
-            <p className="text-center text-xs font-semibold uppercase tracking-widest text-gray-400 mb-7">
+            <p className="text-center text-xs font-semibold tracking-widest text-gray-400 uppercase mb-8">
               Integrado com as ferramentas que você já usa
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
-              {["WhatsApp", "OLX", "Webmotors", "iCarros", "FIPE"].map(
-                (brand) => (
-                  <span
-                    key={brand}
-                    className="text-base font-bold text-gray-300 tracking-tight select-none"
-                  >
-                    {brand}
-                  </span>
-                )
-              )}
+            <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
+              <PartnerLogos />
             </div>
           </FadeUp>
-        </Container>
+        </div>
       </section>
 
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}
