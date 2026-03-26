@@ -1,163 +1,183 @@
 import Link from "next/link";
-import { CheckIcon, CrownIcon, SparklesIcon } from "lucide-react";
+import { CheckIcon, ArrowRightIcon, MessageCircleIcon } from "lucide-react";
 
 import { Container } from "@/components/site/container";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { FadeUp } from "@/components/site/fade-up";
 
 const plans = [
   {
     name: "Free",
     price: "R$ 0",
+    period: "para sempre",
     description: "Para organizar o básico e rodar o primeiro funil.",
-    limits: {
-      vehicles: "5 veículos",
-      leads: "20 leads",
-      ai: "Não",
-      pipeline: "Sim",
-      metrics: "Sim",
-    },
+    features: [
+      "Até 5 veículos no estoque",
+      "Até 20 leads ativos",
+      "Pipeline Kanban visual",
+      "Dashboard de métricas",
+      "Agenda de follow-ups",
+    ],
     cta: "Começar grátis",
     href: "/cadastro",
-    variant: "outline" as const,
+    highlight: false,
   },
   {
     name: "Pro",
-    price: "R$ 99/mês",
+    price: "R$ 99",
+    period: "/mês",
     description: "Para operar todo dia com escala, padrão e IA.",
-    limits: {
-      vehicles: "1000 veículos",
-      leads: "1000 leads",
-      ai: "Sim",
-      pipeline: "Sim",
-      metrics: "Sim",
-    },
+    features: [
+      "Até 1.000 veículos no estoque",
+      "Leads ilimitados",
+      "FIPE integrada",
+      "WhatsApp + histórico completo",
+      "Gerador de anúncios (OLX, Webmotors)",
+      "Importação CSV de leads",
+      "Proposta em PDF",
+      "IA para descrições e mensagens",
+    ],
     cta: "Assinar Pro",
     href: "/cadastro",
-    variant: "default" as const,
+    highlight: true,
   },
 ];
 
-const rows = [
-  { label: "Veículos", key: "vehicles" as const },
-  { label: "Leads", key: "leads" as const },
-  { label: "IA (mensagens/descrições)", key: "ai" as const },
-  { label: "Pipeline visual", key: "pipeline" as const },
-  { label: "Métricas em tempo real", key: "metrics" as const },
+const comparison = [
+  { label: "Veículos no estoque", free: "5", pro: "1.000" },
+  { label: "Leads ativos", free: "20", pro: "Ilimitados" },
+  { label: "Pipeline Kanban", free: "✓", pro: "✓" },
+  { label: "Métricas em tempo real", free: "✓", pro: "✓" },
+  { label: "FIPE integrada", free: "—", pro: "✓" },
+  { label: "WhatsApp + histórico", free: "—", pro: "✓" },
+  { label: "Gerador de anúncios", free: "—", pro: "✓" },
+  { label: "Proposta em PDF", free: "—", pro: "✓" },
+  { label: "IA (mensagens/descrições)", free: "—", pro: "✓" },
 ];
 
 export default function PlanosPage() {
   return (
-    <div className="bg-background">
-      <section className="py-16 sm:py-20">
-        <Container className="max-w-7xl">
-          <div className="mx-auto max-w-2xl space-y-3 text-center">
-            <Badge variant="secondary" className="border bg-background">
+    <div className="bg-[#0D1F1A] min-h-screen">
+      {/* Hero */}
+      <section className="pt-28 pb-16 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(74,229,74,0.10),transparent)]" />
+        <Container className="relative max-w-3xl text-center">
+          <FadeUp>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-6">
               Planos
-            </Badge>
-            <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              Escolha um plano que acompanha sua operação.
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+              Escolha um plano que{" "}
+              <span className="text-[#4AE54A]">acompanha sua operação</span>
             </h1>
-            <p className="text-pretty text-muted-foreground">
-              Comece no Free e faça upgrade quando quiser. Estrutura pronta para cobrança futura.
+            <p className="text-[#6B9E6B] text-lg">
+              Comece no Free sem cartão. Faça upgrade quando precisar de mais.
             </p>
-          </div>
+          </FadeUp>
+        </Container>
+      </section>
 
-          <div className="mt-10 grid gap-4 lg:grid-cols-2">
+      {/* Plan cards */}
+      <section className="pb-16 bg-[#0A1A0C]">
+        <Container className="max-w-4xl">
+          <div className="grid gap-5 lg:grid-cols-2">
             {plans.map((p) => (
-              <Card
-                key={p.name}
-                className="rounded-xl border bg-background/60 p-7 shadow-sm backdrop-blur"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div className="text-lg font-semibold">{p.name}</div>
-                      {p.name === "Pro" ? (
-                        <Badge className="bg-foreground/10 text-foreground hover:bg-foreground/10">
-                          <CrownIcon className="mr-1 size-3" /> Recomendado
-                        </Badge>
-                      ) : null}
+              <FadeUp key={p.name}>
+                <div className={`relative rounded-2xl p-8 border h-full flex flex-col ${
+                  p.highlight
+                    ? "bg-[#0F2014] border-[#4AE54A]/40 shadow-[0_0_40px_rgba(74,229,74,0.12)]"
+                    : "bg-[#0F2014] border-[#4AE54A]/15"
+                }`}>
+                  {p.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="px-4 py-1 rounded-full text-xs font-bold bg-[#4AE54A] text-[#0D1F1A]">
+                        Recomendado
+                      </span>
                     </div>
-                    <div className="text-3xl font-semibold tracking-tight">{p.price}</div>
-                    <p className="text-sm text-muted-foreground">{p.description}</p>
+                  )}
+                  <div className="mb-6">
+                    <div className="text-xs font-bold text-[#4AE54A] uppercase tracking-widest mb-2">
+                      {p.name}
+                    </div>
+                    <div className="flex items-end gap-1 mb-1">
+                      <span className="text-4xl font-bold text-white">{p.price}</span>
+                      <span className="text-[#6B9E6B] text-sm pb-1">{p.period}</span>
+                    </div>
+                    <p className="text-[#6B9E6B] text-sm">{p.description}</p>
                   </div>
-                  <div className="rounded-xl border bg-background p-2">
-                    <SparklesIcon className="size-4 text-muted-foreground" />
-                  </div>
-                </div>
 
-                <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="mt-0.5 size-4 text-emerald-500" />
-                    <span>{p.limits.pipeline} pipeline visual</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="mt-0.5 size-4 text-emerald-500" />
-                    <span>{p.limits.metrics} métricas em tempo real</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="mt-0.5 size-4 text-emerald-500" />
-                    <span>{p.limits.vehicles}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="mt-0.5 size-4 text-emerald-500" />
-                    <span>{p.limits.leads}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="mt-0.5 size-4 text-emerald-500" />
-                    <span>IA: {p.limits.ai}</span>
-                  </li>
-                </ul>
+                  <ul className="space-y-2.5 flex-1 mb-8">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5">
+                        <div className="size-5 rounded-full bg-[rgba(74,229,74,0.15)] flex items-center justify-center shrink-0 mt-0.5">
+                          <CheckIcon className="size-3 text-[#4AE54A]" />
+                        </div>
+                        <span className="text-[#9CA3AF] text-sm">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-                <div className="mt-7">
-                  <Button asChild size="lg" variant={p.variant} className="w-full">
-                    <Link href={p.href}>
-                      {p.cta} {p.name === "Pro" ? <CrownIcon className="ml-2 size-4" /> : null}
-                    </Link>
-                  </Button>
-                  <p className="mt-3 text-center text-xs text-muted-foreground">
-                    Placeholder de billing • sem cobrança automática ainda
-                  </p>
+                  <Link
+                    href={p.href}
+                    className={`w-full flex items-center justify-center gap-2 h-11 rounded-xl font-bold text-sm transition-all ${
+                      p.highlight
+                        ? "bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] shadow-[0_0_20px_rgba(74,229,74,0.3)] hover:-translate-y-0.5"
+                        : "border border-[rgba(74,229,74,0.3)] text-white hover:bg-[rgba(74,229,74,0.06)]"
+                    }`}
+                  >
+                    {p.cta} {p.highlight && <ArrowRightIcon className="size-4" />}
+                  </Link>
+                  {!p.highlight && (
+                    <p className="text-center text-xs text-[#6B9E6B]/50 mt-3">
+                      Sem cartão de crédito
+                    </p>
+                  )}
                 </div>
-              </Card>
+              </FadeUp>
             ))}
           </div>
+        </Container>
+      </section>
 
-          <Card className="mt-10 overflow-hidden rounded-xl border bg-background/60 shadow-sm backdrop-blur">
-            <div className="grid gap-4 p-6 lg:grid-cols-3">
-              <div className="lg:col-span-1">
-                <div className="text-sm font-medium">Comparação rápida</div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Uma tabela simples para você decidir rápido.
-                </p>
-              </div>
-              <div className="lg:col-span-2">
-                <div className="grid grid-cols-3 gap-0 rounded-xl border bg-background">
-                  <div className="p-4 text-sm font-medium text-muted-foreground">Recurso</div>
-                  <div className="border-l p-4 text-sm font-medium">Free</div>
-                  <div className="border-l p-4 text-sm font-medium">Pro</div>
-                  {rows.map((r) => (
-                    <div key={r.key} className="contents">
-                      <div className="border-t p-4 text-sm text-muted-foreground">{r.label}</div>
-                      <div className="border-l border-t p-4 text-sm">{plans[0].limits[r.key]}</div>
-                      <div className="border-l border-t p-4 text-sm">{plans[1].limits[r.key]}</div>
-                    </div>
-                  ))}
-                </div>
+      {/* Comparison table */}
+      <section className="py-16 bg-[#0D1F1A]">
+        <Container className="max-w-3xl">
+          <FadeUp>
+            <h2 className="text-2xl font-bold text-white text-center mb-8">
+              Comparação rápida
+            </h2>
+            <div className="rounded-2xl border border-[#4AE54A]/15 overflow-hidden bg-[#0F2014]">
+              <div className="grid grid-cols-3">
+                <div className="p-4 text-xs font-bold text-[#6B9E6B] uppercase tracking-wider">Recurso</div>
+                <div className="border-l border-[#4AE54A]/10 p-4 text-xs font-bold text-white uppercase tracking-wider text-center">Free</div>
+                <div className="border-l border-[#4AE54A]/10 p-4 text-xs font-bold text-[#4AE54A] uppercase tracking-wider text-center">Pro</div>
+                {comparison.map((r, i) => (
+                  <>
+                    <div key={`l-${r.label}`} className={`p-4 text-sm text-[#9CA3AF] ${i % 2 === 0 ? "bg-[#0D1F1A]" : ""}`}>{r.label}</div>
+                    <div key={`f-${r.label}`} className={`border-l border-[#4AE54A]/10 p-4 text-sm text-center ${i % 2 === 0 ? "bg-[#0D1F1A]" : ""} ${r.free === "—" ? "text-[#6B9E6B]/40" : "text-white"}`}>{r.free}</div>
+                    <div key={`p-${r.label}`} className={`border-l border-[#4AE54A]/10 p-4 text-sm text-center ${i % 2 === 0 ? "bg-[#0D1F1A]" : ""} ${r.pro === "✓" ? "text-[#4AE54A]" : "text-white"}`}>{r.pro}</div>
+                  </>
+                ))}
               </div>
             </div>
-          </Card>
+          </FadeUp>
+        </Container>
+      </section>
 
-          <div className="mt-10 flex justify-center">
-            <Button asChild variant="outline">
-              <Link href="/contato">Falar com a equipe</Link>
-            </Button>
-          </div>
+      {/* Contact CTA */}
+      <section className="py-16 bg-[#0A1A0C]">
+        <Container className="max-w-2xl text-center">
+          <FadeUp>
+            <p className="text-[#6B9E6B] mb-4">Tem dúvidas sobre qual plano escolher?</p>
+            <Link
+              href="/contato"
+              className="inline-flex items-center gap-2 h-11 px-7 rounded-xl border border-[rgba(74,229,74,0.25)] text-white text-sm hover:bg-[rgba(74,229,74,0.06)] transition-colors"
+            >
+              <MessageCircleIcon className="size-4 text-[#4AE54A]" />
+              Falar com a equipe
+            </Link>
+          </FadeUp>
         </Container>
       </section>
     </div>
   );
 }
-

@@ -21,7 +21,6 @@ import { FadeUp } from "@/components/site/fade-up";
 import { FaqSection } from "@/components/site/faq-section";
 import Image from "next/image";
 import { HeroBackground } from "@/components/site/hero-background";
-import { AnimatedStats } from "@/components/site/animated-stats";
 import { StaggerSection, StaggerItem } from "@/components/site/stagger-section";
 import { HeroTextMotion } from "@/components/site/hero-parallax-text";
 
@@ -93,27 +92,6 @@ const features4 = [
   },
 ];
 
-const steps = [
-  {
-    number: "01",
-    title: "Cadastre seus veículos",
-    description:
-      "Importe pelo FIPE, adicione fotos e gere anúncios prontos em segundos. Estoque organizado desde o primeiro dia.",
-  },
-  {
-    number: "02",
-    title: "Gerencie seus leads",
-    description:
-      "Receba, organize e acompanhe cada cliente no pipeline. WhatsApp integrado com templates e histórico completo.",
-  },
-  {
-    number: "03",
-    title: "Feche mais vendas",
-    description:
-      "Agende follow-ups, envie propostas em PDF e acompanhe métricas reais de conversão no dashboard.",
-  },
-];
-
 const highlights = [
   {
     icon: ZapIcon,
@@ -151,30 +129,6 @@ const benefits = [
   { feature: "Gerador de anúncios", motorgestor: true, planilha: false, outros: false },
   { feature: "Proposta em PDF", motorgestor: true, planilha: false, outros: false },
   { feature: "Dashboard de métricas", motorgestor: true, planilha: false, outros: true },
-];
-
-const testimonials = [
-  {
-    quote:
-      "Em 2 semanas, a equipe parou de perder lead no histórico. O funil deixou tudo previsível.",
-    name: "Marina Almeida",
-    role: "Gestora",
-    company: "Revenda Compacta",
-  },
-  {
-    quote:
-      "A FIPE e o pipeline tiraram a bagunça do atendimento. Hoje sei exatamente quem responder agora.",
-    name: "Rafael Souza",
-    role: "Vendedor Autônomo",
-    company: "RS Veículos",
-  },
-  {
-    quote:
-      "As métricas do dashboard viraram rotina. É o tipo de visibilidade que antes só existia em planilha gigante.",
-    name: "Diego Pereira",
-    role: "Sócio",
-    company: "Loja de Seminovos",
-  },
 ];
 
 const faqs = [
@@ -363,24 +317,23 @@ export default function HomePage() {
           <FadeUp className="flex justify-center mb-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.35)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm text-[#4AE54A] font-semibold">
               <span className="size-1.5 rounded-full bg-[#4AE54A] animate-pulse" />
-              Usado por +50 mil usuários no Brasil
+              Grátis para começar · Sem cartão de crédito
             </div>
           </FadeUp>
 
           {/* Headline */}
           <FadeUp delay={0.08} className="text-center mb-5">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-              Solução Completa para
+              Sua concessionária no
               <br />
-              <span className="text-[#4AE54A]">Gestão de Concessionárias</span>
+              <span className="text-[#4AE54A]">controle total</span>
             </h1>
           </FadeUp>
 
           {/* Subtitle */}
           <FadeUp delay={0.14} className="text-center mb-9">
             <p className="text-[#9CA3AF] text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Pipeline, WhatsApp, FIPE e métricas em um só sistema. Responda
-              leads mais rápido e feche mais carros — sem planilhas.
+              Gerencie estoque, leads e vendas num só lugar. Sem planilha, sem achismo.
             </p>
           </FadeUp>
 
@@ -452,7 +405,7 @@ export default function HomePage() {
               Integrado com as ferramentas que você já usa
             </p>
             <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
-              {["WhatsApp", "Google", "Stripe", "OLX", "Webmotors", "FIPE"].map(
+              {["WhatsApp", "OLX", "Webmotors", "iCarros", "FIPE"].map(
                 (brand) => (
                   <span
                     key={brand}
@@ -467,98 +420,116 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* ══ 2b. STATS ════════════════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-14 relative overflow-hidden">
-        <DotPattern />
-        <GreenBlob className="top-0 right-0" />
-        <Container className="relative max-w-4xl">
-          <FadeUp>
-            <AnimatedStats />
-          </FadeUp>
-        </Container>
-      </section>
-
-      <SectionDivider />
-
       {/* ══ 3. COMO FUNCIONA ══════════════════════════════════════════════════ */}
       <section
         id="como-funciona"
         className="bg-[#0D1F1A] py-20 sm:py-28 scroll-mt-16 relative overflow-hidden"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(74,229,74,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(74,229,74,0.05) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
       >
-        <DotPattern />
         {/* Decorative circles */}
         <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full border border-[#4AE54A]/10 pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full border border-[#4AE54A]/15 pointer-events-none" />
-        <Container className="relative max-w-6xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left: app window + person photo */}
-            <FadeUp>
-              <div className="space-y-4">
-                <div className="relative rounded-2xl overflow-hidden border border-[#4AE54A]/30 shadow-[0_0_40px_rgba(74,229,74,0.1)]">
-                  <div className="rounded-3xl bg-[#0D1F1A] p-6 shadow-2xl shadow-black/20">
-                    <div className="absolute -inset-1 rounded-[1.75rem] bg-gradient-to-br from-[#4AE54A]/10 to-transparent blur-xl pointer-events-none" />
-                    <DashboardMockup />
-                  </div>
-                </div>
-                <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80"
-                    alt="Concessionária moderna"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D1F1A]/80 via-[#4AE54A]/10 to-transparent" />
-                </div>
-              </div>
-            </FadeUp>
+        <Container className="relative max-w-5xl">
+          <FadeUp className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-5">
+              Passo a passo
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+              Do cadastro ao fechamento em minutos
+            </h2>
+            <p className="text-[#6B9E6B] max-w-xl mx-auto text-lg">
+              Setup simples, rotina clara. Organize estoque e atendimento no mesmo dia.
+            </p>
+          </FadeUp>
 
-            {/* Right: steps */}
-            <div>
-              <FadeUp>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-5">
-                  Passo a Passo
+          {/* Steps grid */}
+          <div className="relative">
+            {/* Connecting dashed line — desktop only */}
+            <div className="hidden lg:block absolute top-[64px] left-[calc(16.67%+40px)] right-[calc(16.67%+40px)] h-px border-t border-dashed border-[#4AE54A]/25 z-0" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-6 relative z-10">
+              {/* Step 1 */}
+              <FadeUp delay={0.0}>
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="relative w-32 h-32">
+                    <div className="absolute inset-0 rounded-full bg-[#4AE54A]/10 animate-pulse" />
+                    <div className="absolute inset-4 rounded-full bg-[#4AE54A]/15" />
+                    <div className="relative z-10 w-full h-full flex items-center justify-center">
+                      <svg viewBox="0 0 80 80" className="w-20 h-20">
+                        <rect x="10" y="35" width="60" height="22" rx="8" fill="#4AE54A" opacity="0.9"/>
+                        <rect x="20" y="22" width="38" height="18" rx="6" fill="#4AE54A" opacity="0.7"/>
+                        <circle cx="22" cy="57" r="7" fill="#0D1F1A" stroke="#4AE54A" strokeWidth="2"/>
+                        <circle cx="58" cy="57" r="7" fill="#0D1F1A" stroke="#4AE54A" strokeWidth="2"/>
+                        <path d="M50 28 L56 22 M56 22 L62 28 M56 22 L56 14" stroke="#4AE54A" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="text-[#4AE54A] text-sm font-semibold">Passo 01</span>
+                  <h3 className="text-white font-goldman text-xl">Cadastre seu estoque</h3>
+                  <p className="text-[#6B9E6B] text-sm max-w-[200px]">Importe pelo FIPE ou adicione manualmente. Fotos, preço e detalhes prontos.</p>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
-                  Como o MotorGestor funciona
-                </h2>
-                <p className="text-[#6B9E6B] mb-10 text-lg">
-                  Setup simples, rotina clara. Você organiza estoque e
-                  atendimento no mesmo dia.
-                </p>
               </FadeUp>
 
-              <div className="space-y-7">
-                {steps.map((step, i) => (
-                  <FadeUp key={step.number} delay={i * 0.1}>
-                    <div className="flex gap-5">
-                      <div className="shrink-0 size-12 rounded-2xl bg-[#4AE54A] text-black flex items-center justify-center font-bold text-sm">
-                        {step.number}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-white mb-1.5">
-                          {step.title}
-                        </h3>
-                        <p className="text-[#6B9E6B] text-sm leading-relaxed">
-                          {step.description}
-                        </p>
-                      </div>
+              {/* Step 2 */}
+              <FadeUp delay={0.15}>
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="relative w-32 h-32">
+                    <div className="absolute inset-0 rounded-full bg-[#4AE54A]/10 animate-pulse" style={{ animationDelay: "0.5s" }} />
+                    <div className="absolute inset-4 rounded-full bg-[#4AE54A]/15" />
+                    <div className="relative z-10 w-full h-full flex items-center justify-center">
+                      <svg viewBox="0 0 80 80" className="w-20 h-20">
+                        <path d="M10 15 L70 15 L50 40 L50 65 L30 65 L30 40 Z" fill="#4AE54A" opacity="0.2" stroke="#4AE54A" strokeWidth="1.5"/>
+                        <circle cx="25" cy="10" r="4" fill="#4AE54A" opacity="0.8"/>
+                        <circle cx="40" cy="8" r="4" fill="#4AE54A"/>
+                        <circle cx="55" cy="10" r="4" fill="#4AE54A" opacity="0.8"/>
+                        <circle cx="40" cy="58" r="6" fill="#4AE54A"/>
+                        <path d="M37 55 L40 61 L43 55" fill="#4AE54A"/>
+                      </svg>
                     </div>
-                  </FadeUp>
-                ))}
-              </div>
+                  </div>
+                  <span className="text-[#4AE54A] text-sm font-semibold">Passo 02</span>
+                  <h3 className="text-white font-goldman text-xl">Receba e organize leads</h3>
+                  <p className="text-[#6B9E6B] text-sm max-w-[200px]">Pipeline Kanban visual com WhatsApp integrado. Nunca mais perca um cliente.</p>
+                </div>
+              </FadeUp>
 
-              <FadeUp delay={0.32} className="mt-10">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-bold"
-                >
-                  <Link href="/cadastro">
-                    Começar agora <ArrowRightIcon className="ml-2 size-4" />
-                  </Link>
-                </Button>
+              {/* Step 3 */}
+              <FadeUp delay={0.3}>
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="relative w-32 h-32">
+                    <div className="absolute inset-0 rounded-full bg-[#4AE54A]/10 animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute inset-4 rounded-full bg-[#4AE54A]/15" />
+                    <div className="relative z-10 w-full h-full flex items-center justify-center">
+                      <svg viewBox="0 0 80 80" className="w-20 h-20">
+                        <polyline points="10,60 25,45 40,50 55,30 70,15" fill="none" stroke="#4AE54A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="70" cy="15" r="8" fill="#4AE54A" opacity="0.2"/>
+                        <path d="M66 15 L69 18 L74 12" stroke="#4AE54A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="text-[#4AE54A] text-sm font-semibold">Passo 03</span>
+                  <h3 className="text-white font-goldman text-xl">Feche mais vendas</h3>
+                  <p className="text-[#6B9E6B] text-sm max-w-[200px]">Envie propostas em PDF, acompanhe métricas e veja resultado desde a primeira semana.</p>
+                </div>
               </FadeUp>
             </div>
           </div>
+
+          <FadeUp delay={0.4} className="flex justify-center mt-14">
+            <Button
+              asChild
+              size="lg"
+              className="bg-[#4AE54A] text-[#0D1F1A] hover:bg-[#3dd13d] font-bold"
+            >
+              <Link href="/cadastro">
+                Começar agora <ArrowRightIcon className="ml-2 size-4" />
+              </Link>
+            </Button>
+          </FadeUp>
         </Container>
       </section>
 
@@ -566,33 +537,32 @@ export default function HomePage() {
 
       {/* ══ 4. FEATURES GRID (2×2) ════════════════════════════════════════════ */}
       <section className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
         <Container className="relative max-w-6xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               Funcionalidades
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Tudo que sua revenda precisa
+              Tudo que sua revenda precisa para crescer
             </h2>
             <p className="text-[#6B9E6B] max-w-xl mx-auto text-lg">
-              Uma stack completa de vendas, do estoque ao fechamento, em um só
-              lugar.
+              Do estoque ao fechamento, em um só lugar. Sem complexidade, sem curva de aprendizado.
             </p>
           </FadeUp>
 
-          <FadeUp className="mb-8">
-            <div className="relative w-full h-64 rounded-2xl overflow-hidden">
+          <FadeUp className="mb-10">
+            <div className="relative w-full h-72 rounded-2xl overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=80"
-                alt="Veículos concessionária"
+                src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1400&q=80"
+                alt="Pátio de concessionária com veículos"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1F1A]/90 to-[#0D1F1A]/40" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1F1A]/95 via-[#0D1F1A]/50 to-transparent" />
               <div className="absolute inset-0 flex items-center px-10">
-                <p className="text-white font-goldman text-2xl font-bold max-w-xs">
-                  Uma equipe mais rápida, uma revenda mais lucrativa.
-                </p>
+                <div className="max-w-xs">
+                  <p className="text-[#4AE54A] text-sm font-semibold mb-2">Gestão completa</p>
+                  <p className="text-white font-goldman text-2xl font-bold leading-tight">Do pátio ao fechamento, tudo conectado.</p>
+                </div>
               </div>
             </div>
           </FadeUp>
@@ -623,20 +593,20 @@ export default function HomePage() {
       <div className="w-full h-px bg-gradient-to-r from-transparent via-[#4AE54A]/30 to-transparent" />
 
       {/* ══ 5. APP EM DESTAQUE ════════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
-        <GreenBlob className="top-0 left-0" />
+      <section
+        className="py-20 sm:py-28 relative overflow-hidden"
+        style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(74,229,74,0.06) 0%, #060F08 70%)" }}
+      >
         <Container className="relative max-w-6xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               O Produto
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Dashboard completo para vender mais
+              Visão completa do seu negócio em tempo real
             </h2>
             <p className="text-[#6B9E6B] max-w-xl mx-auto">
-              Métricas, pipeline e estoque num lugar só. Sem precisar de
-              planilha.
+              Métricas, pipeline e estoque num lugar só. Sem precisar de planilha.
             </p>
           </FadeUp>
 
@@ -675,20 +645,24 @@ export default function HomePage() {
       </section>
 
       {/* ══ 6. PLANOS / BILLING CTA ══════════════════════════════════════════ */}
-      <section className="bg-gray-50 py-20 sm:py-28">
-        <Container className="max-w-6xl">
+      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 opacity-30" style={{
+            backgroundImage: "repeating-linear-gradient(45deg, rgba(74,229,74,0.06) 0px, rgba(74,229,74,0.06) 1px, transparent 1px, transparent 60px)",
+          }} />
+        </div>
+        <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left */}
             <FadeUp>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#22C55E] mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-6">
                 Planos Simples
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
                 Comece grátis, faça upgrade quando precisar
               </h2>
-              <p className="text-gray-500 mb-7 text-lg leading-relaxed">
-                Free forever para equipes pequenas. Pro a R$ 79/mês para FIPE,
-                WhatsApp avançado e importação CSV.
+              <p className="text-[#6B9E6B] mb-7 text-lg leading-relaxed">
+                Plano Free para começar sem cartão. Pro para quem precisa de mais volume, FIPE e WhatsApp avançado.
               </p>
               <ul className="space-y-3 mb-9">
                 {[
@@ -699,10 +673,10 @@ export default function HomePage() {
                 ].map((item) => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 text-gray-700 text-sm"
+                    className="flex items-center gap-3 text-[#9CA3AF] text-sm"
                   >
                     <div className="size-5 rounded-full bg-[rgba(74,229,74,0.15)] flex items-center justify-center shrink-0">
-                      <CheckIcon className="size-3 text-[#22C55E]" />
+                      <CheckIcon className="size-3 text-[#4AE54A]" />
                     </div>
                     {item}
                   </li>
@@ -783,18 +757,16 @@ export default function HomePage() {
 
       {/* ══ 7. COMPARATIVO ════════════════════════════════════════════════════ */}
       <section className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
         <Container className="relative max-w-5xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
               Por que escolher
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              MotorGestor vs. alternativas
+              Por que times de vendas escolhem o MotorGestor
             </h2>
             <p className="text-[#6B9E6B] max-w-lg mx-auto">
-              Feito especificamente para revendas brasileiras — não é um CRM
-              genérico adaptado.
+              Feito especificamente para revendas brasileiras — não é um CRM genérico adaptado.
             </p>
           </FadeUp>
 
@@ -855,107 +827,35 @@ export default function HomePage() {
       <SectionDivider />
 
       {/* ══ 8. TESTIMONIALS (dark) ════════════════════════════════════════════ */}
-      <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
-        <GreenBlob className="top-0 right-0" />
-        <GreenBlob className="bottom-0 left-0 opacity-50" />
-        <Container className="max-w-5xl">
-          <FadeUp className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
+      <section className="py-20 sm:py-28 relative overflow-hidden" style={{ background: "#060F08" }}>
+        <Container className="max-w-3xl">
+          <FadeUp className="text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-6">
               Depoimentos
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               O que dizem sobre nós
             </h2>
-            <p className="text-[#9CA3AF] max-w-lg mx-auto">
-              Revendas e vendedores que já organizam sua operação com o
-              MotorGestor.
+            <p className="text-[#6B9E6B] max-w-lg mx-auto mb-12">
+              Revendas e vendedores que já organizam sua operação com o MotorGestor.
             </p>
-          </FadeUp>
-
-          {/* Featured */}
-          <FadeUp delay={0.1}>
-            <div className="bg-[#1A2E23] border border-[rgba(74,229,74,0.15)] rounded-2xl p-8 mb-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 size-64 rounded-full bg-[#4AE54A]/5 blur-3xl pointer-events-none" />
-              <div className="relative flex flex-col sm:flex-row gap-6 items-start">
-                <div className="size-14 rounded-2xl overflow-hidden border border-[rgba(74,229,74,0.2)] shrink-0 relative">
-                  <Image
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80"
-                    alt={testimonials[0].name}
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                    loading="lazy"
-                    placeholder="blur"
-                    blurDataURL={BLUR_PLACEHOLDER}
-                  />
-                </div>
-                <div>
-                  <div className="flex gap-0.5 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        className="size-4 text-[#4AE54A] fill-[#4AE54A]"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-white text-lg leading-relaxed mb-4">
-                    &ldquo;{testimonials[0].quote}&rdquo;
-                  </p>
-                  <div>
-                    <div className="text-white font-semibold">
-                      {testimonials[0].name}
-                    </div>
-                    <div className="text-[#9CA3AF] text-sm">
-                      {testimonials[0].role} · {testimonials[0].company}
-                    </div>
-                  </div>
-                </div>
+            <div className="rounded-2xl border border-dashed border-[#4AE54A]/20 bg-[#0D1F1A]/60 px-8 py-12 flex flex-col items-center gap-4">
+              <div className="size-14 rounded-2xl bg-[rgba(74,229,74,0.08)] border border-[rgba(74,229,74,0.15)] flex items-center justify-center">
+                <StarIcon className="size-7 text-[#4AE54A]/50" />
               </div>
+              <p className="text-[#6B9E6B] text-base text-center max-w-sm">
+                Em breve — depoimentos reais de revendas parceiras.
+              </p>
+              <p className="text-[#6B9E6B]/50 text-sm text-center">
+                Está usando o MotorGestor? <Link href="/contato" className="text-[#4AE54A] hover:underline">Conta pra gente.</Link>
+              </p>
             </div>
           </FadeUp>
-
-          {/* Secondary cards */}
-          <StaggerSection className="grid sm:grid-cols-2 gap-5">
-            {testimonials.slice(1).map((t) => (
-              <StaggerItem key={t.name}>
-                <div className="bg-[#1A2E23] border border-[rgba(74,229,74,0.1)] rounded-2xl p-6 hover:border-[rgba(74,229,74,0.2)] transition-colors h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="size-10 rounded-xl bg-[#0D1F1A] border border-[rgba(74,229,74,0.15)] flex items-center justify-center shrink-0">
-                      <span className="text-sm font-bold text-[#4AE54A]">
-                        {t.name[0]}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white font-medium text-sm truncate">
-                        {t.name}
-                      </div>
-                      <div className="text-[#9CA3AF] text-xs truncate">
-                        {t.role} · {t.company}
-                      </div>
-                    </div>
-                    <div className="flex gap-0.5 shrink-0">
-                      {[...Array(5)].map((_, j) => (
-                        <StarIcon
-                          key={j}
-                          className="size-3 text-[#4AE54A] fill-[#4AE54A]"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-[#9CA3AF] text-sm leading-relaxed">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerSection>
         </Container>
       </section>
 
       {/* ══ 9. FAQ ════════════════════════════════════════════════════════════ */}
       <section className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden">
-        <DotPattern />
         <Container className="relative max-w-3xl">
           <FadeUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.3)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm font-semibold text-[#4AE54A] mb-4">
@@ -975,24 +875,22 @@ export default function HomePage() {
 
       {/* ══ 10. CTA FINAL (dark) ═════════════════════════════════════════════ */}
       <section
-        className="bg-[#0D1F1A] py-20 sm:py-28 relative overflow-hidden"
-        style={{ backgroundImage: "radial-gradient(rgba(74,229,74,0.12) 1px, transparent 1px)", backgroundSize: "32px 32px" }}
+        className="bg-[#0A1A0C] py-20 sm:py-28 relative overflow-hidden"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_30%_50%,rgba(74,229,74,0.10),transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_50%_50%,rgba(74,229,74,0.08),transparent)]" />
         {/* Decorative circles */}
         <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full border border-[#4AE54A]/10 pointer-events-none" />
         <div className="absolute -bottom-20 -right-20 w-40 h-40 rounded-full border border-[#4AE54A]/15 pointer-events-none" />
+        <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full border border-[#4AE54A]/10 pointer-events-none" />
         <Container className="relative max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <FadeUp>
               <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-                Comece a Gerenciar Sua
-                Concessionária de Forma{" "}
-                <span className="text-[#4AE54A]">Inteligente</span>
+                Comece hoje.{" "}
+                <span className="text-[#4AE54A]">Veja resultado na primeira semana.</span>
               </h2>
               <p className="text-[#9CA3AF] mb-8 text-lg leading-relaxed">
-                Sem cartão de crédito. Configure em minutos e veja a diferença
-                no primeiro dia de uso.
+                Sem cartão de crédito. Configure em minutos e veja a diferença no primeiro dia.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <Button

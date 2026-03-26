@@ -22,7 +22,9 @@
       "Bash(git -C /c/Users/Bruno/motorgestor-saas status)",
       "Bash(xargs grep:*)",
       "Bash(pnpm add:*)",
-      "Bash(pnpm list:*)"
+      "Bash(pnpm list:*)",
+      "Bash(find \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\\\(app\\)\\\\app\" -maxdepth 1 -type d)",
+      "Bash(ls -la \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\\\(app\\)\\\\app\")"
     ]
   }
 }
