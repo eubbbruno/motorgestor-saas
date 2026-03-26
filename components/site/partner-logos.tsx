@@ -5,31 +5,31 @@ import { useState } from "react";
 const partners = [
   {
     name: "WhatsApp",
-    src: "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
+    src: "/images/logos/Digital_Inline_Green_RGB_2026.png",
     h: "h-8",
     fallbackColor: "text-[#25D366]",
   },
   {
     name: "OLX",
-    src: "https://upload.wikimedia.org/wikipedia/commons/b/b1/OLX_logo.svg",
+    src: "/images/logos/olx-logo-png_seeklogo-270798.png",
     h: "h-7",
     fallbackColor: "text-[#E8392A]",
   },
   {
     name: "Webmotors",
-    src: "https://www.webmotors.com.br/imagens/logos/webmotors.svg",
+    src: "/images/logos/webmotors-logo-8.png",
     h: "h-7",
     fallbackColor: "text-[#E8392A]",
   },
   {
     name: "iCarros",
-    src: "https://www.icarros.com.br/imagens/logo-icarros.svg",
+    src: "/images/logos/novo-logo-icarros.svg",
     h: "h-7",
     fallbackColor: "text-[#CC0000]",
   },
   {
     name: "FIPE",
-    src: "https://www.fipe.org.br/Content/images/logo-fipe.png",
+    src: "/images/logos/logo_oficial_2025.jpg",
     h: "h-7",
     fallbackColor: "text-gray-500",
   },

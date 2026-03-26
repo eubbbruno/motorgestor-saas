@@ -318,7 +318,7 @@ export default function HomePage() {
           <FadeUp className="flex justify-center mb-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(74,229,74,0.35)] bg-[rgba(74,229,74,0.08)] px-4 py-1.5 text-sm text-[#4AE54A] font-semibold">
               <span className="size-1.5 rounded-full bg-[#4AE54A] animate-pulse" />
-              Grátis para começar · Sem cartão de crédito
+              Grátis para começar
             </div>
           </FadeUp>
 
