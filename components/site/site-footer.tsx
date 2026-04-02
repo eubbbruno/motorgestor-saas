@@ -22,8 +22,8 @@ const cols = {
   Contato: [
     { href: "/contato", label: "Fale conosco" },
     { href: "/suporte", label: "Suporte" },
-    { href: "/politica-de-privacidade", label: "Privacidade" },
-    { href: "/termos-de-uso", label: "Termos" },
+    { href: "/privacidade", label: "Privacidade" },
+    { href: "/termos", label: "Termos" },
   ],
 };
 
@@ -122,8 +122,8 @@ export function SiteFooter() {
         <div className="pt-6 border-t border-[rgba(74,229,74,0.06)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B9E6B]/70">
           <span>© {new Date().getFullYear()} MotorGestor. Todos os direitos reservados.</span>
           <div className="flex gap-4">
-            <Link href="/politica-de-privacidade" className="hover:text-white transition-colors">Privacidade</Link>
-            <Link href="/termos-de-uso" className="hover:text-white transition-colors">Termos</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
+            <Link href="/termos" className="hover:text-white transition-colors">Termos</Link>
             <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
           </div>
         </div>
