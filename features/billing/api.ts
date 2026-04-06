@@ -1,3 +1,20 @@
+// Funções server-side planejadas para integração com Mercado Pago:
+//
+// getSubscription(companyId)
+//   → Busca a assinatura ativa da empresa na tabela `subscriptions`
+//
+// upsertSubscription(companyId, data)
+//   → Cria ou atualiza o registro de assinatura (usado pelo webhook e create-subscription)
+//
+// cancelSubscription(companyId)
+//   → Marca a assinatura como cancelled no banco
+//
+// getActivePlan(companyId)
+//   → Retorna o plano atual da empresa (free | starter | pro | enterprise)
+//
+// Tabela esperada no Supabase: `subscriptions`
+//   id, company_id, mp_subscription_id, plan, status, current_period_end, created_at, updated_at
+
 "use client";
 
 export type BillingSummary = {
