@@ -23,12 +23,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://motorgestor.com.br"),
   title: {
-    default: "MotorGestor",
+    default: "MotorGestor — Gestão Completa para Concessionárias",
     template: "%s | MotorGestor",
   },
   description:
-    "MotorGestor é o SaaS para pequenas revendas e vendedores que organiza estoque, leads, agenda e vendas — com visão de funil e métricas.",
+    "Gerencie estoque, leads e vendas da sua concessionária em um só lugar. Integração com OLX, Webmotors e iCarros. Teste grátis por 14 dias.",
+  keywords: [
+    "gestão de concessionária",
+    "CRM automotivo",
+    "software para revenda de carros",
+    "gestão de leads automotivos",
+    "OLX integração",
+    "Webmotors integração",
+    "sistema para concessionária",
+  ],
+  authors: [{ name: "MotorGestor" }],
+  creator: "MotorGestor",
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "https://motorgestor.com.br",
+    siteName: "MotorGestor",
+    title: "MotorGestor — Gestão Completa para Concessionárias",
+    description:
+      "Gerencie estoque, leads e vendas da sua concessionária em um só lugar.",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "MotorGestor Dashboard",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MotorGestor — Gestão Completa para Concessionárias",
+    description:
+      "Gerencie estoque, leads e vendas da sua concessionária em um só lugar.",
+    images: ["/images/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  verification: { google: "adicionar_depois" },
 };
 
 export default function RootLayout({

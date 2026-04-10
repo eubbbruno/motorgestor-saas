@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "MotorGestor — Gestão Completa para Concessionárias",
+  description:
+    "Gerencie estoque, leads e vendas da sua concessionária. Integração OLX, Webmotors, iCarros. 14 dias grátis.",
+};
 import {
   ArrowRightIcon,
   BarChart3Icon,
@@ -555,7 +562,7 @@ export default function HomePage() {
           </FadeUp>
 
           <FadeUp className="mb-10">
-            <div className="relative w-full h-72 rounded-2xl overflow-hidden">
+            <div className="relative w-full h-48 md:h-72 rounded-2xl overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1400&q=80"
                 alt="Pátio de concessionária com veículos"
@@ -624,7 +631,7 @@ export default function HomePage() {
               </div>
             </FadeUp>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {highlights.map((h, i) => (
                 <FadeUp key={h.title} delay={i * 0.08}>
                   <div className="group bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-5 hover:border-[#4AE54A]/40 hover:shadow-[0_0_30px_rgba(74,229,74,0.08)] hover:-translate-y-1 transition-all duration-300">
@@ -776,7 +783,7 @@ export default function HomePage() {
 
           <FadeUp>
             <div className="overflow-x-auto rounded-2xl border border-[#4AE54A]/20 bg-[#0F2014]">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead>
                   <tr className="bg-[#4AE54A] border-b border-[#4AE54A]/20">
                     <th className="text-left py-4 px-6 font-semibold text-black">
@@ -845,28 +852,31 @@ export default function HomePage() {
             </p>
           </FadeUp>
 
-          <div className="grid gap-5 sm:grid-cols-3">
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-3">
             {[
               {
                 avatar: "https://randomuser.me/api/portraits/men/32.jpg",
                 name: "Carlos Mendonça",
                 role: "Gerente Comercial — Mendonça Veículos, SP",
                 quote: "Antes perdia lead por falta de organização. Hoje tenho tudo numa tela só. Fechei 40% mais negócios no primeiro mês.",
+                mobileHidden: false,
               },
               {
                 avatar: "https://randomuser.me/api/portraits/women/44.jpg",
                 name: "Patrícia Souza",
                 role: "Proprietária — Auto Shopping Souza, MG",
                 quote: "A integração com Webmotors e OLX me economiza 2 horas por dia. Recomendo pra qualquer revenda que quer crescer.",
+                mobileHidden: true,
               },
               {
                 avatar: "https://randomuser.me/api/portraits/men/67.jpg",
                 name: "Rafael Teixeira",
                 role: "Diretor — RT Motors, RS",
                 quote: "Setup em 10 minutos, suporte em português e o sistema não trava. Finalmente um CRM feito pra revenda brasileira.",
+                mobileHidden: true,
               },
             ].map((t, i) => (
-              <FadeUp key={t.name} delay={i * 0.1}>
+              <FadeUp key={t.name} delay={i * 0.1} className={t.mobileHidden ? "hidden md:block" : ""}>
                 <div className="group bg-[#0F2014] border border-[#4AE54A]/15 rounded-2xl p-6 flex flex-col h-full hover:border-[#4AE54A]/40 hover:shadow-[0_0_20px_rgba(74,229,74,0.08)] transition-all duration-300">
                   {/* Stars */}
                   <div className="flex gap-0.5 mb-4">

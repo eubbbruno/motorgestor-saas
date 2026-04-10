@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Recursos e Funcionalidades",
+  description:
+    "Gestão de estoque, CRM de leads, integração com marketplaces e relatórios completos para sua revenda.",
+};
 import {
   BarChart3Icon,
   CalendarIcon,

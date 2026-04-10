@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Blog — Dicas para Concessionárias",
+  description:
+    "Artigos sobre gestão de revendas, vendas de veículos e mercado automotivo brasileiro.",
+};
 import { ClockIcon, CalendarIcon, TagIcon } from "lucide-react";
 
 import { posts } from "@/content/blog";
