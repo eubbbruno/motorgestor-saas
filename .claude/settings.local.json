@@ -29,7 +29,9 @@
       "Bash(cp \"logo_oficial_2025.jpg\" fipe.jpg)",
       "Bash(cp \"olx-logo-png_seeklogo-270798.png\" olx.png)",
       "Bash(cp \"webmotors-logo-8.png\" webmotors.png)",
-      "Bash(cp \"novo-logo-icarros.svg\" icarros.svg)"
+      "Bash(cp \"novo-logo-icarros.svg\" icarros.svg)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Goldman, Prompt, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/app/providers";
+import { Analytics } from "@/components/analytics";
 
 const goldman = Goldman({
   subsets: ["latin"],
@@ -83,6 +84,7 @@ export default function RootLayout({
       <body
         className={`${goldman.variable} ${prompt.variable} ${geistMono.variable} font-sans min-h-screen antialiased`}
       >
+        <Analytics />
         <Providers>{children}</Providers>
       </body>
     </html>

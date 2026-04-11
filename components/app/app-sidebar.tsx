@@ -6,6 +6,7 @@ import {
   BarChart3Icon,
   CalendarIcon,
   CarIcon,
+  CreditCardIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
   LayoutGridIcon,
@@ -22,6 +23,7 @@ const primaryNav = [
   { href: "/app/pipeline", label: "Pipeline", icon: LayoutGridIcon },
   { href: "/app/agenda", label: "Agenda", icon: CalendarIcon },
   { href: "/app/relatorios", label: "Relatórios", icon: BarChart3Icon },
+  { href: "/app/billing", label: "Plano & Cobrança", icon: CreditCardIcon },
   { href: "/app/configuracoes", label: "Configurações", icon: SettingsIcon },
   { href: "/app/ajuda", label: "Ajuda", icon: HelpCircleIcon },
 ];
