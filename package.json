@@ -12,6 +12,7 @@
     "format:check": "prettier . --check"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.88.0",
     "@hookform/resolvers": "^5.2.2",
     "@mercadopago/sdk-react": "^1.0.7",
     "@studio-freight/react-lenis": "^0.0.47",

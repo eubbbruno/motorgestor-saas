@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { AppTopbar } from "@/components/app/app-topbar";
 import { MobileSidebar } from "@/components/app/mobile-sidebar";
+import { TrialBanner } from "@/components/app/trial-banner";
 import { getUserAndProfile } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,9 @@ export default async function AppLayout({
       <MobileSidebar />
 
       <div className="min-h-screen lg:pl-80">
+        {profile?.company_id && (
+          <TrialBanner companyId={profile.company_id} />
+        )}
         <div className="sticky top-0 z-40">
           <AppTopbar
             name={profile?.full_name ?? user.email}

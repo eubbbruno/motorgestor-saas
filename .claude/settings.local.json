@@ -31,7 +31,10 @@
       "Bash(cp \"webmotors-logo-8.png\" webmotors.png)",
       "Bash(cp \"novo-logo-icarros.svg\" icarros.svg)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__list_tables",
+      "mcp__claude_ai_Supabase__apply_migration"
     ]
   }
 }

@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
         pending: "https://www.motorgestor.com.br/app/billing?payment=pending",
       },
       auto_return: "approved",
-      metadata: { userId, planId, billingCycle },
+      metadata: {
+        userId,
+        planId,
+        billingCycle,
+        free_trial: { frequency: 14, frequency_type: "days" },
+      },
       notification_url:
         "https://www.motorgestor.com.br/api/billing/webhook",
     },
