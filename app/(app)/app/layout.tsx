@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { AppTopbar } from "@/components/app/app-topbar";
 import { MobileSidebar } from "@/components/app/mobile-sidebar";
 import { TrialBanner } from "@/components/app/trial-banner";
+import { AiAssistant } from "@/components/app/ai-assistant";
 import { getUserAndProfile } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,7 @@ export default async function AppLayout({
           <div className="mx-auto w-full max-w-[1400px]">{children}</div>
         </main>
       </div>
+      <AiAssistant />
     </div>
   );
 }

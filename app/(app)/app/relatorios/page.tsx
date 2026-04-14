@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { BarChart3Icon, CarIcon, UsersIcon } from "lucide-react";
+import { BarChart3Icon, CarIcon, DownloadIcon, FileTextIcon, UsersIcon } from "lucide-react";
+import Papa from "papaparse";
 
 import { useVehicles } from "@/features/vehicles/hooks";
 import { useLeads } from "@/features/leads/hooks";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/app/page-header";
 import { PremiumSurface } from "@/components/dashboard/premium-surface";
@@ -20,12 +22,58 @@ export default function RelatoriosPage() {
     return { total, fechado, pct };
   }, [leads.data]);
 
+  function exportCSV() {
+    const leadsData = (leads.data ?? []).map((l) => ({
+      Nome: l.name,
+      Telefone: l.phone ?? "",
+      Email: l.email ?? "",
+      Status: l.status,
+      Origem: l.source ?? "",
+      "Criado em": l.created_at ? new Date(l.created_at).toLocaleDateString("pt-BR") : "",
+    }));
+    const vehiclesData = (vehicles.data ?? []).map((v) => ({
+      Título: v.title,
+      Preço: v.price ?? "",
+      Status: v.status ?? "",
+      "Criado em": v.created_at ? new Date(v.created_at).toLocaleDateString("pt-BR") : "",
+    }));
+
+    const csvLeads = Papa.unparse(leadsData);
+    const csvVehicles = Papa.unparse(vehiclesData);
+    const blob = new Blob(
+      [`LEADS\n${csvLeads}\n\nVEÍCULOS\n${csvVehicles}`],
+      { type: "text/csv;charset=utf-8;" }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `motorgestor-relatorio-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportPDF() {
+    window.print();
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
         kicker="Insights"
         title="Relatórios"
         description="Indicadores essenciais para acompanhar sua operação."
+        right={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportCSV} className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
+              <DownloadIcon className="mr-2 size-4" />
+              Exportar CSV
+            </Button>
+            <Button variant="outline" onClick={exportPDF} className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
+              <FileTextIcon className="mr-2 size-4" />
+              Exportar PDF
+            </Button>
+          </div>
+        }
       />
 
       <div className="grid gap-4 md:grid-cols-3">

@@ -45,7 +45,7 @@ async function finishTour() {
   } catch {
     // ignora — o redirect vai forçar reavaliação do middleware de qualquer forma
   }
-  window.location.href = "/app";
+  window.location.href = "/app/billing";
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

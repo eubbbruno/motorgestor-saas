@@ -55,10 +55,15 @@ export default function BillingPage() {
         }),
       });
       const data = await res.json();
+      console.log("[Billing] create-preference response:", data);
       if (data.preferenceId) {
         setSelectedPlan(planId);
         setPreferenceId(data.preferenceId);
+      } else {
+        console.error("[Billing] preferenceId ausente:", data);
       }
+    } catch (err) {
+      console.error("[Billing] erro ao criar preferência:", err);
     } finally {
       setLoadingPlan(null);
     }

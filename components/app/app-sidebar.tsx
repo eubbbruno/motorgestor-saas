@@ -10,6 +10,7 @@ import {
   HelpCircleIcon,
   LayoutDashboardIcon,
   LayoutGridIcon,
+  LinkIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
@@ -23,6 +24,7 @@ const primaryNav = [
   { href: "/app/pipeline", label: "Pipeline", icon: LayoutGridIcon },
   { href: "/app/agenda", label: "Agenda", icon: CalendarIcon },
   { href: "/app/relatorios", label: "Relatórios", icon: BarChart3Icon },
+  { href: "/app/integracoes", label: "Integrações", icon: LinkIcon },
   { href: "/app/billing", label: "Plano & Cobrança", icon: CreditCardIcon },
   { href: "/app/configuracoes", label: "Configurações", icon: SettingsIcon },
   { href: "/app/ajuda", label: "Ajuda", icon: HelpCircleIcon },
@@ -78,18 +80,8 @@ export function AppSidebar() {
 
         {/* Footer */}
         <div className="border-t border-[rgba(74,229,74,0.08)] px-5 py-4">
-          <div className="text-[11px] text-[#6B9E6B] mb-3">
+          <div className="text-[11px] text-[#6B9E6B]">
             Cadastre veículos primeiro, depois conecte os leads.
-          </div>
-          <div className="flex gap-2">
-            {["in", "tw", "ig"].map((s) => (
-              <div
-                key={s}
-                className="size-7 rounded-lg bg-[rgba(74,229,74,0.08)] border border-[rgba(74,229,74,0.12)] flex items-center justify-center text-[9px] font-bold text-[#4AE54A]"
-              >
-                {s}
-              </div>
-            ))}
           </div>
         </div>
       </div>
