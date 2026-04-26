@@ -32,6 +32,7 @@ export default function BillingPage() {
   );
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [preferenceError, setPreferenceError] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<PlanId | null>(null);
 
   const plan = billing.data?.plan;
@@ -43,6 +44,9 @@ export default function BillingPage() {
 
   async function handleSelectPlan(planId: PlanId) {
     setLoadingPlan(planId);
+    setPreferenceError(null);
+    setPreferenceId(null);
+    setSelectedPlan(null);
     try {
       const res = await fetch("/api/billing/create-preference", {
         method: "POST",
@@ -55,15 +59,18 @@ export default function BillingPage() {
         }),
       });
       const data = await res.json();
-      console.log("[Billing] create-preference response:", data);
       if (data.preferenceId) {
         setSelectedPlan(planId);
         setPreferenceId(data.preferenceId);
       } else {
-        console.error("[Billing] preferenceId ausente:", data);
+        const msg = data.error ?? "preferenceId ausente na resposta da API.";
+        console.error("[Billing] create-preference falhou:", data);
+        setPreferenceError(msg);
       }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       console.error("[Billing] erro ao criar preferência:", err);
+      setPreferenceError(`Erro de rede: ${msg}`);
     } finally {
       setLoadingPlan(null);
     }
@@ -246,6 +253,17 @@ export default function BillingPage() {
         })}
       </div>
 
+      {/* Erro ao criar preferência */}
+      {preferenceError && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
+          <div className="flex items-center gap-2 font-medium">
+            Erro ao iniciar pagamento
+          </div>
+          <p className="mt-1 font-mono text-xs text-red-400/70">{preferenceError}</p>
+          <p className="mt-2 text-red-400/70">Verifique se o Mercado Pago está configurado corretamente no Vercel (MP_ACCESS_TOKEN).</p>
+        </div>
+      )}
+
       {/* Checkout Brick */}
       {preferenceId && selectedPlan && (
         <PremiumSurface>
@@ -256,7 +274,10 @@ export default function BillingPage() {
                 Pagamento — {PLANS[selectedPlan].name}
               </span>
             </div>
-            <CheckoutBrick preferenceId={preferenceId} />
+            <CheckoutBrick
+              preferenceId={preferenceId}
+              amount={billingCycle === "annual" ? PLANS[selectedPlan].priceAnnual : PLANS[selectedPlan].priceMonthly}
+            />
           </Card>
         </PremiumSurface>
       )}
