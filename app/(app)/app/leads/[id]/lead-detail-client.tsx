@@ -17,6 +17,7 @@ import {
 
 import { LeadForm } from "@/features/leads/lead-form";
 import type { LeadFormValues } from "@/features/leads/schema";
+import { getHumanErrorMessage } from "@/lib/errors";
 import { useLead, useUpdateLead, useDeleteLead } from "@/features/leads/hooks";
 import { useCreateLeadEvent, useLeadEvents } from "@/features/leads/events-hooks";
 import { useCreateLeadTask, useDeleteTask, useLeadTasks, usePatchTask } from "@/features/leads/tasks-hooks";
@@ -183,23 +184,29 @@ export function LeadDetailClient({ id }: { id: string }) {
 
   async function onSubmit(values: LeadFormValues) {
     const prev = lead.data?.status ?? null;
-    const l = await update.mutateAsync({ id, values });
+    try {
+      const l = await update.mutateAsync({ id, values });
 
-    if (prev && prev !== l.status) {
-      try {
-        await createEvent.mutateAsync({
-          leadId: id,
-          type: "status_change",
-          message: `Status: ${String(prev)} → ${String(l.status)}`,
-        });
-      } catch {
-        // não bloqueia atualização do lead
+      if (prev && prev !== l.status) {
+        try {
+          await createEvent.mutateAsync({
+            leadId: id,
+            type: "status_change",
+            message: `Status: ${String(prev)} → ${String(l.status)}`,
+          });
+        } catch {
+          // não bloqueia atualização do lead
+        }
       }
-    }
 
-    toast.success("Lead atualizado.");
-    router.push(`/app/leads/${l.id}`);
-    router.refresh();
+      toast.success("Lead atualizado.");
+      router.push(`/app/leads/${l.id}`);
+      router.refresh();
+    } catch (err: unknown) {
+      toast.error("Não foi possível atualizar o lead.", {
+        description: getHumanErrorMessage(err) ?? "Tente novamente.",
+      });
+    }
   }
 
   async function onDelete() {

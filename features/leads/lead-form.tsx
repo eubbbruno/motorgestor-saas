@@ -254,8 +254,10 @@ export function LeadForm({
             <div className="space-y-2 md:col-span-2">
               <Label>Veículo de interesse (opcional)</Label>
               <Select
-                value={form.watch("vehicle_id") ?? ""}
-                onValueChange={(v) => form.setValue("vehicle_id", v, { shouldValidate: true })}
+                value={form.watch("vehicle_id") || "__none__"}
+                onValueChange={(v) =>
+                  form.setValue("vehicle_id", v === "__none__" ? "" : v, { shouldValidate: true })
+                }
               >
                 <SelectTrigger>
                   <SelectValue
@@ -263,7 +265,7 @@ export function LeadForm({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="__none__">Nenhum</SelectItem>
                   {(vehicles.data ?? []).map((v) => (
                     <SelectItem key={v.id} value={v.id}>
                       {v.title}
