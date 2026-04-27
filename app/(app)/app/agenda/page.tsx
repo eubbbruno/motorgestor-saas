@@ -87,15 +87,19 @@ export default function AgendaPage() {
       return;
     }
 
-    await create.mutateAsync({
-      values,
-      companyId: profile.data.company_id,
-      userId: profile.data.id,
-    });
-
-    toast.success("Evento criado.");
-    form.reset();
-    setOpen(false);
+    try {
+      await create.mutateAsync({
+        values,
+        companyId: profile.data.company_id,
+        userId: profile.data.id,
+      });
+      toast.success("Evento criado.");
+      form.reset();
+      setOpen(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Tente novamente.";
+      toast.error("Não foi possível criar o evento.", { description: message });
+    }
   }
 
   const tasksQuery = useQuery({
@@ -424,14 +428,14 @@ export default function AgendaPage() {
             <div className="space-y-2">
               <Label>Lead (opcional)</Label>
               <Select
-                value={form.watch("lead_id") ?? ""}
-                onValueChange={(v) => form.setValue("lead_id", v)}
+                value={form.watch("lead_id") || "__none__"}
+                onValueChange={(v) => form.setValue("lead_id", v === "__none__" ? "" : v, { shouldValidate: true })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={leads.isLoading ? "Carregando..." : "Selecionar lead"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="__none__">Nenhum</SelectItem>
                   {(leads.data ?? []).map((l) => (
                     <SelectItem key={l.id} value={l.id}>
                       {l.name}
