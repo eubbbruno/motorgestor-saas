@@ -48,6 +48,11 @@ type TaskCalendarEvent = RBCEvent & {
   leadId: string;
 };
 
+type AgendaCalendarEvent = RBCEvent & {
+  eventId: string;
+  leadId: string | null;
+};
+
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -121,6 +126,18 @@ export default function AgendaPage() {
   });
 
   const todayISO = React.useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  // Eventos da tabela `events` mapeados para o calendário com Date objects
+  const agendaEvents = React.useMemo<AgendaCalendarEvent[]>(() => {
+    return (events.data ?? []).map((e) => ({
+      title: e.title,
+      start: new Date(e.start_at),
+      end: e.end_at ? new Date(e.end_at) : new Date(e.start_at),
+      allDay: false,
+      eventId: e.id,
+      leadId: e.lead_id,
+    }));
+  }, [events.data]);
 
   const taskEvents = React.useMemo<TaskCalendarEvent[]>(() => {
     const list = tasksQuery.data ?? [];
@@ -224,23 +241,27 @@ export default function AgendaPage() {
               Não foi possível carregar tarefas do calendário. A migração `lead_tasks` já foi aplicada?
             </div>
           ) : (
-            <div className="rounded-2xl border border-mg-border bg-mg-surface/55 p-3 backdrop-blur">
+            <div className="rbc-dark-green rounded-2xl border border-[#4AE54A]/20 bg-[#0F2014] p-4">
               <Calendar
                 localizer={localizer}
                 culture="pt-BR"
-                events={taskEvents}
+                events={[...taskEvents, ...agendaEvents]}
                 startAccessor="start"
                 endAccessor="end"
                 view={view}
                 onView={(v) => setView(v)}
                 date={date}
                 onNavigate={(d) => setDate(d)}
-                style={{ height: 460 }}
+                style={{ height: 480 }}
                 popup
                 onSelectEvent={(e) => {
-                  const ev = e as TaskCalendarEvent;
-                  router.push(`/app/leads/${ev.leadId}`);
-                  router.refresh();
+                  const task = e as TaskCalendarEvent;
+                  const agenda = e as AgendaCalendarEvent;
+                  const leadId = task.leadId ?? agenda.leadId;
+                  if (leadId) {
+                    router.push(`/app/leads/${leadId}`);
+                    router.refresh();
+                  }
                 }}
                 messages={{
                   next: "Próximo",
@@ -253,7 +274,7 @@ export default function AgendaPage() {
                   date: "Data",
                   time: "Hora",
                   event: "Evento",
-                  noEventsInRange: "Sem tarefas com vencimento neste período.",
+                  noEventsInRange: "Sem eventos neste período.",
                   showMore: (total) => `+${total} mais`,
                 }}
               />
