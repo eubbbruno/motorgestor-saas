@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { BotIcon, Loader2Icon, SendIcon, UserIcon } from "lucide-react";
+import { BotIcon, Loader2Icon, PlusIcon, SendIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +16,18 @@ type Message = {
   text: string;
 };
 
+const WELCOME_MESSAGE: Message = {
+  id: "welcome",
+  role: "assistant",
+  text: "Olá! 👋 Sou o assistente do MotorGestor. Posso te ajudar com:\n- Cadastro de veículos e consulta FIPE\n- Gestão de leads e pipeline\n- Configuração do WhatsApp\n- Relatórios e exportações\n- Dúvidas sobre planos e cobrança\n\nComo posso te ajudar hoje?",
+};
+
 const QUICK_QUESTIONS = [
   "Como cadastrar um veículo?",
-  "Como importar leads via CSV?",
+  "Como mover um lead no pipeline?",
   "Como configurar o WhatsApp?",
-  "Como gerar relatórios?",
+  "Como exportar relatório CSV?",
+  "Como convidar um usuário?",
 ];
 
 // ─── Bubble ───────────────────────────────────────────────────────────────────
@@ -57,13 +64,7 @@ function MessageBubble({ msg }: { msg: Message }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AssistentePage() {
-  const [messages, setMessages] = React.useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      text: "Olá! Sou o assistente do MotorGestor. Como posso te ajudar hoje?\n\nPosso te orientar sobre cadastro de veículos, CRM de leads, agenda, relatórios, WhatsApp e muito mais.",
-    },
-  ]);
+  const [messages, setMessages] = React.useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const bottomRef = React.useRef<HTMLDivElement>(null);
@@ -73,20 +74,33 @@ export default function AssistentePage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  function newConversation() {
+    setMessages([WELCOME_MESSAGE]);
+    setInput("");
+    textareaRef.current?.focus();
+  }
+
   async function sendMessage(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
 
     const userMsg: Message = { id: crypto.randomUUID(), role: "user", text: trimmed };
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
+
+    // Build history excluding the welcome message (id="welcome")
+    const history = updatedMessages
+      .filter((m) => m.id !== "welcome")
+      .slice(-10)
+      .map((m) => ({ role: m.role, content: m.text }));
 
     try {
       const res = await fetch("/api/ai/assistant", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ message: trimmed, history }),
       });
       const data = (await res.json()) as { response?: string; error?: string };
 
@@ -129,9 +143,20 @@ export default function AssistentePage() {
             <div className="text-[10px] text-[#6B9E6B]">Pergunte sobre qualquer funcionalidade do sistema</div>
           </div>
         </div>
-        <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/8 text-[#4AE54A] text-[10px]">
-          Powered by Claude
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={newConversation}
+            className="border-[rgba(74,229,74,0.2)] bg-transparent text-[#6B9E6B] hover:bg-[rgba(74,229,74,0.08)] hover:text-white"
+          >
+            <PlusIcon className="mr-1.5 size-3.5" />
+            Nova conversa
+          </Button>
+          <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/8 text-[#4AE54A] text-[10px]">
+            Powered by Claude
+          </Badge>
+        </div>
       </div>
 
       {/* Messages */}
