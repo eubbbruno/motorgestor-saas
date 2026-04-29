@@ -1,226 +1,215 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ClockIcon, SearchIcon, SettingsIcon, CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { BotIcon, CarIcon, FileTextIcon, MessageCircleIcon, SettingsIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/app/page-header";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type MarketplaceCard = {
-  id: string;
-  name: string;
-  color: string;
-  logoText: string;
-  status: string;
-  statusNote: string;
+type CardProps = {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  badge: React.ReactNode;
+  action: React.ReactNode;
+  expanded?: React.ReactNode;
 };
 
-type PlacaCard = {
-  provider: string;
-  price: string;
-  envKey: string;
-  docUrl: string;
-  steps: string[];
-};
+// ─── Generic Card ─────────────────────────────────────────────────────────────
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const MARKETPLACES: MarketplaceCard[] = [
-  {
-    id: "webmotors",
-    name: "Webmotors",
-    color: "#E8003D",
-    logoText: "W",
-    status: "Em breve",
-    statusNote: "Integração via parceiro oficial — aguardando aprovação do contrato.",
-  },
-  {
-    id: "olx",
-    name: "OLX Autos",
-    color: "#6E1FFF",
-    logoText: "OLX",
-    status: "Em breve",
-    statusNote: "API em aprovação junto ao time OLX Pro.",
-  },
-  {
-    id: "mercadolivre",
-    name: "Mercado Livre",
-    color: "#FFE600",
-    logoText: "ML",
-    status: "Em breve",
-    statusNote: "Em desenvolvimento — integração com ML Veículos prevista.",
-  },
-];
-
-const PLACA_PROVIDER: PlacaCard = {
-  provider: "APIPlacas",
-  price: "R$29/mês",
-  envKey: "VEHICLE_LOOKUP_API_KEY",
-  docUrl: "https://apiplacas.com.br",
-  steps: [
-    "Acesse apiplacas.com.br e crie sua conta",
-    "Gere uma API Key no painel",
-    "Adicione VEHICLE_LOOKUP_PROVIDER=apiplacas e VEHICLE_LOOKUP_API_KEY=sua-chave no Vercel → Settings → Environment Variables",
-    "Faça redeploy — a busca por placa ficará ativa no cadastro de veículos",
-  ],
-};
-
-// ─── Marketplace Card ─────────────────────────────────────────────────────────
-
-function MarketplaceCardItem({ card }: { card: MarketplaceCard }) {
+function IntegrationCard({ icon, title, description, badge, action, expanded }: CardProps) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(74,229,74,0.12)] bg-[#0F2014] p-6">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.15)] to-transparent" />
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(74,229,74,0.12)] bg-[#0F2014] p-6 transition-all duration-200 hover:border-[rgba(74,229,74,0.22)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(74,229,74,0.18)] to-transparent" />
 
       <div className="flex items-start gap-4">
-        <div
-          className="flex size-12 shrink-0 items-center justify-center rounded-2xl text-sm font-extrabold"
-          style={{
-            backgroundColor: card.color + "22",
-            border: `1px solid ${card.color}40`,
-            color: card.color,
-          }}
-        >
-          {card.logoText}
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-[#4AE54A]/20 bg-[#4AE54A]/8">
+          {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-white">{card.name}</span>
-            <Badge className="border border-yellow-500/20 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold">
-              <ClockIcon className="mr-1 size-2.5" />
-              {card.status}
-            </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-bold text-white">{title}</span>
+            {badge}
           </div>
-          <p className="mt-1 text-xs text-[#6B9E6B] leading-relaxed">{card.statusNote}</p>
+          <p className="mt-1 text-xs text-[#6B9E6B] leading-relaxed">{description}</p>
         </div>
       </div>
 
-      <div className="mt-4 border-t border-[rgba(74,229,74,0.06)] pt-3">
-        <Button
-          size="sm"
-          variant="outline"
-          disabled
-          className="border-[rgba(74,229,74,0.15)] bg-transparent text-[#6B9E6B]/50 cursor-not-allowed"
-        >
-          Disponível em breve
-        </Button>
+      {expanded && <div className="mt-5">{expanded}</div>}
+
+      <div className="mt-5 border-t border-[rgba(74,229,74,0.06)] pt-4">
+        {action}
       </div>
     </div>
   );
 }
 
-// ─── Placa Card ───────────────────────────────────────────────────────────────
+// ─── Card 1: Consulta por Placa ───────────────────────────────────────────────
 
-function PlacaConfigCard() {
-  const [open, setOpen] = React.useState(false);
+function PlacaCard() {
+  const [active, setActive] = React.useState(false);
+  const [apiKey, setApiKey] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
 
-  async function copyEnvInstructions() {
-    try {
-      await navigator.clipboard.writeText(
-        `VEHICLE_LOOKUP_PROVIDER=apiplacas\nVEHICLE_LOOKUP_API_KEY=sua-chave-aqui`,
-      );
-      toast.success("Copiado.");
-    } catch {
-      toast.error("Não foi possível copiar.");
-    }
+  async function handleSave() {
+    if (!apiKey.trim()) { toast.error("Informe a API Key."); return; }
+    setSaving(true);
+    // Instrução para o usuário — key é configurada via Vercel env vars
+    await new Promise((r) => setTimeout(r, 400));
+    setSaving(false);
+    toast.success("Configure no Vercel: VEHICLE_LOOKUP_PROVIDER=apiplacas e VEHICLE_LOOKUP_API_KEY=" + apiKey.trim().slice(0, 8) + "…");
   }
 
   return (
-    <>
-      <div className="relative overflow-hidden rounded-2xl border border-[#4AE54A]/20 bg-[#0F2014] p-6">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4AE54A]/30 to-transparent" />
-
-        <div className="flex items-start gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#4AE54A]/10 border border-[#4AE54A]/30">
-            <SearchIcon className="size-5 text-[#4AE54A]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-white">Consulta por Placa</span>
-              <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/10 text-[#4AE54A] text-[10px] font-semibold">
-                Disponível
-              </Badge>
+    <IntegrationCard
+      icon={<CarIcon className="size-5 text-[#4AE54A]" />}
+      title="Consulta por Placa"
+      description="Digite a placa e preencha os dados do veículo automaticamente via APIPlacas."
+      badge={
+        <Badge className="border border-yellow-500/20 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold">
+          Plano Pro+
+        </Badge>
+      }
+      expanded={
+        active ? (
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-[#6B9E6B]">API Key — apiplacas.com.br</Label>
+              <Input
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Sua chave de API"
+                className="border-[rgba(74,229,74,0.2)] bg-[#0A1A0C] text-white placeholder:text-[#6B9E6B]/50 focus-visible:ring-[#4AE54A]/30"
+              />
             </div>
-            <p className="mt-1 text-xs text-[#6B9E6B] leading-relaxed">
-              Ative a busca automática por placa no cadastro de veículos.
-              Preenche marca, modelo, ano e cor automaticamente via{" "}
-              <span className="text-white font-medium">{PLACA_PROVIDER.provider}</span>{" "}
-              ({PLACA_PROVIDER.price}).
+            <p className="text-[10px] text-[#6B9E6B]/70">
+              Após salvar, adicione também ao Vercel: <code className="text-[#4AE54A]">VEHICLE_LOOKUP_PROVIDER=apiplacas</code>
             </p>
           </div>
-        </div>
-
-        <div className="mt-4 border-t border-[rgba(74,229,74,0.06)] pt-3">
-          <Button
-            size="sm"
-            className="bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd43d] font-semibold"
-            onClick={() => setOpen(true)}
+        ) : null
+      }
+      action={
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setActive((v) => !v)}
+            role="switch"
+            aria-checked={active}
+            className={[
+              "relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 transition-colors",
+              active ? "border-[#4AE54A] bg-[#4AE54A]" : "border-[rgba(74,229,74,0.2)] bg-[#0A1A0C]",
+            ].join(" ")}
           >
-            <SettingsIcon className="mr-1.5 size-3.5" />
-            Configurar
-          </Button>
-        </div>
-      </div>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Configurar Consulta por Placa</DialogTitle>
-            <DialogDescription>
-              Integração com {PLACA_PROVIDER.provider} — {PLACA_PROVIDER.price}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <ol className="space-y-3">
-              {PLACA_PROVIDER.steps.map((step, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm">
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#4AE54A]/10 text-[10px] font-bold text-[#4AE54A]">
-                    {i + 1}
-                  </span>
-                  <span className="text-muted-foreground">{step}</span>
-                </li>
-              ))}
-            </ol>
-
-            <div className="rounded-xl border border-[rgba(74,229,74,0.15)] bg-[#0A1A0C] p-3">
-              <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#6B9E6B]">
-                Variáveis de ambiente
-              </div>
-              <pre className="font-mono text-xs text-white/80">{`VEHICLE_LOOKUP_PROVIDER=apiplacas\nVEHICLE_LOOKUP_API_KEY=sua-chave-aqui`}</pre>
-            </div>
-
-            <div className="flex items-start gap-2 rounded-xl border border-blue-500/20 bg-blue-500/8 p-3 text-xs text-blue-400">
-              <CheckIcon className="mt-0.5 size-3.5 shrink-0" />
-              Após salvar as variáveis no Vercel, faça redeploy. A busca por placa ficará ativa automaticamente no formulário de cadastro de veículos.
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Fechar
-            </Button>
+            <span className={["pointer-events-none inline-block size-4 rounded-full bg-white shadow transition-transform self-center", active ? "translate-x-5" : "translate-x-0.5"].join(" ")} />
+          </button>
+          <span className={`text-xs font-semibold ${active ? "text-[#4AE54A]" : "text-[#6B9E6B]/50"}`}>
+            {active ? "Ativado" : "Desativado"}
+          </span>
+          {active && (
             <Button
-              className="bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd43d]"
-              onClick={copyEnvInstructions}
+              size="sm"
+              className="ml-auto bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd43d] font-semibold"
+              onClick={handleSave}
+              disabled={saving}
             >
-              Copiar variáveis
+              <SettingsIcon className="mr-1.5 size-3.5" />
+              {saving ? "Salvando…" : "Configurar"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          )}
+        </div>
+      }
+    />
+  );
+}
+
+// ─── Card 2: WhatsApp Business ────────────────────────────────────────────────
+
+function WhatsAppCard() {
+  return (
+    <IntegrationCard
+      icon={<MessageCircleIcon className="size-5 text-[#25D366]" />}
+      title="WhatsApp Business"
+      description="Atenda leads e envie propostas direto pelo WhatsApp com templates prontos."
+      badge={
+        <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/10 text-[#4AE54A] text-[10px] font-semibold">
+          Configurar
+        </Badge>
+      }
+      action={
+        <Button asChild size="sm" className="bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/20">
+          <Link href="/app/whatsapp">
+            <MessageCircleIcon className="mr-1.5 size-3.5" />
+            Abrir configuração
+          </Link>
+        </Button>
+      }
+    />
+  );
+}
+
+// ─── Card 3: Catálogo PDF ─────────────────────────────────────────────────────
+
+function CatalogCard() {
+  function handleGenerate() {
+    window.open("/api/vehicles/catalog-pdf", "_blank");
+  }
+
+  return (
+    <IntegrationCard
+      icon={<FileTextIcon className="size-5 text-[#4AE54A]" />}
+      title="Exportar Catálogo"
+      description="Gere PDF do seu estoque para enviar aos marketplaces ou clientes manualmente."
+      badge={
+        <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/10 text-[#4AE54A] text-[10px] font-semibold">
+          Disponível
+        </Badge>
+      }
+      action={
+        <Button
+          size="sm"
+          className="bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd43d] font-semibold"
+          onClick={handleGenerate}
+        >
+          <FileTextIcon className="mr-1.5 size-3.5" />
+          Gerar PDF do Estoque
+        </Button>
+      }
+    />
+  );
+}
+
+// ─── Card 4: Assistente IA ────────────────────────────────────────────────────
+
+function AssistanteCard() {
+  const router = useRouter();
+  return (
+    <IntegrationCard
+      icon={<BotIcon className="size-5 text-[#4AE54A]" />}
+      title="Assistente IA"
+      description="Tire dúvidas sobre o MotorGestor com inteligência artificial. Powered by Claude."
+      badge={
+        <Badge className="border border-[#4AE54A]/20 bg-[#4AE54A]/10 text-[#4AE54A] text-[10px] font-semibold">
+          Disponível
+        </Badge>
+      }
+      action={
+        <Button
+          size="sm"
+          className="bg-[#4AE54A] text-[#0A1A0C] hover:bg-[#3dd43d] font-semibold"
+          onClick={() => router.push("/app/assistente")}
+        >
+          <BotIcon className="mr-1.5 size-3.5" />
+          Abrir Assistente
+        </Button>
+      }
+    />
   );
 }
 
@@ -230,18 +219,16 @@ export default function IntegracoesAppPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        kicker="Marketplaces"
+        kicker="Ferramentas"
         title="Integrações"
-        description="Conecte seu estoque aos principais portais e ferramentas."
+        description="Conecte e automatize seu processo de vendas."
       />
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MARKETPLACES.map((m) => (
-          <MarketplaceCardItem key={m.id} card={m} />
-        ))}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <PlacaCard />
+        <WhatsAppCard />
+        <CatalogCard />
+        <AssistanteCard />
       </div>
-
-      <PlacaConfigCard />
     </div>
   );
 }
