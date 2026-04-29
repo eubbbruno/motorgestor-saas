@@ -88,13 +88,13 @@ export default function AssistentePage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message: trimmed }),
       });
-      const data = (await res.json()) as { ok?: boolean; reply?: string; error?: string };
+      const data = (await res.json()) as { response?: string; error?: string };
 
-      if (!res.ok || !data.reply) {
+      if (!res.ok || !data.response) {
         throw new Error(data.error ?? "IA indisponível.");
       }
 
-      const aiMsg: Message = { id: crypto.randomUUID(), role: "assistant", text: data.reply };
+      const aiMsg: Message = { id: crypto.randomUUID(), role: "assistant", text: data.response };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Tente novamente.";
