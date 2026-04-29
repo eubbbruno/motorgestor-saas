@@ -259,6 +259,112 @@
   --mg-glow-blue: oklch(0.488 0.243 264.376 / 22%);
 }
 
+/* ── Print / PDF export ────────────────────────────────────────────────────── */
+@media print {
+  /* Esconde tudo: sidebar, header, botões, nav */
+  body * { visibility: hidden; }
+  /* Mostra apenas o bloco de impressão do veículo */
+  #mg-vehicle-pdf,
+  #mg-vehicle-pdf * { visibility: visible; }
+  #mg-vehicle-pdf {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    background: white;
+    color: #111;
+    padding: 2.5rem 3rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow: visible;
+  }
+  #mg-vehicle-pdf h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  #mg-vehicle-pdf h2 { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: #555; }
+  #mg-vehicle-pdf .pdf-photo {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+  #mg-vehicle-pdf .pdf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 20px;
+    margin: 16px 0;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+  }
+  #mg-vehicle-pdf .pdf-grid-item label {
+    display: block;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #888;
+    margin-bottom: 2px;
+  }
+  #mg-vehicle-pdf .pdf-grid-item span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111;
+  }
+  #mg-vehicle-pdf .pdf-price {
+    font-size: 26px;
+    font-weight: 800;
+    color: #16a34a;
+    margin: 8px 0 16px;
+  }
+  #mg-vehicle-pdf .pdf-section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    margin: 16px 0 6px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 4px;
+  }
+  #mg-vehicle-pdf .pdf-description {
+    font-size: 11px;
+    color: #444;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  #mg-vehicle-pdf .pdf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #16a34a;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+  }
+  #mg-vehicle-pdf .pdf-logo {
+    font-size: 18px;
+    font-weight: 900;
+    color: #16a34a;
+    letter-spacing: -0.02em;
+  }
+  #mg-vehicle-pdf .pdf-company {
+    font-size: 11px;
+    color: #555;
+    text-align: right;
+  }
+  #mg-vehicle-pdf .pdf-footer {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 3rem;
+    right: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #aaa;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+  }
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }

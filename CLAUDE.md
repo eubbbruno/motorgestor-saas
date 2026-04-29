@@ -104,6 +104,17 @@ Foreign key constraints live in `rls.sql`, not `schema.sql`.
 | `FIPE_API_BASE_URL` | No | FIPE pricing API (defaults to parallelum.com.br) |
 | `AI_PROVIDER` | No | `mock` or `openai` |
 | `OPENAI_API_KEY` | If AI_PROVIDER=openai | OpenAI key |
+| `VEHICLE_LOOKUP_PROVIDER` | No | `mock` (default) or `apiplacas` |
+| `VEHICLE_LOOKUP_API_KEY` | If PROVIDER=apiplacas | API key from apiplacas.com.br |
+| `SUPABASE_SERVICE_ROLE_KEY` | No | Required for XML export via token (no session) |
+
+### Ativar consulta por placa (APIPlacas)
+
+1. Crie conta em apiplacas.com.br e gere uma API Key
+2. No Vercel: Settings → Environment Variables
+   - `VEHICLE_LOOKUP_PROVIDER` = `apiplacas`
+   - `VEHICLE_LOOKUP_API_KEY` = `<sua-chave>`
+3. Redeploy — o botão "Buscar por placa" no cadastro de veículos passa a usar a API real
 
 ## Key Libraries
 

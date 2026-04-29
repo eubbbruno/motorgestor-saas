@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
-import { CopyIcon, ExternalLinkIcon, Loader2Icon, SparklesIcon, TrashIcon } from "lucide-react";
+import { CopyIcon, ExternalLinkIcon, Loader2Icon, PrinterIcon, SparklesIcon, TrashIcon } from "lucide-react";
 
 import { useVehicle, useUpdateVehicle, useDeleteVehicle } from "@/features/vehicles/hooks";
+import { useMyProfile } from "@/features/auth/hooks";
 import { VehicleForm } from "@/features/vehicles/vehicle-form";
 import type { VehicleFormValues } from "@/features/vehicles/schema";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -54,9 +55,11 @@ export function VehicleDetailClient({ id }: { id: string }) {
   const vehicle = useVehicle(id);
   const update = useUpdateVehicle();
   const del = useDeleteVehicle();
+  const profile = useMyProfile();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [adOpen, setAdOpen] = React.useState(false);
+  const [printLoading, setPrintLoading] = React.useState(false);
   const [adTitle, setAdTitle] = React.useState("");
   const [adCity, setAdCity] = React.useState("");
   const [adHighlights, setAdHighlights] = React.useState("");
@@ -226,8 +229,99 @@ export function VehicleDetailClient({ id }: { id: string }) {
     }
   }
 
+  async function handlePrint() {
+    if (!vehicle.data) return;
+    setPrintLoading(true);
+    try {
+      // Garante que as signed URLs estão carregadas
+      if (photoPaths.length && Object.keys(photoUrls).length === 0) {
+        const supabase = createSupabaseBrowserClient();
+        const entries = await Promise.all(
+          photoPaths.map(async (p) => {
+            const { data } = await supabase.storage.from("vehicle-photos").createSignedUrl(p, 60 * 60);
+            return [p, data?.signedUrl ?? ""] as const;
+          }),
+        );
+        setPhotoUrls(Object.fromEntries(entries.filter(([, url]) => Boolean(url))));
+      }
+    } catch {
+      // não bloqueia o print se falhar
+    } finally {
+      setPrintLoading(false);
+    }
+    window.print();
+  }
+
+  const v = vehicle.data;
+  const printPhotoUrl = v ? (photoUrls[photoPaths[0] ?? ""] ?? null) : null;
+  const companyName = profile.data?.full_name ?? "Concessionária";
+
   return (
     <div className="space-y-6">
+      {/* ── Print / PDF layout (invisível na tela, visível na impressão) ── */}
+      {v && (
+        <div id="mg-vehicle-pdf" style={{ display: "none" }}>
+          <div className="pdf-header">
+            <span className="pdf-logo">MotorGestor</span>
+            <span className="pdf-company">{companyName}</span>
+          </div>
+
+          <h1>{v.title}</h1>
+          <h2>
+            {[v.make, v.model, v.version].filter(Boolean).join(" ")}
+            {v.year ? ` · ${v.year}` : ""}
+          </h2>
+
+          {printPhotoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={printPhotoUrl} alt={v.title} className="pdf-photo" />
+          )}
+
+          {v.price != null && (
+            <div className="pdf-price">
+              R$ {Number(v.price).toLocaleString("pt-BR")}
+            </div>
+          )}
+
+          <div className="pdf-grid">
+            {[
+              { label: "Marca", value: v.make },
+              { label: "Modelo", value: v.model },
+              { label: "Versão", value: v.version },
+              { label: "Ano", value: v.year },
+              { label: "Cor", value: v.color },
+              { label: "Quilometragem", value: v.mileage != null ? `${Number(v.mileage).toLocaleString("pt-BR")} km` : null },
+              { label: "Combustível", value: v.fuel },
+              { label: "Câmbio", value: v.transmission },
+              { label: "Portas", value: "4" },
+              { label: "Placa", value: v.plate },
+              { label: "Chassi", value: v.chassis },
+              { label: "RENAVAM", value: v.renavam },
+            ]
+              .filter(({ value }) => value != null && String(value).trim() !== "")
+              .map(({ label, value }) => (
+                <div key={label} className="pdf-grid-item">
+                  <label>{label}</label>
+                  <span>{String(value)}</span>
+                </div>
+              ))}
+          </div>
+
+          {(v.description_ai || v.notes) && (
+            <>
+              <div className="pdf-section-title">Descrição</div>
+              <div className="pdf-description">{v.description_ai ?? v.notes}</div>
+            </>
+          )}
+
+          <div className="pdf-footer">
+            <span>Gerado pelo MotorGestor</span>
+            <span>motorgestor.com.br</span>
+            <span>{new Date().toLocaleDateString("pt-BR")}</span>
+          </div>
+        </div>
+      )}
+
       <PageHeader
         kicker="Estoque"
         title={vehicle.data?.title ? `Veículo · ${vehicle.data.title}` : "Veículo"}
@@ -245,8 +339,42 @@ export function VehicleDetailClient({ id }: { id: string }) {
             >
               Gerar anúncio
             </Button>
-            <Button asChild variant="outline" className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2">
-              <Link href={`/app/proposta?vehicleId=${id}`}>Gerar proposta PDF</Link>
+            <Button
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+              onClick={handlePrint}
+              disabled={printLoading || !vehicle.data}
+            >
+              {printLoading ? (
+                <Loader2Icon className="mr-2 size-4 animate-spin" />
+              ) : (
+                <PrinterIcon className="mr-2 size-4" />
+              )}
+              Exportar PDF
+            </Button>
+            <Button
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+              disabled={!vehicle.data}
+              onClick={() => {
+                if (!vehicle.data) return;
+                const v = vehicle.data;
+                const text = [
+                  `*${v.title}*`,
+                  v.year ? `Ano: ${v.year}` : "",
+                  v.mileage != null ? `KM: ${Number(v.mileage).toLocaleString("pt-BR")}` : "",
+                  v.color ? `Cor: ${v.color}` : "",
+                  v.fuel ? `Combustível: ${v.fuel}` : "",
+                  v.price != null ? `Preço: R$ ${Number(v.price).toLocaleString("pt-BR")}` : "",
+                  "",
+                  "Mais informações: motorgestor.com.br",
+                ]
+                  .filter(Boolean)
+                  .join("\n");
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+              }}
+            >
+              Compartilhar WhatsApp
             </Button>
             <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
               <TrashIcon className="mr-2 size-4" />
