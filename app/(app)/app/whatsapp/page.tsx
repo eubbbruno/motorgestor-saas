@@ -8,6 +8,7 @@ import {
   CheckIcon,
   CopyIcon,
   EditIcon,
+  InfoIcon,
   Loader2Icon,
   MessageCircleIcon,
   PhoneIcon,
@@ -241,7 +242,7 @@ function TemplatesSection() {
   const [editIndex, setEditIndex] = React.useState<number | null>(null);
   const [editText, setEditText] = React.useState("");
   const [sendOpen, setSendOpen] = React.useState(false);
-  const [sendPhone, setSendPhone] = React.useState("5511999990000");
+  const [sendPhone, setSendPhone] = React.useState("5543996466446");
   const [sendTemplate, setSendTemplate] = React.useState(0);
   const [sending, setSending] = React.useState(false);
 
@@ -348,12 +349,23 @@ function TemplatesSection() {
             <DialogDescription>Envie uma mensagem de teste para um número via WhatsApp Business.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Meta test number warning */}
+            <div className="flex gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+              <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-amber-400" />
+              <span>
+                Número de teste gratuito do Meta (<strong>+1 555 630 7621</strong>): o destinatário precisa estar na{" "}
+                <strong>lista de números permitidos</strong> em{" "}
+                <span className="font-mono">developers.facebook.com → WhatsApp → API Setup → To</span>.
+                Será enviado o template <strong>hello_world</strong>.
+              </span>
+            </div>
+
             <div className="space-y-1.5">
-              <Label className="text-xs">Número (com DDI)</Label>
+              <Label className="text-xs">Número destinatário (somente dígitos, com DDI)</Label>
               <Input
                 value={sendPhone}
-                onChange={(e) => setSendPhone(e.target.value)}
-                placeholder="5511999999999"
+                onChange={(e) => setSendPhone(e.target.value.replace(/\D/g, ""))}
+                placeholder="5543996466446"
               />
             </div>
             <div className="space-y-1.5">

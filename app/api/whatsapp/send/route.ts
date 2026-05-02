@@ -1,50 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const WHATSAPP_API_URL = "https://graph.facebook.com/v19.0";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+const META_API = "https://graph.facebook.com/v25.0";
 
 export async function POST(req: NextRequest) {
-  const { to, message } = await req.json();
+  const body = await req.json().catch(() => ({}));
+  const to: string = (body.to ?? "").replace(/\D/g, "");
 
-  if (!to || !message) {
+  if (!to) {
+    return NextResponse.json({ error: "Campo 'to' é obrigatório." }, { status: 400 });
+  }
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return NextResponse.json({ error: "Configuração Supabase ausente." }, { status: 500 });
+  }
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("company_id")
+    .eq("id", user.id)
+    .single();
+
+  const companyId = profile?.company_id;
+  if (!companyId) {
+    return NextResponse.json({ error: "Empresa não encontrada." }, { status: 400 });
+  }
+
+  const { data: company } = await supabase
+    .from("companies")
+    .select("whatsapp_token, whatsapp_phone_number_id")
+    .eq("id", companyId)
+    .single();
+
+  const token = company?.whatsapp_token;
+  const phoneNumberId = company?.whatsapp_phone_number_id;
+
+  if (!token || !phoneNumberId) {
     return NextResponse.json(
-      { error: "Campos 'to' e 'message' são obrigatórios." },
-      { status: 400 }
+      { error: "Credenciais WhatsApp não configuradas. Salve o Token e o Phone Number ID primeiro." },
+      { status: 400 },
     );
   }
 
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const token = process.env.WHATSAPP_TOKEN;
+  const metaRes = await fetch(`${META_API}/${phoneNumberId}/messages`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "template",
+      template: { name: "hello_world", language: { code: "en_US" } },
+    }),
+  });
 
-  if (!phoneNumberId || !token) {
-    return NextResponse.json(
-      { error: "Variáveis de ambiente WhatsApp não configuradas." },
-      { status: 500 }
-    );
+  const metaData = await metaRes.json();
+
+  if (!metaRes.ok) {
+    console.error("[whatsapp/send] Meta error:", metaData);
+    return NextResponse.json({ error: metaData?.error?.message ?? "Erro na API do Meta." }, { status: metaRes.status });
   }
 
-  const res = await fetch(
-    `${WHATSAPP_API_URL}/${phoneNumberId}/messages`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to,
-        type: "text",
-        text: { body: message },
-      }),
-    }
-  );
-
-  if (!res.ok) {
-    const error = await res.json();
-    console.error("[WhatsApp send] Erro:", error);
-    return NextResponse.json({ error }, { status: res.status });
-  }
-
-  const data = await res.json();
-  return NextResponse.json({ ok: true, data });
+  return NextResponse.json({ ok: true, data: metaData });
 }
