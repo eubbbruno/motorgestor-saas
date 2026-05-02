@@ -1,33 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
-function makeSupabase(req: NextRequest) {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return req.cookies.getAll(); },
-        setAll() {},
-      },
-    },
-  );
-}
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-async function getCompanyId(supabase: ReturnType<typeof makeSupabase>) {
+async function getCompanyId() {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
+
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return null;
+
   const { data } = await supabase
     .from("profiles")
     .select("company_id")
     .eq("id", user.id)
     .single();
+
   return data?.company_id ?? null;
 }
 
-export async function GET(req: NextRequest) {
-  const supabase = makeSupabase(req);
-  const companyId = await getCompanyId(supabase);
+export async function GET(_req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return NextResponse.json({ ok: false, error: "Configuração Supabase ausente." }, { status: 500 });
+
+  const companyId = await getCompanyId();
   if (!companyId) return NextResponse.json({ ok: false, error: "Não autenticado." }, { status: 401 });
 
   const { data, error } = await supabase
@@ -46,8 +41,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = makeSupabase(req);
-  const companyId = await getCompanyId(supabase);
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return NextResponse.json({ ok: false, error: "Configuração Supabase ausente." }, { status: 500 });
+
+  const companyId = await getCompanyId();
   if (!companyId) return NextResponse.json({ ok: false, error: "Não autenticado." }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -56,7 +53,10 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabase
     .from("companies")
-    .update({ whatsapp_token: token || null, whatsapp_phone_number_id: phoneNumberId || null })
+    .update({
+      whatsapp_token: token || null,
+      whatsapp_phone_number_id: phoneNumberId || null,
+    })
     .eq("id", companyId);
 
   if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
