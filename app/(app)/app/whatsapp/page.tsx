@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   CheckCheckIcon,
@@ -101,6 +101,11 @@ const DEMO_CONVERSATIONS: Conversation[] = [
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
+async function fetchConfig(): Promise<{ ok: boolean; token: string; phone_number_id: string }> {
+  const res = await fetch("/api/companies/whatsapp-config");
+  return res.json();
+}
+
 async function saveConfig(body: { token: string; phone_number_id: string }) {
   const res = await fetch("/api/companies/whatsapp-config", {
     method: "POST",
@@ -114,47 +119,65 @@ async function saveConfig(body: { token: string; phone_number_id: string }) {
 // ─── Status Card ──────────────────────────────────────────────────────────────
 
 function StatusCard() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["whatsapp", "config"],
+    queryFn: fetchConfig,
+  });
+
+  const isConfigured = !isLoading && data?.ok && !!data.token && !!data.phone_number_id;
+
   return (
     <PremiumSurface>
       <Card className="rounded-2xl border-0 bg-transparent p-6 shadow-none">
         <div className="flex items-center justify-between flex-wrap gap-4">
           {/* Left: icon + info */}
           <div className="flex items-center gap-4">
-            <div className="relative flex size-14 items-center justify-center rounded-2xl border border-[#25D366]/30 bg-[#25D366]/10">
-              <SmartphoneIcon className="size-7 text-[#25D366]" />
-              <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full border-2 border-[#0A1A0C] bg-[#25D366]">
-                <WifiIcon className="size-2.5 text-white" />
-              </span>
+            <div className={`relative flex size-14 items-center justify-center rounded-2xl border ${isConfigured ? "border-[#25D366]/30 bg-[#25D366]/10" : "border-[#6B9E6B]/20 bg-[#6B9E6B]/5"}`}>
+              <SmartphoneIcon className={`size-7 ${isConfigured ? "text-[#25D366]" : "text-[#6B9E6B]"}`} />
+              {isConfigured && (
+                <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full border-2 border-[#0A1A0C] bg-[#25D366]">
+                  <WifiIcon className="size-2.5 text-white" />
+                </span>
+              )}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white">WhatsApp Business</span>
-                <Badge className="border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366] text-[10px]">
-                  Conectado
+                <Badge className={isConfigured
+                  ? "border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366] text-[10px]"
+                  : "border border-[#6B9E6B]/20 bg-transparent text-[#6B9E6B] text-[10px]"
+                }>
+                  {isLoading ? "..." : isConfigured ? "Configurado" : "Não configurado"}
                 </Badge>
               </div>
               <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[#6B9E6B]">
-                <PhoneIcon className="size-3" />
-                <span>+55 11 99999-0000</span>
-                <span className="text-[#6B9E6B]/40">·</span>
-                <span>MotorGestor Vendas</span>
+                {isConfigured ? (
+                  <>
+                    <PhoneIcon className="size-3" />
+                    <span className="font-mono">Phone ID: {data!.phone_number_id}</span>
+                  </>
+                ) : (
+                  <span>Configure seu número na seção abaixo para ativar</span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Right: stats */}
-          <div className="flex gap-6">
-            {[
-              { label: "Enviadas hoje", value: "14" },
-              { label: "Conversas ativas", value: "6" },
-              { label: "Taxa de resposta", value: "87%" },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-lg font-bold text-white">{s.value}</div>
-                <div className="text-[10px] text-[#6B9E6B]/70">{s.label}</div>
-              </div>
-            ))}
-          </div>
+          {/* Right: stats — zerados até integração real */}
+          {isConfigured && (
+            <div className="flex gap-6">
+              {[
+                { label: "Enviadas hoje", value: "0" },
+                { label: "Conversas ativas", value: "0" },
+                { label: "Taxa de resposta", value: "—" },
+              ].map((s) => (
+                <div key={s.label} className="text-center">
+                  <div className="text-lg font-bold text-white">{s.value}</div>
+                  <div className="text-[10px] text-[#6B9E6B]/70">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Card>
     </PremiumSurface>
@@ -340,6 +363,13 @@ function TemplatesSection() {
         <p className="mt-3 text-[10px] text-[#6B9E6B]/60">
           Use <code className="text-[#4AE54A]">{"{nome}"}</code>, <code className="text-[#4AE54A]">{"{veiculo}"}</code>, <code className="text-[#4AE54A]">{"{preco}"}</code> etc. como variáveis dinâmicas.
         </p>
+
+        <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-[rgba(74,229,74,0.1)] bg-[rgba(74,229,74,0.04)] px-4 py-3">
+          <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-[#4AE54A]/50" />
+          <p className="text-xs text-[#6B9E6B]">
+            As mensagens são enviadas apenas para leads que demonstraram interesse nos seus veículos. Não enviamos spam ou mensagens em massa.
+          </p>
+        </div>
       </Card>
 
       <Dialog open={sendOpen} onOpenChange={setSendOpen}>
