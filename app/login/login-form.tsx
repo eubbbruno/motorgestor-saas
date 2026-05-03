@@ -7,7 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { CarIcon, CheckIcon, Loader2Icon, StarIcon } from "lucide-react";
+import { CheckIcon, Loader2Icon, StarIcon } from "lucide-react";
 
 import { getHumanErrorMessage } from "@/lib/errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
