@@ -2,18 +2,29 @@ import { MercadoPagoConfig, Payment } from "mercadopago";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function getAccessToken(): string | undefined {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.MP_ACCESS_TOKEN;
+  }
+  return process.env.MP_ACCESS_TOKEN_TEST ?? process.env.MP_ACCESS_TOKEN;
+}
+
 export async function POST(req: NextRequest) {
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    return NextResponse.json({ error: "MP_ACCESS_TOKEN não configurado." }, { status: 500 });
+  }
+
   const body = await req.json();
 
-  const client = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN!,
-  });
+  const client = new MercadoPagoConfig({ accessToken });
   const payment = new Payment(client);
   const result = await payment.create({ body });
 
   if (result.status === "approved") {
     const supabase = await createSupabaseServerClient();
     if (!supabase) return NextResponse.json({ status: result.status, id: result.id });
+
     const isAnnual = result.metadata?.billingCycle === "annual";
     const daysToAdd = isAnnual ? 365 : 30;
 

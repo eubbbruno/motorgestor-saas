@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 import { AlertCircle, Loader2 } from "lucide-react";
 
-const MP_PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
-
-if (MP_PUBLIC_KEY) {
-  initMercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
-}
+// Em produção usa a chave de produção; em dev usa a chave de teste.
+// Configure no Vercel:
+//   NEXT_PUBLIC_MP_PUBLIC_KEY      → chave pública de PRODUÇÃO
+//   NEXT_PUBLIC_MP_PUBLIC_KEY_TEST → chave pública de TESTE
+const MP_PUBLIC_KEY =
+  process.env.NODE_ENV === "production"
+    ? process.env.NEXT_PUBLIC_MP_PUBLIC_KEY
+    : (process.env.NEXT_PUBLIC_MP_PUBLIC_KEY_TEST ?? process.env.NEXT_PUBLIC_MP_PUBLIC_KEY);
 
 interface CheckoutBrickProps {
   preferenceId: string;
@@ -16,8 +19,16 @@ interface CheckoutBrickProps {
 }
 
 export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
+  const [initialized, setInitialized] = useState(false);
   const [ready, setReady] = useState(false);
   const [mpError, setMpError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!MP_PUBLIC_KEY) return;
+    // Inicializa uma única vez por sessão
+    initMercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
+    setInitialized(true);
+  }, []);
 
   if (!MP_PUBLIC_KEY) {
     return (
@@ -28,15 +39,24 @@ export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
         </div>
         <p className="mt-1 text-red-400/70">
           Adicione <code className="font-mono">NEXT_PUBLIC_MP_PUBLIC_KEY</code>{" "}
-          nas variáveis de ambiente do Vercel e faça redeploy.
+          (produção) ou <code className="font-mono">NEXT_PUBLIC_MP_PUBLIC_KEY_TEST</code>{" "}
+          (teste) nas variáveis de ambiente e faça redeploy.
         </p>
+      </div>
+    );
+  }
+
+  if (!initialized) {
+    return (
+      <div className="flex items-center gap-2 py-8 text-sm text-mg-fg-muted">
+        <Loader2 className="size-4 animate-spin" />
+        Inicializando Mercado Pago…
       </div>
     );
   }
 
   return (
     <div className="relative">
-      {/* Loading state enquanto o brick não montou */}
       {!ready && !mpError && (
         <div className="flex items-center gap-2 py-8 text-sm text-mg-fg-muted">
           <Loader2 className="size-4 animate-spin" />
@@ -44,7 +64,6 @@ export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
         </div>
       )}
 
-      {/* Erro visível na tela quando o SDK do MP falha */}
       {mpError && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
           <div className="flex items-center gap-2 font-medium">
@@ -53,8 +72,7 @@ export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
           </div>
           <p className="mt-1 font-mono text-xs text-red-400/70">{mpError}</p>
           <p className="mt-2 text-red-400/70">
-            Tente recarregar a página. Se o erro persistir, entre em contato com
-            o suporte.
+            Verifique se a Public Key e o Access Token são do mesmo ambiente (teste ou produção).
           </p>
         </div>
       )}
