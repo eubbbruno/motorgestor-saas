@@ -3,6 +3,8 @@ import { WelcomeEmail } from "./templates/welcome";
 import { TrialExpiringEmail } from "./templates/trial-expiring";
 import { PaymentConfirmedEmail } from "./templates/payment-confirmed";
 import { PaymentFailedEmail } from "./templates/payment-failed";
+import { ConfirmEmailTemplate } from "./templates/confirm-email";
+import { ResetPasswordTemplate } from "./templates/reset-password";
 
 const FROM = "MotorGestor <noreply@motorgestor.com.br>";
 const REPLY_TO = "motorgestor@gmail.com";
@@ -50,5 +52,25 @@ export async function sendPaymentFailedEmail(to: string, name: string) {
     to,
     subject: "Problema com seu pagamento ⚠️",
     react: PaymentFailedEmail({ name }),
+  });
+}
+
+export async function sendConfirmEmailEmail(to: string, confirmUrl: string) {
+  return resend.emails.send({
+    from: FROM,
+    reply_to: REPLY_TO,
+    to,
+    subject: "Confirme seu email — MotorGestor",
+    react: ConfirmEmailTemplate({ confirmUrl }),
+  });
+}
+
+export async function sendResetPasswordEmail(to: string, resetUrl: string) {
+  return resend.emails.send({
+    from: FROM,
+    reply_to: REPLY_TO,
+    to,
+    subject: "Redefinir senha — MotorGestor",
+    react: ResetPasswordTemplate({ resetUrl }),
   });
 }
