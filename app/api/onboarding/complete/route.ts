@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+import { sendWelcomeEmail } from "@/lib/email/send";
+
 export async function POST(req: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -71,6 +73,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Nome amigável: user_metadata > email prefix
+  const userName: string =
+    (user.user_metadata?.full_name as string | undefined) ||
+    (user.user_metadata?.name as string | undefined) ||
+    emailPrefix;
+
   const { error: profileError } = await supabase.from("profiles").upsert(
     { id: user.id, company_id: company.id, role: "admin", email: user.email ?? null },
     { onConflict: "id" },
@@ -81,6 +89,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { ok: false, error: "Erro ao atualizar perfil." },
       { status: 500 },
+    );
+  }
+
+  // Envia email de boas-vindas — fire and forget (não bloqueia a resposta)
+  if (user.email) {
+    sendWelcomeEmail(user.email, userName).catch(err =>
+      console.error("[onboarding/complete] sendWelcomeEmail failed:", err)
     );
   }
 
