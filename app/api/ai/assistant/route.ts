@@ -22,7 +22,7 @@ REGRAS:
 - Se não souber algo específico do sistema, oriente o usuário a contatar o suporte
 - Nunca invente funcionalidades que não existem
 - Seja amigável mas profissional
-- Para dúvidas técnicas complexas, sugira contato: suporte@motorgestor.com.br`
+- Para dúvidas técnicas complexas, sugira contato: motorgestor@gmail.com`
 
 type HistoryMessage = { role: 'user' | 'assistant'; content: string }
 

@@ -119,7 +119,7 @@ export function PaymentConfirmedEmail({ name, plan, amount, nextBilling }: Payme
                         <p style={{ margin: "0 0 8px", fontSize: "13px", color: gray }}>
                           <a href="https://www.motorgestor.com.br" style={{ color: green, textDecoration: "none", fontWeight: "600" }}>motorgestor.com.br</a>
                           {" "}·{" "}
-                          <a href="mailto:suporte@motorgestor.com.br" style={{ color: gray, textDecoration: "none" }}>suporte@motorgestor.com.br</a>
+                          <a href="mailto:motorgestor@gmail.com" style={{ color: gray, textDecoration: "none" }}>motorgestor@gmail.com</a>
                         </p>
                       </td>
                     </tr>

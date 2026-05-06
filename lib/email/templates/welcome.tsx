@@ -111,7 +111,7 @@ export function WelcomeEmail({ name }: { name: string }) {
                         <p style={{ margin: "0 0 8px", fontSize: "13px", color: gray }}>
                           <a href="https://www.motorgestor.com.br" style={{ color: green, textDecoration: "none", fontWeight: "600" }}>motorgestor.com.br</a>
                           {" "}·{" "}
-                          <a href="mailto:suporte@motorgestor.com.br" style={{ color: gray, textDecoration: "none" }}>suporte@motorgestor.com.br</a>
+                          <a href="mailto:motorgestor@gmail.com" style={{ color: gray, textDecoration: "none" }}>motorgestor@gmail.com</a>
                         </p>
                         <p style={{ margin: 0, fontSize: "12px", color: "#9ca3af" }}>
                           Você está recebendo este email porque criou uma conta no MotorGestor.
