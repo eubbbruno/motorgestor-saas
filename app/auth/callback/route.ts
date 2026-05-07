@@ -12,7 +12,16 @@ export async function GET(request: NextRequest) {
     if (supabase) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) {
+        // Password reset flows pass next=/app/... explicitly; plain confirmation goes to login
+        if (next === "/app") {
+          return NextResponse.redirect(`${origin}/login?confirmed=true`);
+        }
         return NextResponse.redirect(`${origin}${next}`);
+      }
+
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("expired") || msg.includes("invalid") || msg.includes("otp")) {
+        return NextResponse.redirect(`${origin}/login?error=link_expired`);
       }
     }
   }

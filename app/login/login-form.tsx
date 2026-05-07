@@ -59,7 +59,15 @@ const inputCls =
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
+export function LoginForm({
+  redirectTo = "/app",
+  confirmed = false,
+  errorParam,
+}: {
+  redirectTo?: string;
+  confirmed?: boolean;
+  errorParam?: string;
+}) {
   const router = useRouter();
 
   const form = useForm<FormValues>({
@@ -70,6 +78,43 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
   const [loading, setLoading] = React.useState(false);
   const [oauthLoading, setOauthLoading] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
+  const [bannerVisible, setBannerVisible] = React.useState(true);
+  const [resendLoading, setResendLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!confirmed && errorParam !== "link_expired") return;
+    const t = setTimeout(() => setBannerVisible(false), 5000);
+    return () => clearTimeout(t);
+  }, [confirmed, errorParam]);
+
+  async function onResendConfirmation() {
+    const email = form.getValues("email");
+    if (!email) {
+      toast.error("Digite seu email no campo abaixo para reenviar a confirmação.");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const res = await fetch("/api/auth/resend-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        toast.success("Email de confirmação reenviado!", {
+          description: "Verifique sua caixa de entrada.",
+        });
+        setBannerVisible(false);
+      } else {
+        const data = await res.json();
+        toast.error(data.error ?? "Não foi possível reenviar. Tente novamente.");
+      }
+    } catch {
+      toast.error("Erro ao reenviar confirmação.");
+    } finally {
+      setResendLoading(false);
+    }
+  }
 
   // ── Handlers (unchanged logic) ────────────────────────────────────────────
 
@@ -208,6 +253,39 @@ export function LoginForm({ redirectTo = "/app" }: { redirectTo?: string }) {
             <span className="text-xs text-[#6B9E6B]">ou</span>
             <div className="flex-1 h-px bg-[rgba(74,229,74,0.08)]" />
           </div>
+
+          {/* Confirmed banner */}
+          {confirmed && bannerVisible ? (
+            <div
+              role="status"
+              className="rounded-xl border border-[rgba(74,229,74,0.35)] bg-[rgba(74,229,74,0.08)] px-4 py-3 text-sm text-[#4AE54A] flex items-start gap-2"
+            >
+              <span className="shrink-0">✅</span>
+              <span>Email confirmado com sucesso! Faça login para acessar sua conta.</span>
+            </div>
+          ) : null}
+
+          {/* Link expired banner */}
+          {errorParam === "link_expired" && bannerVisible ? (
+            <div
+              role="alert"
+              className="rounded-xl border border-yellow-500/30 bg-yellow-500/8 px-4 py-3 text-sm text-yellow-400 space-y-2"
+            >
+              <p className="flex items-start gap-2">
+                <span className="shrink-0">⚠️</span>
+                <span>O link de confirmação expirou. Faça login e enviaremos um novo link.</span>
+              </p>
+              <button
+                type="button"
+                onClick={onResendConfirmation}
+                disabled={resendLoading}
+                className="flex items-center gap-1.5 text-xs font-semibold text-yellow-300 hover:text-yellow-200 transition-colors disabled:opacity-50"
+              >
+                {resendLoading && <Loader2Icon className="size-3 animate-spin" />}
+                Reenviar confirmação
+              </button>
+            </div>
+          ) : null}
 
           {/* Form error */}
           {formError ? (
