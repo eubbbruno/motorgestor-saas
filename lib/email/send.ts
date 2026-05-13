@@ -12,7 +12,7 @@ const REPLY_TO = "motorgestor@gmail.com";
 export async function sendWelcomeEmail(to: string, name: string) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Bem-vindo ao MotorGestor! 🚗",
     react: WelcomeEmail({ name }),
@@ -22,7 +22,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 export async function sendTrialExpiringEmail(to: string, name: string, expiresAt: string) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Seu período de teste termina em 3 dias ⏰",
     react: TrialExpiringEmail({ name, expiresAt }),
@@ -38,7 +38,7 @@ export async function sendPaymentConfirmedEmail(
 ) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Pagamento confirmado! ✅",
     react: PaymentConfirmedEmail({ name, plan, amount, nextBilling }),
@@ -48,7 +48,7 @@ export async function sendPaymentConfirmedEmail(
 export async function sendPaymentFailedEmail(to: string, name: string) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Problema com seu pagamento ⚠️",
     react: PaymentFailedEmail({ name }),
@@ -58,7 +58,7 @@ export async function sendPaymentFailedEmail(to: string, name: string) {
 export async function sendConfirmEmailEmail(to: string, confirmUrl: string) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Confirme seu email — MotorGestor",
     react: ConfirmEmailTemplate({ confirmUrl }),
@@ -68,7 +68,7 @@ export async function sendConfirmEmailEmail(to: string, confirmUrl: string) {
 export async function sendResetPasswordEmail(to: string, resetUrl: string) {
   return resend.emails.send({
     from: FROM,
-    reply_to: REPLY_TO,
+    replyTo: REPLY_TO,
     to,
     subject: "Redefinir senha — MotorGestor",
     react: ResetPasswordTemplate({ resetUrl }),
