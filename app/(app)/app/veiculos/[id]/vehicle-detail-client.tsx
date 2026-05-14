@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
-import { CopyIcon, ExternalLinkIcon, Loader2Icon, PrinterIcon, SparklesIcon, TrashIcon } from "lucide-react";
+import { CopyIcon, ExternalLinkIcon, Loader2Icon, PrinterIcon, Share2Icon, SparklesIcon, TrashIcon } from "lucide-react";
 
 import { useVehicle, useUpdateVehicle, useDeleteVehicle } from "@/features/vehicles/hooks";
 import { useMyProfile } from "@/features/auth/hooks";
@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PostModal } from "@/components/social/post-modal";
 
 async function copyText(text: string) {
   const value = (text ?? "").toString();
@@ -59,6 +60,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [adOpen, setAdOpen] = React.useState(false);
+  const [postOpen, setPostOpen] = React.useState(false);
   const [printLoading, setPrintLoading] = React.useState(false);
   const [adTitle, setAdTitle] = React.useState("");
   const [adCity, setAdCity] = React.useState("");
@@ -118,7 +120,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
   React.useEffect(() => {
     let cancelled = false;
     async function run() {
-      if (!adOpen) return;
+      if (!adOpen && !postOpen) return;
       if (!photoPaths.length) {
         if (!cancelled) setPhotoUrls({});
         return;
@@ -140,7 +142,7 @@ export function VehicleDetailClient({ id }: { id: string }) {
     return () => {
       cancelled = true;
     };
-  }, [adOpen, photoPaths]);
+  }, [adOpen, postOpen, photoPaths]);
 
   React.useEffect(() => {
     if (!adOpen) return;
@@ -338,6 +340,15 @@ export function VehicleDetailClient({ id }: { id: string }) {
               disabled={!vehicle.data}
             >
               Gerar anúncio
+            </Button>
+            <Button
+              variant="outline"
+              className="border-mg-border bg-mg-surface text-foreground hover:bg-mg-surface-2"
+              onClick={() => setPostOpen(true)}
+              disabled={!vehicle.data}
+            >
+              <Share2Icon className="mr-2 size-4" />
+              Gerar Post
             </Button>
             <Button
               variant="outline"
@@ -597,6 +608,26 @@ export function VehicleDetailClient({ id }: { id: string }) {
           <DialogFooter showCloseButton />
         </DialogContent>
       </Dialog>
+
+      {postOpen && v && (
+        <PostModal
+          open={postOpen}
+          onClose={() => setPostOpen(false)}
+          vehicle={{
+            make: v.make,
+            model: v.model,
+            version: v.version ?? null,
+            year: v.year,
+            color: v.color ?? null,
+            mileage: v.mileage,
+            fuel: v.fuel ?? null,
+            transmission: v.transmission ?? null,
+            price: v.price,
+          }}
+          company={{ name: companyName }}
+          photoUrl={printPhotoUrl}
+        />
+      )}
     </div>
   );
 }

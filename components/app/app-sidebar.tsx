@@ -13,6 +13,7 @@ import {
   MessageCircleIcon,
   PlugIcon,
   SettingsIcon,
+  Share2Icon,
   UsersIcon,
 } from "lucide-react";
 
@@ -36,6 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Ferramentas",
     items: [
       { href: "/app/relatorios",  label: "Relatórios",    icon: BarChart3Icon },
+      { href: "/app/social",      label: "Social Media",  icon: Share2Icon },
       { href: "/app/assistente",  label: "Assistente IA", icon: BotIcon },
       {
         href: "/app/whatsapp",
