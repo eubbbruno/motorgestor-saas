@@ -2,6 +2,8 @@
 
 ## 🔴 URGENTE
 - [ ] Testar WhatsApp com token permanente e número real
+- [ ] Configurar webhook WhatsApp no Meta for Developers (URL: https://www.motorgestor.com.br/api/whatsapp/webhook)
+- [ ] Testar recebimento de mensagem real no inbox
 - [ ] Testar pagamento completo (Mercado Pago produção)
 - [ ] Rodar SQL segurança WhatsApp no Supabase
 - [ ] Configurar SMTP Supabase (templates em português)
@@ -41,6 +43,10 @@
 - [x] RLS Supabase corrigido
 - [x] Onboarding modal
 - [x] Social Media (estrutura)
+- [x] ROADMAP criado
+- [x] Salvamento de telefone corrigido nas configurações
+- [x] Inbox WhatsApp sem dados demo (empty state real)
+- [x] Banner de configuração WhatsApp no inbox
 
 ## 📋 NOTAS
 - WhatsApp: token permanente configurado, número +5543988110833

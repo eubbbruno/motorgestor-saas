@@ -4,6 +4,7 @@ import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  AlertTriangleIcon,
   BotIcon,
   CheckCheckIcon,
   CheckIcon,
@@ -17,7 +18,6 @@ import {
   SmartphoneIcon,
   UserPlusIcon,
   WifiIcon,
-  XCircleIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,55 +44,6 @@ type WaMessage = {
   created_at: string;
 };
 
-// ─── Demo data (shown when no real conversations exist yet) ───────────────────
-
-const DEMO_CONVERSATIONS: WaConversation[] = [
-  {
-    id: "demo1",
-    contact_phone: "5511987654321",
-    contact_name: "João Silva",
-    last_message: "R$ 72.900. Posso agendar um test drive para você?",
-    last_message_at: new Date(Date.now() - 3 * 60000).toISOString(),
-    unread_count: 0,
-    status: "open",
-  },
-  {
-    id: "demo2",
-    contact_phone: "5521976543210",
-    contact_name: "Maria Santos",
-    last_message: "Olá Maria! Vi que você tem interesse no Polo Track.",
-    last_message_at: new Date(Date.now() - 45 * 60000).toISOString(),
-    unread_count: 2,
-    status: "open",
-  },
-  {
-    id: "demo3",
-    contact_phone: "5531965432109",
-    contact_name: null,
-    last_message: "Obrigado! Entrarei em contato amanhã.",
-    last_message_at: new Date(Date.now() - 3 * 3600000).toISOString(),
-    unread_count: 0,
-    status: "resolved",
-  },
-];
-
-const DEMO_MESSAGES: Record<string, WaMessage[]> = {
-  demo1: [
-    { id: "m1", direction: "inbound", message: "Olá, vi o HB20 2023 no site, ainda está disponível?", sent_by: "human", created_at: new Date(Date.now() - 25 * 60000).toISOString() },
-    { id: "m2", direction: "outbound", message: "Olá João! Sim, temos disponível 😊 Posso te enviar mais detalhes?", sent_by: "ai", created_at: new Date(Date.now() - 22 * 60000).toISOString() },
-    { id: "m3", direction: "inbound", message: "Sim por favor, qual o valor?", sent_by: "human", created_at: new Date(Date.now() - 18 * 60000).toISOString() },
-    { id: "m4", direction: "outbound", message: "R$ 72.900. Posso agendar um test drive para você? 🚗", sent_by: "ai", created_at: new Date(Date.now() - 3 * 60000).toISOString() },
-  ],
-  demo2: [
-    { id: "m5", direction: "inbound", message: "Tenho interesse no Polo Track", sent_by: "human", created_at: new Date(Date.now() - 60 * 60000).toISOString() },
-    { id: "m6", direction: "outbound", message: "Olá Maria! Vi que você tem interesse no Polo Track. Sou Carlos da MotorGestor. Posso te ajudar com mais informações? 😊", sent_by: "ai", created_at: new Date(Date.now() - 45 * 60000).toISOString() },
-  ],
-  demo3: [
-    { id: "m7", direction: "inbound", message: "Boa tarde, quero saber sobre financiamento", sent_by: "human", created_at: new Date(Date.now() - 5 * 3600000).toISOString() },
-    { id: "m8", direction: "outbound", message: "Boa tarde! Trabalhamos com vários bancos parceiros 😊 Me conta qual veículo você se interessou?", sent_by: "ai", created_at: new Date(Date.now() - 4.5 * 3600000).toISOString() },
-    { id: "m9", direction: "inbound", message: "Obrigado! Entrarei em contato amanhã.", sent_by: "human", created_at: new Date(Date.now() - 3 * 3600000).toISOString() },
-  ],
-};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -134,10 +85,15 @@ async function fetchConversations(): Promise<WaConversation[]> {
 }
 
 async function fetchMessages(conversationId: string): Promise<WaMessage[]> {
-  if (conversationId.startsWith("demo")) return DEMO_MESSAGES[conversationId] ?? [];
   const res = await fetch(`/api/whatsapp/conversations/${conversationId}/messages`);
   const data = await res.json();
   return data.ok ? data.data : [];
+}
+
+async function fetchStatus(): Promise<{ configured: boolean }> {
+  const res = await fetch("/api/whatsapp/status");
+  const data = await res.json();
+  return { configured: data.configured ?? false };
 }
 
 // ─── Conversation Item ─────────────────────────────────────────────────────────
@@ -235,15 +191,19 @@ export default function WhatsAppPage() {
   const [note, setNote] = React.useState("");
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-  // Real conversations — poll every 5s
-  const { data: realConversations = [] } = useQuery({
+  const { data: statusData } = useQuery({
+    queryKey: ["wa", "status"],
+    queryFn: fetchStatus,
+    staleTime: 30000,
+  });
+  const isConfigured = statusData?.configured ?? true;
+
+  // Conversations — poll every 5s
+  const { data: conversations = [] } = useQuery({
     queryKey: ["wa", "conversations"],
     queryFn: fetchConversations,
     refetchInterval: 5000,
   });
-
-  const conversations = realConversations.length > 0 ? realConversations : DEMO_CONVERSATIONS;
-  const isDemo = realConversations.length === 0;
 
   const filtered = conversations.filter(c => {
     const matchTab =
@@ -258,7 +218,7 @@ export default function WhatsAppPage() {
   });
 
   const openCount = conversations.filter(c => c.status === "open").length;
-  const selected = conversations.find(c => c.id === selectedId) ?? filtered[0] ?? null;
+  const selected = conversations.find(c => c.id === selectedId) ?? (filtered.length > 0 ? filtered[0] : null);
 
   // Messages for selected conversation — poll every 3s
   const { data: messages = [] } = useQuery({
@@ -275,10 +235,7 @@ export default function WhatsAppPage() {
   // Send message mutation
   const sendMutation = useMutation({
     mutationFn: async (message: string) => {
-      if (!selected || isDemo) {
-        toast.info("Modo demonstração — conecte o WhatsApp para enviar.");
-        return;
-      }
+      if (!selected) return;
       const res = await fetch(`/api/whatsapp/conversations/${selected.id}/send`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -298,7 +255,7 @@ export default function WhatsAppPage() {
   // Resolve mutation
   const resolveMutation = useMutation({
     mutationFn: async () => {
-      if (!selected || isDemo) { toast.info("Modo demonstração."); return; }
+      if (!selected) return;
       await fetch(`/api/whatsapp/conversations/${selected.id}/resolve`, { method: "POST" });
     },
     onSuccess: () => {
@@ -323,6 +280,23 @@ export default function WhatsAppPage() {
   const ini = selected ? initials(selected.contact_name, selected.contact_phone) : "";
 
   return (
+    <div className="flex flex-col gap-3">
+      {/* Banner: WhatsApp não configurado */}
+      {!isConfigured && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-amber-400">
+            <AlertTriangleIcon className="size-4 shrink-0" />
+            <span>Configure seu WhatsApp Business para ativar o inbox</span>
+          </div>
+          <button
+            onClick={() => window.location.href = "/app/configuracoes?tab=integracoes"}
+            className="shrink-0 rounded-lg border border-amber-500/40 bg-amber-500/20 px-3 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-500/30 transition-colors"
+          >
+            Configurar agora
+          </button>
+        </div>
+      )}
+
     <div
       className="flex rounded-2xl overflow-hidden border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
       style={{ height: "calc(100vh - 9rem)" }}
@@ -340,9 +314,6 @@ export default function WhatsAppPage() {
               </span>
             )}
           </div>
-          {isDemo && (
-            <span className="text-[9px] text-amber-400/70 border border-amber-400/20 rounded px-1.5 py-0.5">demo</span>
-          )}
         </div>
 
         {/* Search */}
@@ -385,9 +356,13 @@ export default function WhatsAppPage() {
             />
           ))}
           {filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
               <MessageCircleIcon className="size-8 text-[#6B9E6B]/30 mb-2" />
-              <p className="text-xs text-[#6B9E6B]/50">Nenhuma conversa encontrada</p>
+              <p className="text-xs text-[#6B9E6B]/50">
+                {conversations.length === 0
+                  ? "Nenhuma conversa ainda. Configure seu WhatsApp para começar."
+                  : "Nenhuma conversa encontrada"}
+              </p>
             </div>
           )}
         </div>
@@ -593,6 +568,7 @@ export default function WhatsAppPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

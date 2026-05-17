@@ -80,13 +80,19 @@ function PerfilTab() {
 
   React.useEffect(() => {
     if (profile.data) {
-      form.reset({ full_name: profile.data.full_name ?? "" });
+      form.reset({
+        full_name: profile.data.full_name ?? "",
+        phone: profile.data.phone ?? "",
+      });
     }
   }, [profile.data, form]);
 
   async function onSubmit(values: ProfileValues) {
     try {
-      await update.mutateAsync({ full_name: values.full_name ?? null });
+      await update.mutateAsync({
+        full_name: values.full_name ?? null,
+        phone: values.phone || null,
+      });
       toast.success("Perfil salvo.");
     } catch {
       toast.error("Não foi possível salvar.");

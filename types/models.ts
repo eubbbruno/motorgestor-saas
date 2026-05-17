@@ -19,6 +19,7 @@ export type ProfileRow = {
   role: UserRole;
   full_name: string | null;
   email: string | null;
+  phone: string | null;
   created_at: string;
   updated_at: string;
 };

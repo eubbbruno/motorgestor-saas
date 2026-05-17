@@ -40,7 +40,10 @@
       "Bash(grep -v node_modules echo \"---\" find /c/Users/Bruno/motorgestor-saas/components -iname \"*evento*\" -o -iname \"*agenda*\")",
       "Bash(grep -v node_modules echo \"---\" find /c/Users/Bruno/motorgestor-saas/features -iname \"*event*\" -o -iname \"*agenda*\")",
       "Bash(grep -i integra find /c/Users/Bruno/motorgestor-saas/app -name \"*.tsx\")",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\api\\\\whatsapp\\\\status\")",
+      "Bash(Out-Null)",
+      "PowerShell(app *)"
     ]
   }
 }

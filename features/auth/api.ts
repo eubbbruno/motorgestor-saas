@@ -16,7 +16,7 @@ export async function fetchMyProfile(): Promise<ProfileRow> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, company_id, role, full_name, email, created_at, updated_at")
+    .select("id, company_id, role, full_name, email, phone, created_at, updated_at")
     .eq("id", user.id)
     .single();
 
@@ -24,7 +24,7 @@ export async function fetchMyProfile(): Promise<ProfileRow> {
   return data as ProfileRow;
 }
 
-export async function updateMyProfile(values: { full_name?: string | null }): Promise<ProfileRow> {
+export async function updateMyProfile(values: { full_name?: string | null; phone?: string | null }): Promise<ProfileRow> {
   const supabase = createSupabaseBrowserClient();
 
   const {
@@ -38,9 +38,10 @@ export async function updateMyProfile(values: { full_name?: string | null }): Pr
     .from("profiles")
     .update({
       full_name: values.full_name ?? null,
+      phone: values.phone ?? null,
     })
     .eq("id", user.id)
-    .select("id, company_id, role, full_name, email, created_at, updated_at")
+    .select("id, company_id, role, full_name, email, phone, created_at, updated_at")
     .single();
 
   if (error) throw error;
