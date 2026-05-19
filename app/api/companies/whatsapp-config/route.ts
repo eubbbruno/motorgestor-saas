@@ -59,7 +59,21 @@ export async function POST(req: NextRequest) {
     })
     .eq("id", companyId);
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[whatsapp-config POST] Supabase error:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      companyId,
+    });
+    return NextResponse.json({
+      ok: false,
+      error: error.message,
+      code: error.code,
+      hint: error.hint ?? "Verifique se as colunas whatsapp_token e whatsapp_phone_number_id existem na tabela companies. Execute db/migrations/2026_whatsapp_full.sql no Supabase.",
+    }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }
