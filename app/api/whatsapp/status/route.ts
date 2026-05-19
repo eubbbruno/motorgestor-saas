@@ -26,5 +26,9 @@ export async function GET() {
     .single();
 
   const configured = Boolean(company?.whatsapp_token && company?.whatsapp_phone_number_id);
-  return NextResponse.json({ ok: true, configured });
+  return NextResponse.json({
+    ok: true,
+    configured,
+    phone_number_id: company?.whatsapp_phone_number_id ?? null,
+  });
 }
