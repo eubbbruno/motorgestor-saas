@@ -2,67 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart3Icon,
-  BotIcon,
-  BrainIcon,
-  CalendarIcon,
-  CarIcon,
-  CreditCardIcon,
-  LayoutDashboardIcon,
-  MessageCircleIcon,
-  PlugIcon,
-  SettingsIcon,
-  UsersIcon,
-} from "lucide-react";
+import { CarIcon } from "lucide-react";
 
+import { NAV_GROUPS } from "@/components/app/nav-groups";
 import { cn } from "@/lib/utils";
-
-type SubItem = { href: string; label: string; icon: React.ElementType };
-type NavItem = { href: string; label: string; icon: React.ElementType; subItems?: SubItem[] };
-type NavGroup = { label: string; items: NavItem[] };
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    label: "Principal",
-    items: [
-      { href: "/app",          label: "Dashboard",   icon: LayoutDashboardIcon },
-      { href: "/app/veiculos", label: "Veículos",    icon: CarIcon },
-      { href: "/app/leads",    label: "Leads",       icon: UsersIcon },
-      { href: "/app/agenda",   label: "Agenda",      icon: CalendarIcon },
-    ],
-  },
-  {
-    label: "Ferramentas",
-    items: [
-      { href: "/app/relatorios",  label: "Relatórios",    icon: BarChart3Icon },
-      { href: "/app/assistente",  label: "Assistente IA", icon: BotIcon },
-      {
-        href: "/app/whatsapp",
-        label: "WhatsApp",
-        icon: MessageCircleIcon,
-        subItems: [
-          { href: "/app/whatsapp/treinamento", label: "Treinamento IA", icon: BrainIcon },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Configurações",
-    items: [
-      { href: "/app/integracoes",   label: "Integrações",      icon: PlugIcon },
-      { href: "/app/billing",       label: "Plano & Cobrança", icon: CreditCardIcon },
-      { href: "/app/configuracoes", label: "Configurações",    icon: SettingsIcon },
-    ],
-  },
-];
 
 export function AppSidebar() {
   const pathname = usePathname();
 
   function isActive(href: string) {
     if (href === "/app") return pathname === "/app";
-    // For /app/whatsapp, don't match /app/whatsapp/treinamento as active
     if (href === "/app/whatsapp") return pathname === "/app/whatsapp";
     return pathname.startsWith(href);
   }
@@ -107,7 +56,6 @@ export function AppSidebar() {
                         <span>{item.label}</span>
                       </Link>
 
-                      {/* Sub-items — show when parent is active */}
                       {item.subItems && pathname.startsWith(item.href) && (
                         <div className="ml-4 mt-0.5 space-y-0.5 border-l border-[rgba(74,229,74,0.1)] pl-3">
                           {item.subItems.map((sub) => {
