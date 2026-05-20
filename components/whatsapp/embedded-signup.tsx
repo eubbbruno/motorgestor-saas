@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Script from "next/script";
-import { Loader2Icon, SmartphoneIcon } from "lucide-react";
+import { AlertTriangleIcon, CheckCircleIcon, Loader2Icon, SmartphoneIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,6 @@ declare global {
         options: Record<string, unknown>,
       ) => void;
     };
-    fbAsyncInit?: () => void;
   }
 }
 
@@ -23,78 +22,142 @@ type Props = {
   onSuccess: (phoneNumber: string) => void;
 };
 
+const APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID ?? "";
+const CONFIG_ID = process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID ?? "";
+
 export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
   const [sdkReady, setSdkReady] = React.useState(false);
+  const [sdkError, setSdkError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
   function handleSdkLoad() {
-    window.FB.init({
-      appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
-      autoLogAppEvents: true,
-      xfbml: true,
-      version: "v19.0",
-    });
-    setSdkReady(true);
+    try {
+      if (!window.FB) {
+        setSdkError("window.FB não definido após carregamento do script.");
+        return;
+      }
+      window.FB.init({
+        appId: APP_ID,
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: "v19.0",
+      });
+      setSdkReady(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setSdkError(`FB.init falhou: ${msg}`);
+    }
+  }
+
+  function handleSdkError() {
+    setSdkError("Falha ao carregar o script do Facebook SDK. Verifique sua conexão ou bloqueador de anúncios.");
   }
 
   async function launchEmbeddedSignup() {
-    if (!sdkReady) {
-      toast.error("SDK do Facebook ainda carregando. Tente novamente.");
+    if (!sdkReady || !window.FB) {
+      toast.error("SDK do Facebook não carregou ainda.", {
+        description: sdkError ?? "Aguarde alguns segundos e tente novamente.",
+      });
+      return;
+    }
+
+    if (!APP_ID) {
+      toast.error("NEXT_PUBLIC_FACEBOOK_APP_ID não configurado.", {
+        description: "Adicione a variável de ambiente e faça redeploy.",
+      });
+      return;
+    }
+
+    if (!CONFIG_ID) {
+      toast.error("NEXT_PUBLIC_WHATSAPP_CONFIG_ID não configurado.", {
+        description: "Crie o Configurador no Meta for Developers e adicione a variável.",
+      });
       return;
     }
 
     setLoading(true);
 
-    window.FB.login(
-      async (response) => {
-        const code = response.authResponse?.code;
-        if (!code) {
-          toast.error("Autorização cancelada ou falhou.");
-          setLoading(false);
-          return;
-        }
-
-        try {
-          const res = await fetch("/api/whatsapp/embedded-signup", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ code }),
-          });
-
-          const data = await res.json();
-
-          if (!data.ok) {
-            throw new Error(data.error ?? "Erro ao conectar WhatsApp.");
+    try {
+      window.FB.login(
+        async (response) => {
+          const code = response.authResponse?.code;
+          if (!code) {
+            toast.error("Autorização cancelada ou negada pelo Facebook.");
+            setLoading(false);
+            return;
           }
 
-          toast.success("WhatsApp Business conectado!");
-          onSuccess(data.phone_number ?? "");
-        } catch (err: unknown) {
-          const msg = err instanceof Error ? err.message : "Erro desconhecido.";
-          toast.error("Não foi possível conectar.", { description: msg });
-        } finally {
-          setLoading(false);
-        }
-      },
-      {
-        config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID,
-        response_type: "code",
-        override_default_response_type: true,
-        extras: {
-          setup: {},
-          featureName: "whatsapp_embedded_signup",
-          sessionInfoVersion: "3",
+          try {
+            const res = await fetch("/api/whatsapp/embedded-signup", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ code }),
+            });
+
+            const data = await res.json();
+
+            if (!data.ok) {
+              throw new Error(data.error ?? "Erro ao conectar WhatsApp.");
+            }
+
+            toast.success("WhatsApp Business conectado!");
+            onSuccess(data.phone_number ?? "");
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Erro desconhecido.";
+            toast.error("Falha ao salvar conexão.", { description: msg });
+          } finally {
+            setLoading(false);
+          }
         },
-      },
-    );
+        {
+          config_id: CONFIG_ID,
+          response_type: "code",
+          override_default_response_type: true,
+          extras: {
+            setup: {},
+            featureName: "whatsapp_embedded_signup",
+            sessionInfoVersion: "3",
+          },
+        },
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error("FB.login lançou exceção.", { description: msg });
+      setLoading(false);
+    }
   }
+
+  // ── Status indicators ──────────────────────────────────────────────────────
+  const checks = [
+    {
+      label: "Facebook SDK",
+      ok: sdkReady,
+      error: sdkError,
+      pending: !sdkReady && !sdkError,
+    },
+    {
+      label: `App ID: ${APP_ID ? `...${APP_ID.slice(-4)}` : "⚠️ vazio"}`,
+      ok: Boolean(APP_ID),
+      error: APP_ID ? null : "NEXT_PUBLIC_FACEBOOK_APP_ID não definido",
+      pending: false,
+    },
+    {
+      label: `Config ID: ${CONFIG_ID ? `...${CONFIG_ID.slice(-4)}` : "⚠️ vazio"}`,
+      ok: Boolean(CONFIG_ID),
+      error: CONFIG_ID ? null : "NEXT_PUBLIC_WHATSAPP_CONFIG_ID não definido",
+      pending: false,
+    },
+  ];
+
+  const allOk = checks.every(c => c.ok);
 
   return (
     <>
       <Script
         src="https://connect.facebook.net/pt_BR/sdk.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={handleSdkLoad}
+        onError={handleSdkError}
       />
 
       <div className="flex flex-1 flex-col items-center justify-center px-6">
@@ -113,6 +176,55 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
             </p>
           </div>
 
+          {/* Debug status panel */}
+          <div className="rounded-xl border border-[rgba(74,229,74,0.1)] bg-[rgba(0,0,0,0.3)] px-4 py-3 text-left space-y-1.5">
+            {checks.map((c) => (
+              <div key={c.label} className="flex items-start gap-2">
+                {c.pending ? (
+                  <Loader2Icon className="size-3.5 mt-0.5 animate-spin text-[#6B9E6B]/50 shrink-0" />
+                ) : c.ok ? (
+                  <CheckCircleIcon className="size-3.5 mt-0.5 text-[#4AE54A] shrink-0" />
+                ) : (
+                  <AlertTriangleIcon className="size-3.5 mt-0.5 text-amber-400 shrink-0" />
+                )}
+                <div>
+                  <span className={`text-[11px] font-mono ${c.ok ? "text-[#4AE54A]" : c.pending ? "text-[#6B9E6B]/60" : "text-amber-400"}`}>
+                    {c.label}
+                  </span>
+                  {c.error && (
+                    <p className="text-[10px] text-red-400/80 mt-0.5">{c.error}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            onClick={launchEmbeddedSignup}
+            disabled={loading || !allOk}
+            className="w-full h-11 bg-[#25D366] text-white hover:bg-[#1da851] font-semibold text-sm rounded-xl disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <Loader2Icon className="mr-2 size-4 animate-spin" />
+                Conectando...
+              </>
+            ) : !sdkReady && !sdkError ? (
+              <>
+                <Loader2Icon className="mr-2 size-4 animate-spin" />
+                Carregando SDK...
+              </>
+            ) : (
+              "Conectar WhatsApp Business"
+            )}
+          </Button>
+
+          {!allOk && !loading && (
+            <p className="text-[11px] text-amber-400/80">
+              Resolva os itens acima antes de conectar.
+            </p>
+          )}
+
           <ul className="text-left space-y-2">
             {[
               "Atendimento automático com IA",
@@ -127,25 +239,6 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
               </li>
             ))}
           </ul>
-
-          <Button
-            onClick={launchEmbeddedSignup}
-            disabled={loading}
-            className="w-full h-11 bg-[#25D366] text-white hover:bg-[#1da851] font-semibold text-sm rounded-xl"
-          >
-            {loading ? (
-              <>
-                <Loader2Icon className="mr-2 size-4 animate-spin" />
-                Conectando...
-              </>
-            ) : (
-              "Conectar WhatsApp Business"
-            )}
-          </Button>
-
-          <p className="text-[10px] text-[#6B9E6B]/50">
-            Você será redirecionado para o Facebook para autorizar a conexão.
-          </p>
         </div>
       </div>
     </>
