@@ -79,35 +79,14 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
 
     try {
       window.FB.login(
-        async (response) => {
+        function (response) {
           const code = response.authResponse?.code;
           if (!code) {
             toast.error("Autorização cancelada ou negada pelo Facebook.");
             setLoading(false);
             return;
           }
-
-          try {
-            const res = await fetch("/api/whatsapp/embedded-signup", {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ code }),
-            });
-
-            const data = await res.json();
-
-            if (!data.ok) {
-              throw new Error(data.error ?? "Erro ao conectar WhatsApp.");
-            }
-
-            toast.success("WhatsApp Business conectado!");
-            onSuccess(data.phone_number ?? "");
-          } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : "Erro desconhecido.";
-            toast.error("Falha ao salvar conexão.", { description: msg });
-          } finally {
-            setLoading(false);
-          }
+          handleSignupResponse(code);
         },
         {
           config_id: CONFIG_ID,
@@ -123,6 +102,30 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       toast.error("FB.login lançou exceção.", { description: msg });
+      setLoading(false);
+    }
+  }
+
+  async function handleSignupResponse(code: string) {
+    try {
+      const res = await fetch("/api/whatsapp/embedded-signup", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        throw new Error(data.error ?? "Erro ao conectar WhatsApp.");
+      }
+
+      toast.success("WhatsApp Business conectado!");
+      onSuccess(data.phone_number ?? "");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro desconhecido.";
+      toast.error("Falha ao salvar conexão.", { description: msg });
+    } finally {
       setLoading(false);
     }
   }
