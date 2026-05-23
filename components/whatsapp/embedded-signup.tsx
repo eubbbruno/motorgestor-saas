@@ -53,7 +53,7 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
     setSdkError("Falha ao carregar o script do Facebook SDK. Verifique sua conexão ou bloqueador de anúncios.");
   }
 
-  async function launchEmbeddedSignup() {
+  function launchEmbeddedSignup() {
     if (!sdkReady || !window.FB) {
       toast.error("SDK do Facebook não carregou ainda.", {
         description: sdkError ?? "Aguarde alguns segundos e tente novamente.",
