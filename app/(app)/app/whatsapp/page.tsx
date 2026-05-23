@@ -3,8 +3,10 @@
 import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   BotIcon,
+  BookOpenIcon,
   CheckCheckIcon,
   CheckIcon,
   Loader2Icon,
@@ -317,15 +319,25 @@ export default function WhatsAppPage() {
 
   if (!isConfigured) {
     return (
-      <div
-        className="flex rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
-        style={{ height: "calc(100vh - 9rem)" }}
-      >
-        <WhatsAppEmbeddedSignup
-          onSuccess={() => {
-            qc.invalidateQueries({ queryKey: ["wa", "status"] });
-          }}
-        />
+      <div className="space-y-3">
+        <div className="flex items-center justify-end">
+          <Button asChild variant="ghost" size="sm" className="text-[#6B9E6B] hover:text-[#4AE54A] hover:bg-[rgba(74,229,74,0.08)] text-xs gap-1.5">
+            <Link href="/app/whatsapp/tutorial">
+              <BookOpenIcon className="size-3.5" />
+              Ver tutorial
+            </Link>
+          </Button>
+        </div>
+        <div
+          className="flex rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
+          style={{ height: "calc(100vh - 10.5rem)" }}
+        >
+          <WhatsAppEmbeddedSignup
+            onSuccess={() => {
+              qc.invalidateQueries({ queryKey: ["wa", "status"] });
+            }}
+          />
+        </div>
       </div>
     );
   }

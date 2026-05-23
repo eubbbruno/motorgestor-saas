@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import Script from "next/script";
-import { AlertTriangleIcon, CheckCircleIcon, Loader2Icon, SmartphoneIcon } from "lucide-react";
+import { AlertTriangleIcon, BookOpenIcon, CheckCircleIcon, Loader2Icon, SmartphoneIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -242,6 +243,14 @@ export function WhatsAppEmbeddedSignup({ onSuccess }: Props) {
               </li>
             ))}
           </ul>
+
+          <Link
+            href="/app/whatsapp/tutorial"
+            className="inline-flex items-center gap-1.5 text-xs text-[#6B9E6B] hover:text-[#4AE54A] transition-colors"
+          >
+            <BookOpenIcon className="size-3.5" />
+            Ver tutorial passo a passo
+          </Link>
         </div>
       </div>
     </>
