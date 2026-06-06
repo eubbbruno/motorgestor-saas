@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getInstanceStatus } from "@/lib/whatsapp/evolution-go";
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
@@ -21,14 +22,21 @@ export async function GET() {
 
   const { data: company } = await supabase
     .from("companies")
-    .select("whatsapp_token, whatsapp_phone_number_id")
+    .select("whatsapp_instance_name")
     .eq("id", profile.company_id)
     .single();
 
-  const configured = Boolean(company?.whatsapp_token && company?.whatsapp_phone_number_id);
+  const instanceName = company?.whatsapp_instance_name as string | null;
+  if (!instanceName) return NextResponse.json({ ok: true, configured: false });
+
+  const statusData = await getInstanceStatus(instanceName).catch(() => null);
+  const state: string | undefined =
+    statusData?.instance?.state ?? statusData?.state ?? statusData?.instanceInfo?.state;
+  const connected = state === "open";
+
   return NextResponse.json({
     ok: true,
-    configured,
-    phone_number_id: company?.whatsapp_phone_number_id ?? null,
+    configured: connected,
+    instance_name: instanceName,
   });
 }

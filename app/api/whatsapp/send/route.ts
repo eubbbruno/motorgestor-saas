@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-const META_API = "https://graph.facebook.com/v25.0";
+import { sendTextMessage } from "@/lib/whatsapp/evolution-go";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
@@ -17,7 +16,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Configuração Supabase ausente." }, { status: 500 });
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
@@ -35,40 +37,32 @@ export async function POST(req: NextRequest) {
 
   const { data: company } = await supabase
     .from("companies")
-    .select("whatsapp_token, whatsapp_phone_number_id")
+    .select("whatsapp_instance_name")
     .eq("id", companyId)
     .single();
 
-  const token = company?.whatsapp_token;
-  const phoneNumberId = company?.whatsapp_phone_number_id;
-
-  if (!token || !phoneNumberId) {
+  const instanceName = company?.whatsapp_instance_name as string | null;
+  if (!instanceName) {
     return NextResponse.json(
-      { error: "Credenciais WhatsApp não configuradas. Salve o Token e o Phone Number ID primeiro." },
+      { error: "WhatsApp não conectado. Conecte seu WhatsApp primeiro." },
       { status: 400 },
     );
   }
 
-  const metaRes = await fetch(`${META_API}/${phoneNumberId}/messages`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      messaging_product: "whatsapp",
-      to,
-      type: "template",
-      template: { name: "hello_world", language: { code: "en_US" } },
-    }),
-  });
-
-  const metaData = await metaRes.json();
-
-  if (!metaRes.ok) {
-    console.error("[whatsapp/send] Meta error:", metaData);
-    return NextResponse.json({ error: metaData?.error?.message ?? "Erro na API do Meta." }, { status: metaRes.status });
+  const text: string = (body.text ?? body.message ?? "").trim();
+  if (!text) {
+    return NextResponse.json({ error: "Mensagem vazia." }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, data: metaData });
+  const result = await sendTextMessage(instanceName, to, text);
+
+  if (result?.error) {
+    console.error("[whatsapp/send] Evolution GO error:", result);
+    return NextResponse.json(
+      { error: result.error ?? "Erro ao enviar mensagem." },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ ok: true, data: result });
 }

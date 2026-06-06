@@ -25,7 +25,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { WhatsAppEmbeddedSignup } from "@/components/whatsapp/embedded-signup";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -49,7 +48,7 @@ type WaMessage = {
 
 type WaStatus = {
   configured: boolean;
-  phone_number_id: string | null;
+  instance_name?: string | null;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -88,7 +87,7 @@ function formatPhone(phone: string): string {
 async function fetchStatus(): Promise<WaStatus> {
   const res = await fetch("/api/whatsapp/status");
   const data = await res.json();
-  return { configured: data.configured ?? false, phone_number_id: data.phone_number_id ?? null };
+  return { configured: data.configured ?? false, instance_name: data.instance_name ?? null };
 }
 
 async function fetchConversations(): Promise<WaConversation[]> {
@@ -196,6 +195,10 @@ export default function WhatsAppPage() {
   const [aiPaused, setAiPaused] = React.useState(false);
   const [messageInput, setMessageInput] = React.useState("");
   const [note, setNote] = React.useState("");
+  const [qrCode, setQrCode] = React.useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = React.useState(false);
+  const [setupError, setSetupError] = React.useState<string | null>(null);
+  const [isSetupPending, setIsSetupPending] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   const { data: statusData, isLoading: statusLoading } = useQuery({
@@ -205,6 +208,44 @@ export default function WhatsAppPage() {
   });
 
   const isConfigured = statusData?.configured ?? false;
+
+  // Polling query for connection status while scanning QR code
+  const { data: setupStatus } = useQuery({
+    queryKey: ["wa", "setup"],
+    queryFn: async () => {
+      const res = await fetch("/api/whatsapp/setup");
+      return res.json() as Promise<{ connected: boolean; qr: string | null; instance_name?: string }>;
+    },
+    enabled: isConnecting,
+    refetchInterval: isConnecting ? 3000 : false,
+  });
+
+  React.useEffect(() => {
+    if (!setupStatus) return;
+    if (setupStatus.connected) {
+      setIsConnecting(false);
+      setQrCode(null);
+      qc.invalidateQueries({ queryKey: ["wa", "status"] });
+    } else if (setupStatus.qr) {
+      setQrCode(setupStatus.qr);
+    }
+  }, [setupStatus]);
+
+  async function handleConnect() {
+    setSetupError(null);
+    setIsSetupPending(true);
+    try {
+      const res = await fetch("/api/whatsapp/setup", { method: "POST" });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error ?? "Erro ao criar instância.");
+      setQrCode(data.qr ?? null);
+      setIsConnecting(true);
+    } catch (err) {
+      setSetupError(err instanceof Error ? err.message : "Erro ao conectar.");
+    } finally {
+      setIsSetupPending(false);
+    }
+  }
 
   const { data: conversations = [] } = useQuery({
     queryKey: ["wa", "conversations"],
@@ -271,16 +312,14 @@ export default function WhatsAppPage() {
 
   const disconnectMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/companies/whatsapp-config", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token: "", phone_number_id: "" }),
-      });
+      const res = await fetch("/api/whatsapp/setup", { method: "DELETE" });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error ?? "Erro ao desconectar.");
     },
     onSuccess: () => {
       toast.success("WhatsApp desconectado.");
+      setQrCode(null);
+      setIsConnecting(false);
       qc.invalidateQueries({ queryKey: ["wa", "status"] });
       qc.invalidateQueries({ queryKey: ["wa", "conversations"] });
     },
@@ -315,7 +354,7 @@ export default function WhatsAppPage() {
     );
   }
 
-  // ── Not connected: show Embedded Signup ───────────────────────────────────
+  // ── Not connected: QR code flow ───────────────────────────────────────────
 
   if (!isConfigured) {
     return (
@@ -329,14 +368,65 @@ export default function WhatsAppPage() {
           </Button>
         </div>
         <div
-          className="flex rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
+          className="flex items-center justify-center rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
           style={{ height: "calc(100vh - 10.5rem)" }}
         >
-          <WhatsAppEmbeddedSignup
-            onSuccess={() => {
-              qc.invalidateQueries({ queryKey: ["wa", "status"] });
-            }}
-          />
+          {isConnecting && qrCode ? (
+            <div className="flex flex-col items-center gap-6 max-w-sm text-center px-4">
+              <div className="flex flex-col items-center gap-1.5">
+                <WifiIcon className="size-7 text-[#4AE54A] animate-pulse" />
+                <p className="text-white font-semibold">Escaneie o QR Code</p>
+                <p className="text-xs text-[#6B9E6B]/70">
+                  Abra o WhatsApp → Menu → Dispositivos vinculados → Vincular dispositivo
+                </p>
+              </div>
+              <div className="rounded-xl overflow-hidden border border-[rgba(74,229,74,0.25)] bg-white p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={qrCode} alt="QR Code WhatsApp" className="w-52 h-52 object-contain" />
+              </div>
+              <div className="flex items-center gap-2 text-xs text-[#6B9E6B]/50">
+                <Loader2Icon className="size-3.5 animate-spin" />
+                Aguardando leitura do QR Code...
+              </div>
+              <button
+                onClick={() => { setIsConnecting(false); setQrCode(null); }}
+                className="text-xs text-[#6B9E6B]/50 hover:text-red-400 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : isConnecting && !qrCode ? (
+            <div className="flex flex-col items-center gap-4">
+              <Loader2Icon className="size-8 text-[#4AE54A] animate-spin" />
+              <p className="text-[#6B9E6B] text-sm">Gerando QR Code...</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-6 max-w-sm text-center px-4">
+              <div className="flex size-16 items-center justify-center rounded-2xl bg-[#25D366]/10">
+                <SmartphoneIcon className="size-8 text-[#25D366]" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-white font-semibold text-lg">Conectar WhatsApp</h2>
+                <p className="text-[#6B9E6B] text-sm">
+                  Vincule seu WhatsApp para receber e responder mensagens diretamente no MotorGestor.
+                </p>
+              </div>
+              {setupError && (
+                <p className="text-xs text-red-400">{setupError}</p>
+              )}
+              <Button
+                onClick={handleConnect}
+                disabled={isSetupPending}
+                className="bg-[#25D366] hover:bg-[#1fb855] text-white font-medium gap-2"
+              >
+                {isSetupPending
+                  ? <Loader2Icon className="size-4 animate-spin" />
+                  : <SmartphoneIcon className="size-4" />
+                }
+                {isSetupPending ? "Conectando..." : "Conectar WhatsApp"}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -350,9 +440,9 @@ export default function WhatsAppPage() {
       <div className="flex items-center justify-between gap-3 rounded-xl border border-[#25D366]/20 bg-[#25D366]/5 px-4 py-2.5">
         <div className="flex items-center gap-2 text-sm text-[#25D366]">
           <span className="size-2 rounded-full bg-[#25D366] animate-pulse" />
-          <span className="font-medium">WhatsApp Business conectado</span>
-          {statusData?.phone_number_id && (
-            <span className="text-[#25D366]/60 text-xs">· ID: {statusData.phone_number_id}</span>
+          <span className="font-medium">WhatsApp conectado</span>
+          {statusData?.instance_name && (
+            <span className="text-[#25D366]/60 text-xs">· {statusData.instance_name}</span>
           )}
         </div>
         <button

@@ -2,51 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { generateWhatsAppResponse } from "@/lib/ai/claude";
-import { sendWhatsAppText } from "@/lib/whatsapp/send";
+import { sendTextMessage } from "@/lib/whatsapp/evolution-go";
 
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ?? "motorgestor_verify_2026";
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const mode = searchParams.get("hub.mode");
-  const token = searchParams.get("hub.verify_token");
-  const challenge = searchParams.get("hub.challenge");
-
-  if (mode === "subscribe" && token === VERIFY_TOKEN) {
-    return new Response(challenge, { status: 200 });
-  }
-
-  return NextResponse.json({ error: "Verificação falhou." }, { status: 403 });
+export async function GET() {
+  return NextResponse.json({ ok: true });
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
 
   try {
-    const entry = body?.entry?.[0];
-    const changes = entry?.changes?.[0];
-    const value = changes?.value;
-    const message = value?.messages?.[0];
+    // Only handle incoming messages
+    if (body?.event !== "messages.upsert") return NextResponse.json({ ok: true });
 
-    if (!message) return NextResponse.json({ ok: true });
+    const instanceName: string = body?.instance ?? "";
+    const remoteJid: string = body?.data?.key?.remoteJid ?? "";
+    const text: string =
+      body?.data?.message?.conversation ??
+      body?.data?.message?.extendedTextMessage?.text ??
+      "";
 
-    const text: string = message.text?.body ?? "";
-    const from: string = message.from ?? "";
-    const phoneNumberId: string = value?.metadata?.phone_number_id ?? "";
+    // Ignore group messages and status broadcasts
+    if (!instanceName || !remoteJid || !text) return NextResponse.json({ ok: true });
+    if (remoteJid.endsWith("@g.us") || remoteJid === "status@broadcast") {
+      return NextResponse.json({ ok: true });
+    }
 
-    if (!text || !from || !phoneNumberId) return NextResponse.json({ ok: true });
+    // Store only the phone number part, stripping the @s.whatsapp.net suffix
+    const from = remoteJid.replace("@s.whatsapp.net", "");
 
     const db = createSupabaseServiceClient();
     if (!db) return NextResponse.json({ ok: true });
 
-    // Find company by phone number ID
     const { data: company } = await db
       .from("companies")
-      .select("id, whatsapp_token, whatsapp_phone_number_id")
-      .eq("whatsapp_phone_number_id", phoneNumberId)
+      .select("id")
+      .eq("whatsapp_instance_name", instanceName)
       .single();
 
-    if (!company?.id || !company.whatsapp_token) return NextResponse.json({ ok: true });
+    if (!company?.id) return NextResponse.json({ ok: true });
 
     const companyId = company.id;
 
@@ -61,7 +55,7 @@ export async function POST(req: NextRequest) {
           last_message_at: new Date().toISOString(),
           status: "open",
         },
-        { onConflict: "company_id,contact_phone" }
+        { onConflict: "company_id,contact_phone" },
       )
       .select()
       .single();
@@ -75,7 +69,7 @@ export async function POST(req: NextRequest) {
       direction: "inbound",
       message: text,
       sent_by: "human",
-      wa_message_id: message.id ?? null,
+      wa_message_id: body?.data?.key?.id ?? null,
     });
 
     // Update unread count
@@ -123,15 +117,10 @@ export async function POST(req: NextRequest) {
     const delayMin = training.response_delay_min ?? 3;
     const delayMax = training.response_delay_max ?? 8;
     const delay = (delayMin + Math.random() * (delayMax - delayMin)) * 1000;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
-    // Send via Meta API
-    const sendResult = await sendWhatsAppText(
-      from,
-      aiResponse,
-      company.whatsapp_token,
-      phoneNumberId,
-    );
+    // Send via Evolution GO (use remoteJid with @s.whatsapp.net for the API)
+    const sendResult = await sendTextMessage(instanceName, remoteJid, aiResponse);
 
     // Save outbound message
     await db.from("whatsapp_messages").insert({
@@ -140,7 +129,7 @@ export async function POST(req: NextRequest) {
       direction: "outbound",
       message: aiResponse,
       sent_by: "ai",
-      wa_message_id: sendResult.messageId ?? null,
+      wa_message_id: sendResult?.key?.id ?? null,
     });
 
     // Update conversation with last outbound message
@@ -156,6 +145,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[WhatsApp webhook]", err);
-    return NextResponse.json({ ok: true }); // sempre 200 para o Meta
+    return NextResponse.json({ ok: true }); // sempre 200 para o Evolution GO
   }
 }
