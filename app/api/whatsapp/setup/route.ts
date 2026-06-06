@@ -31,22 +31,52 @@ async function getCompanyId() {
 
 // POST — cria instância e retorna QR code
 export async function POST() {
+  console.log("[setup/POST] chamado");
+
+  // Verifica variáveis de ambiente
+  const evoUrl = process.env.EVOLUTION_GO_URL;
+  const evoKey = process.env.EVOLUTION_GO_API_KEY;
+  console.log("[setup/POST] EVOLUTION_GO_URL:", evoUrl ?? "AUSENTE");
+  console.log("[setup/POST] EVOLUTION_GO_API_KEY:", evoKey ? `${evoKey.slice(0, 6)}...` : "AUSENTE");
+
   const { error, supabase, companyId } = await getCompanyId();
   if (error || !supabase || !companyId) {
+    console.error("[setup/POST] auth/company error:", error);
     return NextResponse.json({ error }, { status: error === "Não autenticado." ? 401 : 400 });
   }
 
   const instanceName = `company_${companyId}`;
+  console.log("[setup/POST] instanceName:", instanceName);
 
-  await createInstance(instanceName).catch(() => {});
+  let createResult: unknown;
+  try {
+    createResult = await createInstance(instanceName);
+    console.log("[setup/POST] createInstance response:", JSON.stringify(createResult));
+  } catch (err) {
+    console.error("[setup/POST] createInstance threw:", err);
+  }
 
-  await supabase
+  const { error: dbError } = await supabase
     .from("companies")
     .update({ whatsapp_instance_name: instanceName })
     .eq("id", companyId);
+  if (dbError) console.error("[setup/POST] DB update error:", dbError);
+  else console.log("[setup/POST] instanceName salvo no DB");
 
-  const qrData = await getQRCode(instanceName).catch(() => null);
-  const qr: string | null = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
+  let qrData: unknown;
+  let qr: string | null = null;
+  try {
+    qrData = await getQRCode(instanceName);
+    console.log("[setup/POST] getQRCode response:", JSON.stringify(qrData));
+    qr =
+      (qrData as Record<string, unknown> & { qrcode?: { base64?: string }; base64?: string })
+        ?.qrcode?.base64 ??
+      (qrData as { base64?: string })?.base64 ??
+      null;
+    console.log("[setup/POST] QR extraído:", qr ? `base64[${(qr as string).length} chars]` : "null");
+  } catch (err) {
+    console.error("[setup/POST] getQRCode threw:", err);
+  }
 
   return NextResponse.json({ ok: true, instance_name: instanceName, qr });
 }
