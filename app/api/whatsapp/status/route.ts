@@ -22,7 +22,7 @@ export async function GET() {
 
   const { data: company } = await supabase
     .from("companies")
-    .select("whatsapp_instance_name")
+    .select("whatsapp_instance_name, whatsapp_phone_number_id")
     .eq("id", profile.company_id)
     .single();
 
@@ -31,12 +31,15 @@ export async function GET() {
 
   const statusData = await getInstanceStatus(instanceName).catch(() => null);
   const state: string | undefined =
-    statusData?.instance?.state ?? statusData?.state ?? statusData?.instanceInfo?.state;
+    (statusData?.instance as { state?: string } | undefined)?.state ??
+    (statusData?.state as string | undefined) ??
+    (statusData?.instanceInfo as { state?: string } | undefined)?.state;
   const connected = state === "open";
 
   return NextResponse.json({
     ok: true,
     configured: connected,
     instance_name: instanceName,
+    phone_number: (company?.whatsapp_phone_number_id as string | null) ?? null,
   });
 }

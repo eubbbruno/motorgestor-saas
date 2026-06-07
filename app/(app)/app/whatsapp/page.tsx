@@ -49,6 +49,7 @@ type WaMessage = {
 type WaStatus = {
   configured: boolean;
   instance_name?: string | null;
+  phone_number?: string | null;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -87,7 +88,11 @@ function formatPhone(phone: string): string {
 async function fetchStatus(): Promise<WaStatus> {
   const res = await fetch("/api/whatsapp/status");
   const data = await res.json();
-  return { configured: data.configured ?? false, instance_name: data.instance_name ?? null };
+  return {
+    configured: data.configured ?? false,
+    instance_name: data.instance_name ?? null,
+    phone_number: data.phone_number ?? null,
+  };
 }
 
 async function fetchConversations(): Promise<WaConversation[]> {
@@ -195,10 +200,9 @@ export default function WhatsAppPage() {
   const [aiPaused, setAiPaused] = React.useState(false);
   const [messageInput, setMessageInput] = React.useState("");
   const [note, setNote] = React.useState("");
-  const [qrCode, setQrCode] = React.useState<string | null>(null);
-  const [isConnecting, setIsConnecting] = React.useState(false);
-  const [setupError, setSetupError] = React.useState<string | null>(null);
-  const [isSetupPending, setIsSetupPending] = React.useState(false);
+  const [instanceNameInput, setInstanceNameInput] = React.useState("");
+  const [phoneNumberInput, setPhoneNumberInput] = React.useState("");
+  const [linkError, setLinkError] = React.useState<string | null>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   const { data: statusData, isLoading: statusLoading } = useQuery({
@@ -208,44 +212,6 @@ export default function WhatsAppPage() {
   });
 
   const isConfigured = statusData?.configured ?? false;
-
-  // Polling query for connection status while scanning QR code
-  const { data: setupStatus } = useQuery({
-    queryKey: ["wa", "setup"],
-    queryFn: async () => {
-      const res = await fetch("/api/whatsapp/setup");
-      return res.json() as Promise<{ connected: boolean; qr: string | null; instance_name?: string }>;
-    },
-    enabled: isConnecting,
-    refetchInterval: isConnecting ? 3000 : false,
-  });
-
-  React.useEffect(() => {
-    if (!setupStatus) return;
-    if (setupStatus.connected) {
-      setIsConnecting(false);
-      setQrCode(null);
-      qc.invalidateQueries({ queryKey: ["wa", "status"] });
-    } else if (setupStatus.qr) {
-      setQrCode(setupStatus.qr);
-    }
-  }, [setupStatus]);
-
-  async function handleConnect() {
-    setSetupError(null);
-    setIsSetupPending(true);
-    try {
-      const res = await fetch("/api/whatsapp/setup", { method: "POST" });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error ?? "Erro ao criar instância.");
-      setQrCode(data.qr ?? null);
-      setIsConnecting(true);
-    } catch (err) {
-      setSetupError(err instanceof Error ? err.message : "Erro ao conectar.");
-    } finally {
-      setIsSetupPending(false);
-    }
-  }
 
   const { data: conversations = [] } = useQuery({
     queryKey: ["wa", "conversations"],
@@ -310,20 +276,39 @@ export default function WhatsAppPage() {
     },
   });
 
+  const linkMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/whatsapp/link", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ instanceName: instanceNameInput.trim(), phoneNumber: phoneNumberInput.trim() }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error ?? "Erro ao vincular instância.");
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("WhatsApp vinculado com sucesso!");
+      setLinkError(null);
+      setInstanceNameInput("");
+      setPhoneNumberInput("");
+      qc.invalidateQueries({ queryKey: ["wa", "status"] });
+    },
+    onError: (err: Error) => setLinkError(err.message),
+  });
+
   const disconnectMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch("/api/whatsapp/setup", { method: "DELETE" });
       const data = await res.json();
-      if (!data.ok) throw new Error(data.error ?? "Erro ao desconectar.");
+      if (!data.ok) throw new Error(data.error ?? "Erro ao desvincular.");
     },
     onSuccess: () => {
-      toast.success("WhatsApp desconectado.");
-      setQrCode(null);
-      setIsConnecting(false);
+      toast.success("WhatsApp desvinculado.");
       qc.invalidateQueries({ queryKey: ["wa", "status"] });
       qc.invalidateQueries({ queryKey: ["wa", "conversations"] });
     },
-    onError: (err: Error) => toast.error("Falha ao desconectar.", { description: err.message }),
+    onError: (err: Error) => toast.error("Falha ao desvincular.", { description: err.message }),
   });
 
   function handleSend() {
@@ -354,7 +339,7 @@ export default function WhatsAppPage() {
     );
   }
 
-  // ── Not connected: QR code flow ───────────────────────────────────────────
+  // ── Not connected: manual link form ──────────────────────────────────────
 
   if (!isConfigured) {
     return (
@@ -371,62 +356,63 @@ export default function WhatsAppPage() {
           className="flex items-center justify-center rounded-2xl border border-[rgba(74,229,74,0.1)] bg-[#0A1A0C]"
           style={{ height: "calc(100vh - 10.5rem)" }}
         >
-          {isConnecting && qrCode ? (
-            <div className="flex flex-col items-center gap-6 max-w-sm text-center px-4">
-              <div className="flex flex-col items-center gap-1.5">
-                <WifiIcon className="size-7 text-[#4AE54A] animate-pulse" />
-                <p className="text-white font-semibold">Escaneie o QR Code</p>
-                <p className="text-xs text-[#6B9E6B]/70">
-                  Abra o WhatsApp → Menu → Dispositivos vinculados → Vincular dispositivo
-                </p>
-              </div>
-              <div className="rounded-xl overflow-hidden border border-[rgba(74,229,74,0.25)] bg-white p-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrCode} alt="QR Code WhatsApp" className="w-52 h-52 object-contain" />
-              </div>
-              <div className="flex items-center gap-2 text-xs text-[#6B9E6B]/50">
-                <Loader2Icon className="size-3.5 animate-spin" />
-                Aguardando leitura do QR Code...
-              </div>
-              <button
-                onClick={() => { setIsConnecting(false); setQrCode(null); }}
-                className="text-xs text-[#6B9E6B]/50 hover:text-red-400 transition-colors"
-              >
-                Cancelar
-              </button>
+          <div className="flex flex-col items-center gap-6 w-full max-w-sm px-6">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-[#25D366]/10">
+              <SmartphoneIcon className="size-7 text-[#25D366]" />
             </div>
-          ) : isConnecting && !qrCode ? (
-            <div className="flex flex-col items-center gap-4">
-              <Loader2Icon className="size-8 text-[#4AE54A] animate-spin" />
-              <p className="text-[#6B9E6B] text-sm">Gerando QR Code...</p>
+
+            <div className="space-y-1 text-center">
+              <h2 className="text-white font-semibold text-base">Vincular instância WhatsApp</h2>
+              <p className="text-[#6B9E6B]/70 text-xs">
+                Crie a instância no Evolution GO Manager e informe o nome abaixo.
+              </p>
             </div>
-          ) : (
-            <div className="flex flex-col items-center gap-6 max-w-sm text-center px-4">
-              <div className="flex size-16 items-center justify-center rounded-2xl bg-[#25D366]/10">
-                <SmartphoneIcon className="size-8 text-[#25D366]" />
+
+            <div className="w-full space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium text-[#6B9E6B] uppercase tracking-wider">
+                  Nome da instância *
+                </label>
+                <input
+                  value={instanceNameInput}
+                  onChange={e => { setInstanceNameInput(e.target.value); setLinkError(null); }}
+                  placeholder="ex: teste"
+                  className="w-full rounded-xl border border-[rgba(74,229,74,0.2)] bg-[rgba(74,229,74,0.04)] px-3 py-2.5 text-sm text-white placeholder:text-[#6B9E6B]/30 outline-none focus:border-[rgba(74,229,74,0.5)] transition-colors"
+                />
               </div>
-              <div className="space-y-2">
-                <h2 className="text-white font-semibold text-lg">Conectar WhatsApp</h2>
-                <p className="text-[#6B9E6B] text-sm">
-                  Vincule seu WhatsApp para receber e responder mensagens diretamente no MotorGestor.
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium text-[#6B9E6B] uppercase tracking-wider">
+                  Número conectado
+                  <span className="ml-1 normal-case text-[#6B9E6B]/40">(opcional)</span>
+                </label>
+                <input
+                  value={phoneNumberInput}
+                  onChange={e => setPhoneNumberInput(e.target.value)}
+                  placeholder="ex: 5543988110833"
+                  className="w-full rounded-xl border border-[rgba(74,229,74,0.2)] bg-[rgba(74,229,74,0.04)] px-3 py-2.5 text-sm text-white placeholder:text-[#6B9E6B]/30 outline-none focus:border-[rgba(74,229,74,0.5)] transition-colors"
+                />
+              </div>
+
+              {linkError && (
+                <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                  {linkError}
                 </p>
-              </div>
-              {setupError && (
-                <p className="text-xs text-red-400">{setupError}</p>
               )}
+
               <Button
-                onClick={handleConnect}
-                disabled={isSetupPending}
-                className="bg-[#25D366] hover:bg-[#1fb855] text-white font-medium gap-2"
+                onClick={() => linkMutation.mutate()}
+                disabled={linkMutation.isPending || !instanceNameInput.trim()}
+                className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white font-semibold gap-2"
               >
-                {isSetupPending
+                {linkMutation.isPending
                   ? <Loader2Icon className="size-4 animate-spin" />
-                  : <SmartphoneIcon className="size-4" />
+                  : <WifiIcon className="size-4" />
                 }
-                {isSetupPending ? "Conectando..." : "Conectar WhatsApp"}
+                {linkMutation.isPending ? "Verificando..." : "Vincular instância"}
               </Button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -440,9 +426,12 @@ export default function WhatsAppPage() {
       <div className="flex items-center justify-between gap-3 rounded-xl border border-[#25D366]/20 bg-[#25D366]/5 px-4 py-2.5">
         <div className="flex items-center gap-2 text-sm text-[#25D366]">
           <span className="size-2 rounded-full bg-[#25D366] animate-pulse" />
-          <span className="font-medium">WhatsApp conectado</span>
+          <span className="font-medium">WhatsApp Conectado</span>
+          {statusData?.phone_number && (
+            <span className="text-[#25D366]/70 text-xs font-mono">· {statusData.phone_number}</span>
+          )}
           {statusData?.instance_name && (
-            <span className="text-[#25D366]/60 text-xs">· {statusData.instance_name}</span>
+            <span className="text-[#25D366]/40 text-xs">({statusData.instance_name})</span>
           )}
         </div>
         <button
@@ -454,7 +443,7 @@ export default function WhatsAppPage() {
             ? <Loader2Icon className="size-3 animate-spin" />
             : <XCircleIcon className="size-3.5" />
           }
-          Desconectar
+          Desvincular
         </button>
       </div>
 
