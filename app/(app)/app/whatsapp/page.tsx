@@ -284,7 +284,11 @@ export default function WhatsAppPage() {
         body: JSON.stringify({ instanceName: instanceNameInput.trim(), phoneNumber: phoneNumberInput.trim() }),
       });
       const data = await res.json();
-      if (!data.ok) throw new Error(data.error ?? "Erro ao vincular instância.");
+      if (!data.ok) {
+        const msg = data.error ?? "Erro ao vincular instância.";
+        const detail = data.detail ? ` Resposta Evolution GO: ${data.detail}` : "";
+        throw new Error(msg + detail);
+      }
       return data;
     },
     onSuccess: () => {

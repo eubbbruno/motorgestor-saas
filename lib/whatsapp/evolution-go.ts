@@ -18,10 +18,23 @@ export async function getQRCode(instanceName: string) {
 }
 
 export async function getInstanceStatus(instanceName: string) {
-  const res = await fetch(`${EVOLUTION_URL}/instance/${instanceName}/status`, {
+  const url = `${EVOLUTION_URL}/instance/${instanceName}/status`;
+  console.log("[evolution-go] getInstanceStatus →", url);
+  console.log("[evolution-go] apikey header:", EVOLUTION_KEY ? `${EVOLUTION_KEY.slice(0, 8)}...` : "AUSENTE");
+
+  const res = await fetch(url, {
     headers: { apikey: EVOLUTION_KEY },
   });
-  return res.json();
+
+  const text = await res.text();
+  console.log("[evolution-go] HTTP status:", res.status);
+  console.log("[evolution-go] raw response:", text);
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { _parseError: true, _rawText: text, _httpStatus: res.status };
+  }
 }
 
 export async function sendTextMessage(instanceName: string, to: string, text: string) {

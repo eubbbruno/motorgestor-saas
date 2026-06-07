@@ -54,12 +54,16 @@ export async function POST(req: NextRequest) {
     (statusData?.state as string | undefined) ??
     (statusData?.instanceInfo as { state?: string } | undefined)?.state;
 
-  console.log("[link/POST] instance state:", state);
+  console.log("[link/POST] instance state extraído:", state);
+  console.log("[link/POST] statusData completo:", JSON.stringify(statusData));
 
   if (state !== "open") {
+    const rawDetail = JSON.stringify(statusData);
+    console.error("[link/POST] instância não conectada — resposta completa:", rawDetail);
     return NextResponse.json(
       {
-        error: `Instância "${instanceName}" não está conectada (estado: ${state ?? "desconhecido"}). Abra o Evolution GO Manager e verifique se a instância está ativa.`,
+        error: `Instância "${instanceName}" não conectada (estado: ${state ?? "desconhecido"}).`,
+        detail: rawDetail,
       },
       { status: 400 },
     );
