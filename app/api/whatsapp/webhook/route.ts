@@ -10,6 +10,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
+  console.log("[webhook] recebido:", JSON.stringify(body).slice(0, 200));
 
   try {
     // Only handle incoming messages
