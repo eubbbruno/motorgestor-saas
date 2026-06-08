@@ -49,10 +49,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const state: string | undefined =
-    (statusData?.instance as { state?: string } | undefined)?.state ??
-    (statusData?.state as string | undefined) ??
-    (statusData?.instanceInfo as { state?: string } | undefined)?.state;
+  const state: string | undefined = statusData?.instance?.state ?? statusData?.state;
 
   console.log("[link/POST] instance state extraído:", state);
   console.log("[link/POST] statusData completo:", JSON.stringify(statusData));

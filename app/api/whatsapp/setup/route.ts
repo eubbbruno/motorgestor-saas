@@ -99,7 +99,7 @@ export async function GET() {
 
   const statusData = await getInstanceStatus(instanceName).catch(() => null);
   const state: string | undefined =
-    statusData?.instance?.state ?? statusData?.state ?? statusData?.instanceInfo?.state;
+    statusData?.instance?.state ?? statusData?.state;
   const connected = state === "open";
 
   let qr: string | null = null;

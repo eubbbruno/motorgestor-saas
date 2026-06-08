@@ -30,10 +30,7 @@ export async function GET() {
   if (!instanceName) return NextResponse.json({ ok: true, configured: false });
 
   const statusData = await getInstanceStatus(instanceName).catch(() => null);
-  const state: string | undefined =
-    (statusData?.instance as { state?: string } | undefined)?.state ??
-    (statusData?.state as string | undefined) ??
-    (statusData?.instanceInfo as { state?: string } | undefined)?.state;
+  const state: string | undefined = statusData?.instance?.state ?? statusData?.state;
   const connected = state === "open";
 
   return NextResponse.json({
