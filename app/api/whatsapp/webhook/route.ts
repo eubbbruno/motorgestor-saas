@@ -56,26 +56,31 @@ export async function POST(req: NextRequest) {
       body?.data?.instanceName ??
       "";
 
-    // ── Extração do remoteJid — tenta todos os paths conhecidos ────────────
+    // ── Extração com acesso direto para evitar falhas de optional chaining ───
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = body?.data ?? {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const info: any = data?.Info ?? data?.info ?? {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const msgObj: any = data?.Message ?? data?.message ?? {};
+
     const remoteJid: string =
-      body?.data?.key?.remoteJid ??
-      body?.data?.Info?.Chat ??
-      body?.data?.remoteJid ??
+      data?.key?.remoteJid ??
+      info?.Chat ??
+      info?.chat ??
+      data?.remoteJid ??
       "";
 
-    // ── Extração do texto — maiúsculo e minúsculo (Evolution GO varia) ──────
     const text: string =
-      body?.data?.message?.conversation ??
-      body?.data?.Message?.conversation ??
-      body?.data?.message?.extendedTextMessage?.text ??
-      body?.data?.Message?.extendedTextMessage?.text ??
-      body?.data?.body ??
+      msgObj?.conversation ??
+      msgObj?.extendedTextMessage?.text ??
+      data?.body ??
       "";
 
-    // ── Nome do contato (quando disponível) ─────────────────────────────────
     const pushName: string =
-      body?.data?.Info?.PushName ??
-      body?.data?.pushName ??
+      info?.PushName ??
+      info?.pushName ??
+      data?.pushName ??
       "";
 
     console.log("[webhook] instanceName extraído:", instanceName);
