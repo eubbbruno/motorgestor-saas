@@ -46,6 +46,19 @@ export async function sendTextMessage(instanceName: string, to: string, text: st
   return res.json();
 }
 
+export async function setWebhook(instanceName: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.motorgestor.com.br";
+  const res = await fetch(`${EVOLUTION_URL}/instance/${encodeURIComponent(instanceName)}/webhook`, {
+    method: "POST",
+    headers: BASE_HEADERS,
+    body: JSON.stringify({
+      url: `${siteUrl}/api/whatsapp/webhook`,
+      events: ["MESSAGE", "CONNECTION", "QRCODE"],
+    }),
+  });
+  return res.json();
+}
+
 export async function deleteInstance(instanceName: string) {
   const res = await fetch(`${EVOLUTION_URL}/instance/${encodeURIComponent(instanceName)}`, {
     method: "DELETE",

@@ -36,7 +36,7 @@ import { PremiumSurface } from "@/components/dashboard/premium-surface";
 
 const ProfileSchema = z.object({
   full_name: z.string().min(2, "Informe seu nome.").optional(),
-  phone: z.string().optional(),
+  phone: z.string().min(10, "O telefone é obrigatório para integração com WhatsApp."),
 });
 type ProfileValues = z.infer<typeof ProfileSchema>;
 
@@ -161,8 +161,13 @@ function PerfilTab() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="phone">Telefone</Label>
+                <Label htmlFor="phone">
+                  Telefone <span className="text-destructive">*</span>
+                </Label>
                 <Input id="phone" placeholder="(11) 99999-9999" {...form.register("phone")} />
+                {form.formState.errors.phone && (
+                  <p className="text-xs text-destructive">{form.formState.errors.phone.message}</p>
+                )}
               </div>
             </div>
             <Button type="submit" disabled={busy}>

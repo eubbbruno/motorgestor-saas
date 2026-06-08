@@ -6,6 +6,7 @@ import {
   deleteInstance,
   getInstanceStatus,
   getQRCode,
+  setWebhook,
 } from "@/lib/whatsapp/evolution-go";
 
 async function getCompanyId() {
@@ -29,11 +30,10 @@ async function getCompanyId() {
   return { error: null, supabase, companyId: profile.company_id as string };
 }
 
-// POST — cria instância e retorna QR code
+// POST — cria instância, configura webhook e retorna QR code
 export async function POST() {
   console.log("[setup/POST] chamado");
 
-  // Verifica variáveis de ambiente
   const evoUrl = process.env.EVOLUTION_GO_URL;
   const evoKey = process.env.EVOLUTION_GO_API_KEY;
   console.log("[setup/POST] EVOLUTION_GO_URL:", evoUrl ?? "AUSENTE");
@@ -48,14 +48,24 @@ export async function POST() {
   const instanceName = `company_${companyId}`;
   console.log("[setup/POST] instanceName:", instanceName);
 
-  let createResult: unknown;
+  // 1 — Cria instância
   try {
-    createResult = await createInstance(instanceName);
+    const createResult = await createInstance(instanceName);
     console.log("[setup/POST] createInstance response:", JSON.stringify(createResult));
   } catch (err) {
     console.error("[setup/POST] createInstance threw:", err);
+    // Continua — instância pode já existir
   }
 
+  // 2 — Configura webhook automaticamente
+  try {
+    const webhookResult = await setWebhook(instanceName);
+    console.log("[setup/POST] setWebhook response:", JSON.stringify(webhookResult));
+  } catch (err) {
+    console.error("[setup/POST] setWebhook threw:", err);
+  }
+
+  // 3 — Salva instanceName no DB
   const { error: dbError } = await supabase
     .from("companies")
     .update({ whatsapp_instance_name: instanceName })
@@ -63,17 +73,13 @@ export async function POST() {
   if (dbError) console.error("[setup/POST] DB update error:", dbError);
   else console.log("[setup/POST] instanceName salvo no DB");
 
-  let qrData: unknown;
+  // 4 — Busca QR code
   let qr: string | null = null;
   try {
-    qrData = await getQRCode(instanceName);
+    const qrData = await getQRCode(instanceName);
     console.log("[setup/POST] getQRCode response:", JSON.stringify(qrData));
-    qr =
-      (qrData as Record<string, unknown> & { qrcode?: { base64?: string }; base64?: string })
-        ?.qrcode?.base64 ??
-      (qrData as { base64?: string })?.base64 ??
-      null;
-    console.log("[setup/POST] QR extraído:", qr ? `base64[${(qr as string).length} chars]` : "null");
+    qr = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
+    console.log("[setup/POST] QR extraído:", qr ? `base64[${qr.length} chars]` : "null");
   } catch (err) {
     console.error("[setup/POST] getQRCode threw:", err);
   }
@@ -81,7 +87,7 @@ export async function POST() {
   return NextResponse.json({ ok: true, instance_name: instanceName, qr });
 }
 
-// GET — retorna status da instância + QR code se não conectado
+// GET — polling: retorna status da instância + QR code se ainda não conectado
 export async function GET() {
   const { error, supabase, companyId } = await getCompanyId();
   if (error || !supabase || !companyId) {
@@ -98,9 +104,8 @@ export async function GET() {
   if (!instanceName) return NextResponse.json({ ok: true, connected: false, qr: null });
 
   const statusData = await getInstanceStatus(instanceName).catch(() => null);
-  const state: string | undefined =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (statusData as any)?.instance?.state ?? (statusData as any)?.state;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const state: string | undefined = (statusData as any)?.instance?.state ?? (statusData as any)?.state;
   const connected = state === "open";
 
   let qr: string | null = null;
