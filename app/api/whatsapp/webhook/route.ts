@@ -8,11 +8,29 @@ export async function GET() {
   return NextResponse.json({ ok: true });
 }
 
+// Remove qualquer sufixo @dominio de um JID (suporta @s.whatsapp.net, @lid, @c.us, etc.)
+function extractPhone(jid: string): string {
+  return jid.replace(/@.*$/, "");
+}
+
+// Retorna true apenas para grupos (JIDs que terminam em @g.us)
+function isGroup(jid: string): boolean {
+  return jid.endsWith("@g.us");
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
 
-  // Log full body — sem truncar, para ver o formato real do Evolution GO
+  // Log completo — sem filtrar nada, para diagnóstico de formato
   console.log("[webhook] body completo:", JSON.stringify(body));
+
+  // Log todos os campos candidatos a instanceName para identificar o correto
+  console.log("[webhook] campos de instância no payload —",
+    "instance:", body?.instance,
+    "| instanceName:", body?.instanceName,
+    "| instanceId:", body?.instanceId,
+    "| sender:", body?.sender,
+  );
 
   try {
     // ── Filtro de evento ────────────────────────────────────────────────────
@@ -20,28 +38,38 @@ export async function POST(req: NextRequest) {
     console.log("[webhook] event:", event);
 
     if (event !== "messages.upsert") {
-      console.log("[webhook] ignorado — event não é messages.upsert, recebido:", event);
+      console.log("[webhook] ignorado — event:", event);
       return NextResponse.json({ ok: true });
     }
 
-    // ── Extração de campos ──────────────────────────────────────────────────
-    const instanceName: string = body?.instance ?? body?.instanceName ?? "";
+    // ── Extração do instanceName — tenta todos os campos possíveis ──────────
+    const instanceName: string =
+      body?.instance ??
+      body?.instanceName ??
+      body?.instanceId ??
+      body?.data?.instanceName ??
+      "";
+
+    // ── Extração do remoteJid — aceita qualquer formato ─────────────────────
     const remoteJid: string =
       body?.data?.key?.remoteJid ??
       body?.data?.remoteJid ??
       "";
+
+    // ── Extração do texto — múltiplos formatos Evolution GO ─────────────────
     const text: string =
       body?.data?.message?.conversation ??
       body?.data?.message?.extendedTextMessage?.text ??
+      body?.data?.message?.imageMessage?.caption ??
       body?.data?.body ??
       "";
 
-    console.log("[webhook] instanceName:", instanceName);
-    console.log("[webhook] remoteJid:", remoteJid);
-    console.log("[webhook] text:", text);
+    console.log("[webhook] instanceName extraído:", instanceName);
+    console.log("[webhook] remoteJid:", remoteJid, "| formato:", remoteJid.includes("@lid") ? "LID" : remoteJid.includes("@s.whatsapp.net") ? "JID" : "outro");
+    console.log("[webhook] text:", text || "(vazio)");
 
     if (!instanceName) {
-      console.log("[webhook] abortado — instanceName vazio");
+      console.log("[webhook] abortado — instanceName vazio em todos os campos");
       return NextResponse.json({ ok: true });
     }
     if (!remoteJid) {
@@ -49,16 +77,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
     if (!text) {
-      console.log("[webhook] abortado — text vazio (possivelmente mídia ou outro tipo)");
+      console.log("[webhook] abortado — mensagem sem texto (mídia, sticker, etc.)");
       return NextResponse.json({ ok: true });
     }
-    if (remoteJid.endsWith("@g.us") || remoteJid === "status@broadcast") {
+    if (isGroup(remoteJid) || remoteJid === "status@broadcast") {
       console.log("[webhook] ignorado — grupo ou broadcast:", remoteJid);
       return NextResponse.json({ ok: true });
     }
 
-    const from = remoteJid.replace("@s.whatsapp.net", "");
-    console.log("[webhook] from (sem sufixo):", from);
+    // Extrai o identificador do contato removendo qualquer sufixo @domínio
+    const from = extractPhone(remoteJid);
+    console.log("[webhook] from (normalizado):", from);
 
     // ── Supabase ────────────────────────────────────────────────────────────
     const db = createSupabaseServiceClient();
@@ -73,7 +102,7 @@ export async function POST(req: NextRequest) {
       .eq("whatsapp_instance_name", instanceName)
       .single();
 
-    console.log("[webhook] company lookup:", company?.id ?? null, "| error:", companyErr?.message ?? null);
+    console.log("[webhook] company lookup por instanceName =", instanceName, "→", company?.id ?? "NÃO ENCONTRADO", "| erro:", companyErr?.message ?? null);
 
     if (!company?.id) {
       console.log("[webhook] abortado — nenhuma empresa com whatsapp_instance_name =", instanceName);
@@ -101,7 +130,7 @@ export async function POST(req: NextRequest) {
     console.log("[webhook] upsert conversation:", conversation?.id ?? null, "| error:", convErr?.message ?? null);
 
     if (!conversation) {
-      console.error("[webhook] abortado — falha no upsert de conversa");
+      console.error("[webhook] abortado — falha no upsert de conversa:", convErr?.message);
       return NextResponse.json({ ok: true });
     }
 
@@ -155,7 +184,7 @@ export async function POST(req: NextRequest) {
       vehicles ?? [],
     );
 
-    console.log("[webhook] aiResponse gerado:", aiResponse ? `${aiResponse.slice(0, 80)}...` : "null");
+    console.log("[webhook] aiResponse:", aiResponse ? `${aiResponse.slice(0, 80)}...` : "null");
 
     if (!aiResponse) return NextResponse.json({ ok: true });
 
@@ -164,6 +193,7 @@ export async function POST(req: NextRequest) {
     const delay = (delayMin + Math.random() * (delayMax - delayMin)) * 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
 
+    // Envia para o remoteJid original (com sufixo @lid/@s.whatsapp.net conforme veio)
     const sendResult = await sendTextMessage(instanceName, remoteJid, aiResponse);
     console.log("[webhook] sendTextMessage result:", JSON.stringify(sendResult));
 
