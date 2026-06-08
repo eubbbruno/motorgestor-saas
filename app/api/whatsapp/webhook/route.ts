@@ -10,43 +10,80 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  console.log("[webhook] recebido:", JSON.stringify(body).slice(0, 200));
+
+  // Log full body — sem truncar, para ver o formato real do Evolution GO
+  console.log("[webhook] body completo:", JSON.stringify(body));
 
   try {
-    // Only handle incoming messages
-    if (body?.event !== "messages.upsert") return NextResponse.json({ ok: true });
+    // ── Filtro de evento ────────────────────────────────────────────────────
+    const event: string = body?.event ?? body?.type ?? "";
+    console.log("[webhook] event:", event);
 
-    const instanceName: string = body?.instance ?? "";
-    const remoteJid: string = body?.data?.key?.remoteJid ?? "";
-    const text: string =
-      body?.data?.message?.conversation ??
-      body?.data?.message?.extendedTextMessage?.text ??
-      "";
-
-    // Ignore group messages and status broadcasts
-    if (!instanceName || !remoteJid || !text) return NextResponse.json({ ok: true });
-    if (remoteJid.endsWith("@g.us") || remoteJid === "status@broadcast") {
+    if (event !== "messages.upsert") {
+      console.log("[webhook] ignorado — event não é messages.upsert, recebido:", event);
       return NextResponse.json({ ok: true });
     }
 
-    // Store only the phone number part, stripping the @s.whatsapp.net suffix
+    // ── Extração de campos ──────────────────────────────────────────────────
+    const instanceName: string = body?.instance ?? body?.instanceName ?? "";
+    const remoteJid: string =
+      body?.data?.key?.remoteJid ??
+      body?.data?.remoteJid ??
+      "";
+    const text: string =
+      body?.data?.message?.conversation ??
+      body?.data?.message?.extendedTextMessage?.text ??
+      body?.data?.body ??
+      "";
+
+    console.log("[webhook] instanceName:", instanceName);
+    console.log("[webhook] remoteJid:", remoteJid);
+    console.log("[webhook] text:", text);
+
+    if (!instanceName) {
+      console.log("[webhook] abortado — instanceName vazio");
+      return NextResponse.json({ ok: true });
+    }
+    if (!remoteJid) {
+      console.log("[webhook] abortado — remoteJid vazio");
+      return NextResponse.json({ ok: true });
+    }
+    if (!text) {
+      console.log("[webhook] abortado — text vazio (possivelmente mídia ou outro tipo)");
+      return NextResponse.json({ ok: true });
+    }
+    if (remoteJid.endsWith("@g.us") || remoteJid === "status@broadcast") {
+      console.log("[webhook] ignorado — grupo ou broadcast:", remoteJid);
+      return NextResponse.json({ ok: true });
+    }
+
     const from = remoteJid.replace("@s.whatsapp.net", "");
+    console.log("[webhook] from (sem sufixo):", from);
 
+    // ── Supabase ────────────────────────────────────────────────────────────
     const db = createSupabaseServiceClient();
-    if (!db) return NextResponse.json({ ok: true });
+    if (!db) {
+      console.error("[webhook] Supabase service client não disponível");
+      return NextResponse.json({ ok: true });
+    }
 
-    const { data: company } = await db
+    const { data: company, error: companyErr } = await db
       .from("companies")
       .select("id")
       .eq("whatsapp_instance_name", instanceName)
       .single();
 
-    if (!company?.id) return NextResponse.json({ ok: true });
+    console.log("[webhook] company lookup:", company?.id ?? null, "| error:", companyErr?.message ?? null);
+
+    if (!company?.id) {
+      console.log("[webhook] abortado — nenhuma empresa com whatsapp_instance_name =", instanceName);
+      return NextResponse.json({ ok: true });
+    }
 
     const companyId = company.id;
 
-    // Upsert conversation (unique on company_id + contact_phone)
-    const { data: conversation } = await db
+    // Upsert conversation
+    const { data: conversation, error: convErr } = await db
       .from("whatsapp_conversations")
       .upsert(
         {
@@ -61,10 +98,15 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (!conversation) return NextResponse.json({ ok: true });
+    console.log("[webhook] upsert conversation:", conversation?.id ?? null, "| error:", convErr?.message ?? null);
+
+    if (!conversation) {
+      console.error("[webhook] abortado — falha no upsert de conversa");
+      return NextResponse.json({ ok: true });
+    }
 
     // Save inbound message
-    await db.from("whatsapp_messages").insert({
+    const { error: msgErr } = await db.from("whatsapp_messages").insert({
       conversation_id: conversation.id,
       company_id: companyId,
       direction: "inbound",
@@ -73,22 +115,25 @@ export async function POST(req: NextRequest) {
       wa_message_id: body?.data?.key?.id ?? null,
     });
 
+    console.log("[webhook] insert message:", msgErr ? `ERRO: ${msgErr.message}` : "ok");
+
     // Update unread count
     await db
       .from("whatsapp_conversations")
       .update({ unread_count: (conversation.unread_count ?? 0) + 1 })
       .eq("id", conversation.id);
 
-    // Fetch AI training config
+    // ── IA ──────────────────────────────────────────────────────────────────
     const { data: training } = await db
       .from("ai_training")
       .select("*")
       .eq("company_id", companyId)
       .single();
 
+    console.log("[webhook] ai_enabled:", training?.ai_enabled ?? false);
+
     if (!training?.ai_enabled) return NextResponse.json({ ok: true });
 
-    // Recent conversation history for context
     const { data: history } = await db
       .from("whatsapp_messages")
       .select("direction, message")
@@ -96,7 +141,6 @@ export async function POST(req: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(10);
 
-    // Available vehicles for context
     const { data: vehicles } = await db
       .from("vehicles")
       .select("title, make, model, year, price, color, mileage, status")
@@ -104,7 +148,6 @@ export async function POST(req: NextRequest) {
       .eq("status", "disponivel")
       .limit(20);
 
-    // Generate AI response
     const aiResponse = await generateWhatsAppResponse(
       text,
       (history ?? []).reverse(),
@@ -112,18 +155,18 @@ export async function POST(req: NextRequest) {
       vehicles ?? [],
     );
 
+    console.log("[webhook] aiResponse gerado:", aiResponse ? `${aiResponse.slice(0, 80)}...` : "null");
+
     if (!aiResponse) return NextResponse.json({ ok: true });
 
-    // Human-like typing delay
     const delayMin = training.response_delay_min ?? 3;
     const delayMax = training.response_delay_max ?? 8;
     const delay = (delayMin + Math.random() * (delayMax - delayMin)) * 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    // Send via Evolution GO (use remoteJid with @s.whatsapp.net for the API)
     const sendResult = await sendTextMessage(instanceName, remoteJid, aiResponse);
+    console.log("[webhook] sendTextMessage result:", JSON.stringify(sendResult));
 
-    // Save outbound message
     await db.from("whatsapp_messages").insert({
       conversation_id: conversation.id,
       company_id: companyId,
@@ -133,7 +176,6 @@ export async function POST(req: NextRequest) {
       wa_message_id: sendResult?.key?.id ?? null,
     });
 
-    // Update conversation with last outbound message
     await db
       .from("whatsapp_conversations")
       .update({
@@ -143,9 +185,10 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", conversation.id);
 
+    console.log("[webhook] concluído com sucesso");
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[WhatsApp webhook]", err);
+    console.error("[webhook] erro inesperado:", err);
     return NextResponse.json({ ok: true }); // sempre 200 para o Evolution GO
   }
 }
