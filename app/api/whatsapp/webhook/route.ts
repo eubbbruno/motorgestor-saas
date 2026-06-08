@@ -34,11 +34,17 @@ export async function POST(req: NextRequest) {
 
   try {
     // ── Filtro de evento ────────────────────────────────────────────────────
-    const event: string = body?.event ?? body?.type ?? "";
-    console.log("[webhook] event:", event);
+    const eventName: string = body?.event ?? body?.type ?? "";
+    console.log("[webhook] event:", eventName);
 
-    if (event !== "messages.upsert") {
-      console.log("[webhook] ignorado — event:", event);
+    const isMessage =
+      eventName === "messages.upsert" ||
+      eventName === "Message" ||
+      eventName === "message" ||
+      eventName === "messages";
+
+    if (!isMessage) {
+      console.log("[webhook] ignorado — event:", eventName);
       return NextResponse.json({ ok: true });
     }
 
