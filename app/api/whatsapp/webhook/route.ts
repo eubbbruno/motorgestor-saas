@@ -56,22 +56,31 @@ export async function POST(req: NextRequest) {
       body?.data?.instanceName ??
       "";
 
-    // ── Extração do remoteJid — aceita qualquer formato ─────────────────────
+    // ── Extração do remoteJid — tenta todos os paths conhecidos ────────────
     const remoteJid: string =
       body?.data?.key?.remoteJid ??
+      body?.data?.Info?.Chat ??
       body?.data?.remoteJid ??
       "";
 
-    // ── Extração do texto — múltiplos formatos Evolution GO ─────────────────
+    // ── Extração do texto — maiúsculo e minúsculo (Evolution GO varia) ──────
     const text: string =
       body?.data?.message?.conversation ??
+      body?.data?.Message?.conversation ??
       body?.data?.message?.extendedTextMessage?.text ??
-      body?.data?.message?.imageMessage?.caption ??
+      body?.data?.Message?.extendedTextMessage?.text ??
       body?.data?.body ??
+      "";
+
+    // ── Nome do contato (quando disponível) ─────────────────────────────────
+    const pushName: string =
+      body?.data?.Info?.PushName ??
+      body?.data?.pushName ??
       "";
 
     console.log("[webhook] instanceName extraído:", instanceName);
     console.log("[webhook] remoteJid:", remoteJid, "| formato:", remoteJid.includes("@lid") ? "LID" : remoteJid.includes("@s.whatsapp.net") ? "JID" : "outro");
+    console.log("[webhook] pushName:", pushName || "(vazio)");
     console.log("[webhook] text:", text || "(vazio)");
 
     if (!instanceName) {
@@ -124,6 +133,7 @@ export async function POST(req: NextRequest) {
         {
           company_id: companyId,
           contact_phone: from,
+          contact_name: pushName || null,
           last_message: text,
           last_message_at: new Date().toISOString(),
           status: "open",
