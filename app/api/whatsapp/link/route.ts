@@ -49,7 +49,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const state: string | undefined = statusData?.instance?.state ?? statusData?.state;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const state: string | undefined = (statusData as any)?.instance?.state ?? (statusData as any)?.state;
 
   console.log("[link/POST] instance state extraído:", state);
   console.log("[link/POST] statusData completo:", JSON.stringify(statusData));

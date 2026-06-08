@@ -30,7 +30,8 @@ export async function GET() {
   if (!instanceName) return NextResponse.json({ ok: true, configured: false });
 
   const statusData = await getInstanceStatus(instanceName).catch(() => null);
-  const state: string | undefined = statusData?.instance?.state ?? statusData?.state;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const state: string | undefined = (statusData as any)?.instance?.state ?? (statusData as any)?.state;
   const connected = state === "open";
 
   return NextResponse.json({
