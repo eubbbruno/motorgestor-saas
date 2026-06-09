@@ -8,6 +8,7 @@ export async function POST(
   ctx: { params: Promise<{ id: string }> },
 ) {
   const { id } = await ctx.params;
+  console.log("[conversations/send] conversationId:", id);
 
   const supabase = await createSupabaseServerClient();
   if (!supabase)
@@ -25,6 +26,8 @@ export async function POST(
     .single();
 
   const companyId = profile?.company_id;
+  console.log("[conversations/send] userId:", user.id, "| companyId:", companyId ?? "NÃO ENCONTRADO");
+
   if (!companyId)
     return NextResponse.json({ ok: false, error: "Empresa não encontrada." }, { status: 400 });
 
@@ -33,12 +36,15 @@ export async function POST(
   if (!message)
     return NextResponse.json({ ok: false, error: "Mensagem vazia." }, { status: 400 });
 
-  const { data: conversation } = await supabase
+  // Busca conversa para obter o número de destino
+  const { data: conversation, error: convErr } = await supabase
     .from("whatsapp_conversations")
     .select("contact_phone")
     .eq("id", id)
     .eq("company_id", companyId)
     .single();
+
+  console.log("[conversations/send] conversation lookup:", conversation?.contact_phone ?? "NÃO ENCONTRADA", "| error:", convErr?.message ?? null);
 
   if (!conversation)
     return NextResponse.json(
@@ -46,13 +52,16 @@ export async function POST(
       { status: 404 },
     );
 
-  const { data: company } = await supabase
+  // Busca instanceName da empresa
+  const { data: company, error: companyErr } = await supabase
     .from("companies")
     .select("whatsapp_instance_name")
     .eq("id", companyId)
     .single();
 
   const instanceName = company?.whatsapp_instance_name as string | null;
+  console.log("[conversations/send] instanceName:", instanceName ?? "NÃO CONFIGURADO", "| error:", companyErr?.message ?? null);
+
   if (!instanceName) {
     return NextResponse.json(
       { ok: false, error: "WhatsApp não conectado." },
@@ -60,14 +69,18 @@ export async function POST(
     );
   }
 
-  // Append @s.whatsapp.net if not already present
+  // Monta o número de destino — mantém sufixo @lid se já presente, senão usa @s.whatsapp.net
   const to = conversation.contact_phone.includes("@")
     ? conversation.contact_phone
     : `${conversation.contact_phone}@s.whatsapp.net`;
 
+  console.log("[conversations/send] enviando para:", to, "| mensagem:", message.slice(0, 80));
+
   const result = await sendTextMessage(instanceName, to, message);
+  console.log("[conversations/send] Evolution GO response:", JSON.stringify(result));
 
   if (result?.error) {
+    console.error("[conversations/send] erro no envio:", result.error);
     return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
   }
 
@@ -85,5 +98,6 @@ export async function POST(
     .update({ last_message: message, last_message_at: new Date().toISOString() })
     .eq("id", id);
 
+  console.log("[conversations/send] concluído com sucesso");
   return NextResponse.json({ ok: true });
 }
