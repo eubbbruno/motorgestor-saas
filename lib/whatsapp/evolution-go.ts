@@ -38,12 +38,18 @@ export async function getInstanceStatus(instanceName: string) {
 }
 
 export async function sendTextMessage(instanceName: string, to: string, text: string) {
-  const res = await fetch(`${EVOLUTION_URL}/message/sendText`, {
+  const res = await fetch(`${EVOLUTION_URL}/send/text`, {
     method: "POST",
     headers: BASE_HEADERS,
     body: JSON.stringify({ instanceName, to, text }),
   });
-  return res.json();
+  const responseText = await res.text();
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    console.error("[evolution-go] sendTextMessage resposta não-JSON:", responseText.slice(0, 200));
+    return { error: responseText || "Resposta vazia do servidor", status: res.status };
+  }
 }
 
 export async function setWebhook(instanceName: string) {

@@ -9,6 +9,7 @@ import {
   BookOpenIcon,
   CheckCheckIcon,
   CheckIcon,
+  ChevronLeftIcon,
   Loader2Icon,
   MessageCircleIcon,
   PauseIcon,
@@ -204,6 +205,7 @@ export default function WhatsAppPage() {
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [connectError, setConnectError] = React.useState<string | null>(null);
   const [isConnectPending, setIsConnectPending] = React.useState(false);
+  const [mobileView, setMobileView] = React.useState<"list" | "chat">("list");
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   const { data: statusData, isLoading: statusLoading } = useQuery({
@@ -446,27 +448,33 @@ export default function WhatsAppPage() {
     <div className="flex flex-col gap-3">
       {/* Connected badge */}
       <div className="flex items-center justify-between gap-3 rounded-xl border border-[#25D366]/20 bg-[#25D366]/5 px-4 py-2.5">
-        <div className="flex items-center gap-2 text-sm text-[#25D366]">
-          <span className="size-2 rounded-full bg-[#25D366] animate-pulse" />
-          <span className="font-medium">WhatsApp Conectado</span>
+        <div className="flex items-center gap-2 text-sm text-[#25D366] min-w-0">
+          <span className="size-2 shrink-0 rounded-full bg-[#25D366] animate-pulse" />
+          <span className="font-medium whitespace-nowrap">WhatsApp Conectado</span>
           {statusData?.phone_number && (
-            <span className="text-[#25D366]/70 text-xs font-mono">· {statusData.phone_number}</span>
-          )}
-          {statusData?.instance_name && (
-            <span className="text-[#25D366]/40 text-xs">({statusData.instance_name})</span>
+            <span className="text-[#25D366]/70 text-xs font-mono truncate hidden sm:inline">· {statusData.phone_number}</span>
           )}
         </div>
-        <button
-          onClick={() => disconnectMutation.mutate()}
-          disabled={disconnectMutation.isPending}
-          className="flex items-center gap-1.5 text-xs text-[#6B9E6B]/60 hover:text-red-400 transition-colors disabled:opacity-50"
-        >
-          {disconnectMutation.isPending
-            ? <Loader2Icon className="size-3 animate-spin" />
-            : <XCircleIcon className="size-3.5" />
-          }
-          Desvincular
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href="/app/whatsapp/treinamento"
+            className="flex items-center gap-1 text-xs text-[#6B9E6B]/70 hover:text-[#4AE54A] transition-colors"
+          >
+            <BotIcon className="size-3.5" />
+            <span className="hidden sm:inline">Configure a IA</span>
+          </Link>
+          <button
+            onClick={() => disconnectMutation.mutate()}
+            disabled={disconnectMutation.isPending}
+            className="flex items-center gap-1.5 text-xs text-[#6B9E6B]/60 hover:text-red-400 transition-colors disabled:opacity-50"
+          >
+            {disconnectMutation.isPending
+              ? <Loader2Icon className="size-3 animate-spin" />
+              : <XCircleIcon className="size-3.5" />
+            }
+            <span className="hidden sm:inline">Desvincular</span>
+          </button>
+        </div>
       </div>
 
       <div
@@ -474,7 +482,10 @@ export default function WhatsAppPage() {
         style={{ height: "calc(100vh - 11rem)" }}
       >
         {/* ── Col 1: Conversation list ─────────────────────────────────────── */}
-        <div className="flex w-[272px] shrink-0 flex-col border-r border-[rgba(74,229,74,0.08)]">
+        <div className={cn(
+          "flex-col border-r border-[rgba(74,229,74,0.08)]",
+          mobileView === "list" ? "flex w-full md:w-[272px] md:shrink-0" : "hidden md:flex md:w-[272px] md:shrink-0"
+        )}>
           <div className="flex items-center justify-between border-b border-[rgba(74,229,74,0.08)] px-4 py-3">
             <div className="flex items-center gap-2">
               <SmartphoneIcon className="size-4 text-[#25D366]" />
@@ -520,7 +531,7 @@ export default function WhatsAppPage() {
                 key={conv.id}
                 conv={conv}
                 active={selected?.id === conv.id}
-                onClick={() => setSelectedId(conv.id)}
+                onClick={() => { setSelectedId(conv.id); setMobileView("chat"); }}
               />
             ))}
             {filtered.length === 0 && (
@@ -537,11 +548,21 @@ export default function WhatsAppPage() {
         </div>
 
         {/* ── Col 2: Chat ──────────────────────────────────────────────────── */}
-        <div className="flex flex-1 flex-col min-w-0">
+        <div className={cn(
+          "flex-col min-w-0",
+          mobileView === "chat" ? "flex flex-1" : "hidden md:flex md:flex-1"
+        )}>
           {selected ? (
             <>
               <div className="flex items-center justify-between border-b border-[rgba(74,229,74,0.08)] px-4 py-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
+                  {/* Botão voltar — mobile only */}
+                  <button
+                    className="md:hidden flex items-center justify-center rounded-lg p-1 text-[#6B9E6B] hover:text-white transition-colors"
+                    onClick={() => setMobileView("list")}
+                  >
+                    <ChevronLeftIcon className="size-5" />
+                  </button>
                   <div className="flex size-8 items-center justify-center rounded-full bg-[#4AE54A]/15 text-xs font-bold text-[#4AE54A]">
                     {ini}
                   </div>
@@ -631,8 +652,8 @@ export default function WhatsAppPage() {
           )}
         </div>
 
-        {/* ── Col 3: Contact info ──────────────────────────────────────────── */}
-        <div className="flex w-[272px] shrink-0 flex-col border-l border-[rgba(74,229,74,0.08)]">
+        {/* ── Col 3: Contact info — hidden no mobile ───────────────────────── */}
+        <div className="hidden md:flex w-[272px] shrink-0 flex-col border-l border-[rgba(74,229,74,0.08)]">
           {selected ? (
             <>
               <div className="flex flex-col items-center border-b border-[rgba(74,229,74,0.08)] px-4 py-6 text-center">
