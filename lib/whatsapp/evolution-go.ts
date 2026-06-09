@@ -42,27 +42,47 @@ export async function getInstanceStatus(instanceName: string) {
   return { state: connected ? "open" : "close", instance };
 }
 
+export async function getInstanceToken(instanceName: string): Promise<string | null> {
+  const res = await fetch(`${process.env.EVOLUTION_GO_URL}/instance/all`, {
+    headers: { apikey: process.env.EVOLUTION_GO_API_KEY ?? "" },
+  });
+  const data = await res.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const instances = ((data as any).data || data || []) as any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const instance = instances.find((i: any) => i.name === instanceName);
+  console.log("[evolution-go] getInstanceToken para", instanceName, "→", instance?.token ? `${String(instance.token).slice(0, 8)}...` : "NÃO ENCONTRADO");
+  return instance?.token ?? null;
+}
+
 export async function sendTextMessage(instanceName: string, to: string, text: string) {
+  // Busca o token da instância (usado no header apikey)
+  const token = await getInstanceToken(instanceName);
+  if (!token) {
+    console.error("[evolution-go] sendTextMessage — token da instância não encontrado:", instanceName);
+    return { error: "Instance token not found" };
+  }
+
+  // Evolution GO quer só o número, sem sufixo @s.whatsapp.net ou @lid
+  const number = to.replace(/@.*$/, "");
+
   const url = `${process.env.EVOLUTION_GO_URL}/send/text`;
-  const key = process.env.EVOLUTION_GO_API_KEY ?? "";
   console.log("[evolution-go] sendTextMessage →", url);
-  console.log("[evolution-go] apikey:", key ? `${key.slice(0, 8)}...` : "AUSENTE");
-  console.log("[evolution-go] payload:", JSON.stringify({ instanceName, to, text: text.slice(0, 50) }));
+  console.log("[evolution-go] number:", number, "| text:", text.slice(0, 50));
 
   const res = await fetch(url, {
     method: "POST",
-    headers: headers(),
-    body: JSON.stringify({ instanceName, to, text }),
+    headers: { apikey: token, "Content-Type": "application/json" },
+    body: JSON.stringify({ number, text }),
   });
 
   const responseText = await res.text();
-  console.log("[evolution-go] HTTP status:", res.status);
-  console.log("[evolution-go] resposta:", responseText.slice(0, 300));
+  console.log("[evolution-go] sendTextMessage HTTP:", res.status, responseText.slice(0, 200));
 
   try {
     return JSON.parse(responseText);
   } catch {
-    return { error: responseText || "Resposta vazia do servidor", status: res.status };
+    return { error: responseText, status: res.status };
   }
 }
 
