@@ -1,12 +1,9 @@
 # MotorGestor — Roadmap & Checklist
 
 ## 🔴 URGENTE
-- [ ] Testar WhatsApp com token permanente e número real
-- [ ] Configurar webhook WhatsApp no Meta for Developers (URL: https://www.motorgestor.com.br/api/whatsapp/webhook)
-- [ ] Testar recebimento de mensagem real no inbox
+- [ ] IA respondendo automaticamente no WhatsApp
+- [ ] Fluxo automático de criação de instância para novos clientes
 - [ ] Testar pagamento completo (Mercado Pago produção)
-- [ ] Rodar SQL segurança WhatsApp no Supabase
-- [ ] Configurar SMTP Supabase (templates em português)
 - [ ] Google Analytics ID configurar no Vercel
 
 ## 🟡 ESTA SEMANA
@@ -31,9 +28,11 @@
 - [x] Calendário redesenhado
 - [x] Assistente IA funcionando
 - [x] Exportação PDF veículos e catálogo
-- [x] WhatsApp inbox estruturado
+- [x] WhatsApp inbox — recebimento ✅
+- [x] WhatsApp inbox — envio ✅
 - [x] WhatsApp aprovado no Meta ✅
-- [x] Token permanente WhatsApp configurado
+- [x] Evolution GO no Railway ✅
+- [x] Webhook Evolution GO → MotorGestor ✅
 - [x] Billing estruturado (Mercado Pago)
 - [x] Trial 14 dias
 - [x] Emails transacionais (Resend)
@@ -42,15 +41,13 @@
 - [x] SEO básico
 - [x] RLS Supabase corrigido
 - [x] Onboarding modal
-- [x] Social Media (estrutura)
-- [x] ROADMAP criado
-- [x] Salvamento de telefone corrigido nas configurações
-- [x] Inbox WhatsApp sem dados demo (empty state real)
-- [x] Banner de configuração WhatsApp no inbox
+- [x] Mobile responsivo (site + dashboard)
 
 ## 📋 NOTAS
-- WhatsApp: token permanente configurado, número +5543988110833
-- Meta: verificação Agência Termo enviada (prazo 5 dias)
+- Evolution GO: https://evolution-api-production-2c646.up.railway.app
+- Evolution GO API Key: motorgestor2026secret
+- WhatsApp: instância "teste" conectada ao número +5543988110833
+- Meta: verificação Agência Termo enviada (prazo 16/07/2026)
 - Mercado Pago: chaves teste e produção configuradas no Vercel
 - Resend: domínio motorgestor.com.br verificado
 - Supabase: projeto iondotsjljrhrawcqmzs

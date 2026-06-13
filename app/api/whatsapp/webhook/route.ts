@@ -83,6 +83,14 @@ export async function POST(req: NextRequest) {
       data?.pushName ??
       "";
 
+    // Ignora mensagens enviadas pelo próprio número (respostas da IA, mensagens manuais)
+    const isFromMe: boolean = info?.IsFromMe ?? false;
+    console.log("[webhook] IsFromMe:", isFromMe);
+    if (isFromMe) {
+      console.log("[webhook] ignorado — mensagem enviada pelo próprio número");
+      return NextResponse.json({ ok: true });
+    }
+
     console.log("[webhook] instanceName extraído:", instanceName);
     console.log("[webhook] remoteJid:", remoteJid, "| formato:", remoteJid.includes("@lid") ? "LID" : remoteJid.includes("@s.whatsapp.net") ? "JID" : "outro");
     console.log("[webhook] pushName:", pushName || "(vazio)");
