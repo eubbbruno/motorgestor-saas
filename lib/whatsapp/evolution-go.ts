@@ -14,15 +14,17 @@ export async function createInstance(instanceName: string) {
   const res = await fetch(`${process.env.EVOLUTION_GO_URL}/instance/create`, {
     method: "POST",
     headers: headers(),
-    body: JSON.stringify({ instanceName, integration: "WHATSAPP-BAILEYS" }),
+    body: JSON.stringify({ name: instanceName, token: instanceName }),
   });
   return res.json();
 }
 
-export async function getQRCode(instanceName: string) {
+// token: apikey da instância (definido durante createInstance como o próprio instanceName)
+export async function getQRCode(instanceName: string, token?: string) {
+  const apikey = token ?? process.env.EVOLUTION_GO_API_KEY ?? "";
   const res = await fetch(
     `${process.env.EVOLUTION_GO_URL}/instance/qr?instanceName=${encodeURIComponent(instanceName)}`,
-    { headers: headers() },
+    { headers: { "Content-Type": "application/json", apikey } },
   );
   return res.json();
 }

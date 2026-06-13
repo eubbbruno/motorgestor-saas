@@ -73,10 +73,10 @@ export async function POST() {
   if (dbError) console.error("[setup/POST] DB update error:", dbError);
   else console.log("[setup/POST] instanceName salvo no DB");
 
-  // 4 — Busca QR code
+  // 4 — Busca QR code (usa instanceName como token — definido durante createInstance)
   let qr: string | null = null;
   try {
-    const qrData = await getQRCode(instanceName);
+    const qrData = await getQRCode(instanceName, instanceName);
     console.log("[setup/POST] getQRCode response:", JSON.stringify(qrData));
     qr = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
     console.log("[setup/POST] QR extraído:", qr ? `base64[${qr.length} chars]` : "null");
@@ -110,7 +110,7 @@ export async function GET() {
 
   let qr: string | null = null;
   if (!connected) {
-    const qrData = await getQRCode(instanceName).catch(() => null);
+    const qrData = await getQRCode(instanceName, instanceName).catch(() => null);
     qr = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
   }
 

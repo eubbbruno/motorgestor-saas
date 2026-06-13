@@ -205,6 +205,8 @@ export default function WhatsAppPage() {
   const [isConnecting, setIsConnecting] = React.useState(false);
   const [connectError, setConnectError] = React.useState<string | null>(null);
   const [isConnectPending, setIsConnectPending] = React.useState(false);
+  const [connectTimeout, setConnectTimeout] = React.useState(false);
+  const connectTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileView, setMobileView] = React.useState<"list" | "chat">("list");
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
@@ -238,8 +240,32 @@ export default function WhatsAppPage() {
     }
   }, [setupPoll, qc]);
 
+  // Timeout de 30s no estado "Preparando..." (sem QR ainda)
+  React.useEffect(() => {
+    if (isConnecting && !qrCode) {
+      connectTimeoutRef.current = setTimeout(() => setConnectTimeout(true), 30000);
+    } else {
+      if (connectTimeoutRef.current) {
+        clearTimeout(connectTimeoutRef.current);
+        connectTimeoutRef.current = null;
+      }
+      setConnectTimeout(false);
+    }
+    return () => {
+      if (connectTimeoutRef.current) clearTimeout(connectTimeoutRef.current);
+    };
+  }, [isConnecting, qrCode]);
+
+  function handleRetry() {
+    setConnectTimeout(false);
+    setIsConnecting(false);
+    setQrCode(null);
+    setConnectError(null);
+  }
+
   async function handleConnect() {
     setConnectError(null);
+    setConnectTimeout(false);
     setIsConnectPending(true);
     try {
       const res = await fetch("/api/whatsapp/setup", { method: "POST" });
@@ -403,10 +429,30 @@ export default function WhatsAppPage() {
             </div>
           ) : isConnecting ? (
             /* ── Criando instância / aguardando QR ── */
-            <div className="flex flex-col items-center gap-3">
-              <Loader2Icon className="size-8 text-[#4AE54A] animate-spin" />
-              <p className="text-[#6B9E6B] text-sm">Preparando instância WhatsApp...</p>
-            </div>
+            connectTimeout ? (
+              <div className="flex flex-col items-center gap-4 max-w-xs text-center px-4">
+                <XCircleIcon className="size-8 text-red-400" />
+                <div>
+                  <p className="text-white text-sm font-semibold mb-1">Tempo esgotado</p>
+                  <p className="text-[#6B9E6B]/70 text-xs leading-relaxed">
+                    A instância demorou para responder. Verifique se o Evolution GO está online e tente novamente.
+                  </p>
+                </div>
+                <Button
+                  onClick={handleRetry}
+                  className="bg-[#25D366] hover:bg-[#1fb855] text-white font-semibold gap-2 px-6"
+                >
+                  <SmartphoneIcon className="size-4" />
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-3">
+                <Loader2Icon className="size-8 text-[#4AE54A] animate-spin" />
+                <p className="text-[#6B9E6B] text-sm">Preparando instância WhatsApp...</p>
+                <p className="text-[#6B9E6B]/40 text-xs">Aguarde até 30 segundos</p>
+              </div>
+            )
           ) : (
             /* ── Estado inicial ── */
             <div className="flex flex-col items-center gap-6 max-w-xs text-center px-4">
