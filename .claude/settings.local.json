@@ -43,7 +43,27 @@
       "Bash(grep -v \"^$\")",
       "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Bruno\\\\motorgestor-saas\\\\app\\\\api\\\\whatsapp\\\\status\")",
       "Bash(Out-Null)",
-      "PowerShell(app *)"
+      "PowerShell(app *)",
+      "Bash(curl -s -m 20 -H 'apikey: motorgestor2026secret' https://evolution-api-production-2c646.up.railway.app/instance/all)",
+      "Bash(curl -s -m 20 -H 'apikey: company_24621dd0-6252-4592-8a04-1f97a1fb49b1' https://evolution-api-production-2c646.up.railway.app/instance/qr?instanceName=company_24621dd0-6252-4592-8a04-1f97a1fb49b1)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('TOP KEYS:', list\\(d.keys\\(\\)\\)\\); print\\('DATA KEYS:', list\\(d.get\\('data',{}\\).keys\\(\\)\\) if isinstance\\(d.get\\('data'\\),dict\\) else type\\(d.get\\('data'\\)\\)\\); [print\\(k, '=', \\(str\\(v\\)[:60]+'...'\\) if v else v\\) for k,v in \\(d.get\\('data',{}\\) if isinstance\\(d.get\\('data'\\),dict\\) else {}\\).items\\(\\)]\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const d=JSON.parse\\(s\\);console.log\\('TOP:',Object.keys\\(d\\)\\);if\\(d.data&&typeof d.data==='object'\\){for\\(const[k,v]of Object.entries\\(d.data\\)\\)console.log\\('data.'+k,'=',v?String\\(v\\).slice\\(0,50\\)+'...':v\\)}}\\)\")",
+      "Bash(curl -s -m 20 -X DELETE -H 'apikey: motorgestor2026secret' https://evolution-api-production-2c646.up.railway.app/instance/company_24621dd0-6252-4592-8a04-1f97a1fb49b1)",
+      "Bash(curl -s -m 20 -X POST -H 'apikey: motorgestor2026secret' -H 'Content-Type: application/json' -d '{\"name\":\"company_24621dd0-6252-4592-8a04-1f97a1fb49b1\",\"token\":\"company_24621dd0-6252-4592-8a04-1f97a1fb49b1\"}' https://evolution-api-production-2c646.up.railway.app/instance/create)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{try{const d=JSON.parse\\(s\\);const q=d?.data?.Qrcode;console.log\\('Qrcode presente?',q?\\('SIM ['+q.length+' chars]'\\):'NÃO',' msg:',d.message\\)}catch\\(e\\){console.log\\('raw:',s.slice\\(0,200\\)\\)}}\\)\")",
+      "Bash(curl -s -m 15 -H 'apikey: motorgestor2026secret' https://evolution-api-production-2c646.up.railway.app/instance/all)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const d=JSON.parse\\(s\\);console.log\\('instancias:',d.data.map\\(x=>x.name\\)\\)}\\)\")",
+      "Bash(curl -s -m 12 -X DELETE -H 'apikey: motorgestor2026secret' https://evolution-api-production-2c646.up.railway.app/instance/delete/9961230d-4861-4e0b-a9e9-9df330ea3d1c)",
+      "Bash(curl -s -m 15 -X POST -H 'apikey: motorgestor2026secret' -H 'Content-Type: application/json' -d '{\"name\":\"company_test_flow_check\",\"token\":\"company_test_flow_check\",\"webhook\":\"https://www.motorgestor.com.br/api/whatsapp/webhook\",\"events\":[\"MESSAGE\",\"CONNECTION\"]}' https://evolution-api-production-2c646.up.railway.app/instance/create)",
+      "Bash(curl -s -m 12 -H 'apikey: company_test_flow_check' https://evolution-api-production-2c646.up.railway.app/instance/company_test_flow_check/webhook)",
+      "Bash(curl -s -m 15 https://evolution-api-production-2c646.up.railway.app/swagger/doc.json)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const d=JSON.parse\\(s\\);const p=d.paths;Object.keys\\(p\\).sort\\(\\).forEach\\(path=>{const methods=Object.keys\\(p[path]\\).join\\(','\\).toUpperCase\\(\\);if\\(/instance|webhook/i.test\\(path\\)\\)console.log\\(methods.padEnd\\(12\\),path\\)}\\)}\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npx eslint *)",
+      "Bash(grep -rn -iA 15 \"create table.*subscriptions\\\\|subscriptions \\(\" db/)",
+      "mcp__f1bab333-3aa5-4804-b898-e1763b54bae3__execute_sql",
+      "Bash(npx tsc *)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }

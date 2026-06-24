@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 import { AlertCircle, Loader2 } from "lucide-react";
 
+import type { PlanId } from "@/lib/billing/plans";
+
 // Em produção usa a chave de produção; em dev usa a chave de teste.
 // Configure no Vercel:
 //   NEXT_PUBLIC_MP_PUBLIC_KEY      → chave pública de PRODUÇÃO
@@ -16,9 +18,11 @@ const MP_PUBLIC_KEY =
 interface CheckoutBrickProps {
   preferenceId: string;
   amount: number;
+  planId: PlanId;
+  billingCycle: "monthly" | "annual";
 }
 
-export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
+export function CheckoutBrick({ preferenceId, amount, planId, billingCycle }: CheckoutBrickProps) {
   const [initialized, setInitialized] = useState(false);
   const [ready, setReady] = useState(false);
   const [mpError, setMpError] = useState<string | null>(null);
@@ -100,7 +104,7 @@ export function CheckoutBrick({ preferenceId, amount }: CheckoutBrickProps) {
             const res = await fetch("/api/billing/process-payment", {
               method: "POST",
               headers: { "content-type": "application/json" },
-              body: JSON.stringify(formData),
+              body: JSON.stringify({ formData, planId, billingCycle }),
             });
             const data = await res.json();
             if (data.status === "approved") {

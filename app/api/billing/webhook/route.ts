@@ -31,16 +31,40 @@ export async function POST(req: NextRequest) {
 
   const isApproved = result.status === "approved";
   const companyId = result.metadata?.userId as string | undefined;
+  const planId = result.metadata?.planId as keyof typeof PLANS | undefined;
+  const billingCycle = (result.metadata?.billingCycle as "monthly" | "annual" | undefined) ?? "monthly";
 
-  // Update subscription record
-  await db.from("subscriptions").upsert(
-    {
-      mp_payment_id: result.id?.toString(),
-      status: isApproved ? "active" : "inactive",
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "mp_payment_id" }
-  );
+  // Atualiza a assinatura. Só faz upsert completo se tivermos company_id +
+  // plano (a coluna company_id/plan_id é NOT NULL). Sem isso, ignora — o
+  // process-payment já criou a linha de forma síncrona p/ cartões aprovados.
+  if (companyId && planId) {
+    const planName = PLANS[planId]?.name;
+    const { data: planRow } = await db
+      .from("plans")
+      .select("id")
+      .eq("name", planName)
+      .single();
+    const planUuid = (planRow?.id as string | null) ?? undefined;
+
+    if (planUuid) {
+      const daysToAdd = billingCycle === "annual" ? 365 : 30;
+      await db.from("subscriptions").upsert(
+        {
+          company_id: companyId,
+          plan_id: planUuid,
+          billing_cycle: billingCycle,
+          status: isApproved ? "active" : "inactive",
+          mp_payment_id: result.id?.toString(),
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(
+            Date.now() + daysToAdd * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "company_id" }
+      );
+    }
+  }
 
   // Get user info for email — requires companyId from payment metadata
   if (companyId) {
@@ -56,9 +80,7 @@ export async function POST(req: NextRequest) {
 
     if (email) {
       if (isApproved) {
-        const planId = result.metadata?.planId as keyof typeof PLANS | undefined;
         const plan = planId ? PLANS[planId] : null;
-        const billingCycle = result.metadata?.billingCycle as "monthly" | "annual" | undefined;
         const amount = plan
           ? (billingCycle === "annual" ? plan.priceAnnual : plan.priceMonthly)
           : (result.transaction_amount ?? 0);

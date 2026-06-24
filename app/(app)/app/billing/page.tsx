@@ -277,6 +277,8 @@ export default function BillingPage() {
             <CheckoutBrick
               preferenceId={preferenceId}
               amount={billingCycle === "annual" ? PLANS[selectedPlan].priceAnnual : PLANS[selectedPlan].priceMonthly}
+              planId={selectedPlan}
+              billingCycle={billingCycle}
             />
           </Card>
         </PremiumSurface>
