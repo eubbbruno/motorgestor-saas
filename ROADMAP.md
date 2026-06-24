@@ -1,10 +1,10 @@
 # MotorGestor — Roadmap & Checklist
 
 ## 🔴 URGENTE
-- [ ] IA respondendo automaticamente no WhatsApp
-- [ ] Fluxo automático de criação de instância para novos clientes
-- [ ] Testar pagamento completo (Mercado Pago produção)
-- [ ] Google Analytics ID configurar no Vercel
+- [x] IA respondendo automaticamente no WhatsApp — destravado: webhook agora é gravado via POST /instance/connect (antes 404)
+- [x] Fluxo automático de criação de instância para novos clientes — QR corrigido (lia caminho errado → "Tempo esgotado")
+- [ ] Testar pagamento completo (Mercado Pago produção) — código corrigido (ativação de assinatura); falta o teste real com cartão de produção
+- [ ] Google Analytics ID configurar no Vercel — código pronto; falta só a env var NEXT_PUBLIC_GA_ID
 
 ## 🟡 ESTA SEMANA
 - [ ] Social Media post generator (html2canvas)
@@ -51,3 +51,5 @@
 - Mercado Pago: chaves teste e produção configuradas no Vercel
 - Resend: domínio motorgestor.com.br verificado
 - Supabase: projeto iondotsjljrhrawcqmzs
+- Evolution GO endpoints reais: criar = POST /instance/create; conectar+webhook = POST /instance/connect (apikey=token, body webhookUrl+subscribe); QR = GET /instance/qr (resposta em data.Qrcode); deletar = DELETE /instance/delete/{uuid}
+- Planos (tabela plans alinhada com lib/billing/plans.ts): Free, Starter R$97, Pro R$197, Enterprise R$397
