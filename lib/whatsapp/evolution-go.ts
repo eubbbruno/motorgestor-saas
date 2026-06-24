@@ -19,14 +19,37 @@ export async function createInstance(instanceName: string) {
   return res.json();
 }
 
-// token: apikey da instância (definido durante createInstance como o próprio instanceName)
-export async function getQRCode(instanceName: string, token?: string) {
-  const apikey = token ?? process.env.EVOLUTION_GO_API_KEY ?? "";
+// POST /instance/connect — inicia o pareamento E grava o webhook + eventos.
+// É este endpoint (não /instance/{name}/webhook, que retorna 404) que gera o QR
+// e persiste o webhook no Evolution GO. apikey = token da instância.
+export async function connectInstance(instanceName: string, token?: string) {
+  const apikey = token ?? instanceName;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.motorgestor.com.br";
+  const res = await fetch(`${process.env.EVOLUTION_GO_URL}/instance/connect`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey },
+    body: JSON.stringify({
+      webhookUrl: `${siteUrl}/api/whatsapp/webhook`,
+      subscribe: ["MESSAGE", "CONNECTION"],
+      immediate: true,
+    }),
+  });
+  return res.json();
+}
+
+// GET /instance/qr — retorna a string base64 do QR (data URI pronta p/ <img src>) ou null.
+// token: apikey da instância (definido durante createInstance como o próprio instanceName).
+// Evolution GO devolve o QR em { data: { Qrcode: "data:image/png;base64,...", Code } }.
+export async function getQRCode(instanceName: string, token?: string): Promise<string | null> {
+  const apikey = token ?? instanceName;
   const res = await fetch(
     `${process.env.EVOLUTION_GO_URL}/instance/qr?instanceName=${encodeURIComponent(instanceName)}`,
     { headers: { "Content-Type": "application/json", apikey } },
   );
-  return res.json();
+  const data = await res.json().catch(() => null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d = data as any;
+  return d?.data?.Qrcode ?? d?.qrcode?.base64 ?? d?.base64 ?? null;
 }
 
 // GET /instance/all — busca todas as instâncias e filtra pelo nome
@@ -88,26 +111,15 @@ export async function sendTextMessage(instanceName: string, to: string, text: st
   }
 }
 
-export async function setWebhook(instanceName: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.motorgestor.com.br";
-  const res = await fetch(
-    `${process.env.EVOLUTION_GO_URL}/instance/${encodeURIComponent(instanceName)}/webhook`,
-    {
-      method: "POST",
-      headers: headers(),
-      body: JSON.stringify({
-        url: `${siteUrl}/api/whatsapp/webhook`,
-        events: ["MESSAGE", "CONNECTION", "QRCODE"],
-      }),
-    },
-  );
-  return res.json();
-}
-
+// DELETE /instance/delete/{id} — o Evolution GO exige o UUID (campo `id`), não o nome.
 export async function deleteInstance(instanceName: string) {
-  const res = await fetch(
-    `${process.env.EVOLUTION_GO_URL}/instance/${encodeURIComponent(instanceName)}`,
-    { method: "DELETE", headers: headers() },
-  );
+  const status = await getInstanceStatus(instanceName).catch(() => null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const id = (status as any)?.instance?.id as string | undefined;
+  if (!id) return { error: "instance not found", instanceName };
+  const res = await fetch(`${process.env.EVOLUTION_GO_URL}/instance/delete/${id}`, {
+    method: "DELETE",
+    headers: headers(),
+  });
   return res.json();
 }

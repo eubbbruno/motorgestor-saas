@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
+  connectInstance,
   createInstance,
   deleteInstance,
   getInstanceStatus,
   getQRCode,
-  setWebhook,
 } from "@/lib/whatsapp/evolution-go";
 
 async function getCompanyId() {
@@ -48,7 +48,7 @@ export async function POST() {
   const instanceName = `company_${companyId}`;
   console.log("[setup/POST] instanceName:", instanceName);
 
-  // 1 — Cria instância
+  // 1 — Cria instância (token = instanceName). Se já existir, segue adiante.
   try {
     const createResult = await createInstance(instanceName);
     console.log("[setup/POST] createInstance response:", JSON.stringify(createResult));
@@ -57,12 +57,13 @@ export async function POST() {
     // Continua — instância pode já existir
   }
 
-  // 2 — Configura webhook automaticamente
+  // 2 — Connect: inicia o pareamento e grava o webhook + eventos (apikey = token).
+  // Reexecutar em instância existente reinicia a geração do QR (recupera de "limit reached").
   try {
-    const webhookResult = await setWebhook(instanceName);
-    console.log("[setup/POST] setWebhook response:", JSON.stringify(webhookResult));
+    const connectResult = await connectInstance(instanceName, instanceName);
+    console.log("[setup/POST] connectInstance response:", JSON.stringify(connectResult));
   } catch (err) {
-    console.error("[setup/POST] setWebhook threw:", err);
+    console.error("[setup/POST] connectInstance threw:", err);
   }
 
   // 3 — Salva instanceName no DB
@@ -73,12 +74,10 @@ export async function POST() {
   if (dbError) console.error("[setup/POST] DB update error:", dbError);
   else console.log("[setup/POST] instanceName salvo no DB");
 
-  // 4 — Busca QR code (usa instanceName como token — definido durante createInstance)
+  // 4 — Busca QR code (getQRCode já retorna a data URI base64 normalizada ou null)
   let qr: string | null = null;
   try {
-    const qrData = await getQRCode(instanceName, instanceName);
-    console.log("[setup/POST] getQRCode response:", JSON.stringify(qrData));
-    qr = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
+    qr = await getQRCode(instanceName, instanceName);
     console.log("[setup/POST] QR extraído:", qr ? `base64[${qr.length} chars]` : "null");
   } catch (err) {
     console.error("[setup/POST] getQRCode threw:", err);
@@ -110,8 +109,7 @@ export async function GET() {
 
   let qr: string | null = null;
   if (!connected) {
-    const qrData = await getQRCode(instanceName, instanceName).catch(() => null);
-    qr = qrData?.qrcode?.base64 ?? qrData?.base64 ?? null;
+    qr = await getQRCode(instanceName, instanceName).catch(() => null);
   }
 
   return NextResponse.json({ ok: true, connected, instance_name: instanceName, qr });
